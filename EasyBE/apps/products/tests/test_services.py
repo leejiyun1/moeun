@@ -34,6 +34,7 @@ class BaseServiceTestCase(TestCase):
         self.individual_products = self.test_data["individual_products"]
         self.package_products = self.test_data["package_products"]
         self.all_products = self.test_data["all_products"]
+        self.drinks = self.test_data["drinks"]
         self.user = TestDataCreator.create_user()
 
     def tearDown(self):
@@ -96,7 +97,7 @@ class ProductCommandServiceTest(BaseServiceTestCase):
             images_data=creation_data["images"],
         )
 
-        self.assertEqual(product.package.name, "나만의 전통주 세트")
+        self.assertEqual(product.package.name, "관리자 추천 전통주 세트")
         self.assertEqual(product.package.drinks.count(), 3)
         self.assertEqual(PackageItem.objects.filter(package=product.package).count(), 3)
 

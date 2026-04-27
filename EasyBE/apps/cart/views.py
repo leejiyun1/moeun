@@ -50,11 +50,12 @@ class CartItemViewSet(viewsets.ModelViewSet):
         instance = self.get_object()
         serializer = self.get_serializer(instance, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
-        updated_instance = serializer.save()
 
-        if updated_instance is None:  # 아이템이 삭제된 경우
+        if serializer.validated_data.get("quantity") == 0:
+            CartService.update_item(cart_item=instance, data=serializer.validated_data)
             return Response(status=status.HTTP_204_NO_CONTENT)
 
+        updated_instance = serializer.save()
         return Response(self.get_serializer(updated_instance).data)
 
 

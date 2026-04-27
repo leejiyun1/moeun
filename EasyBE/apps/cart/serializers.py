@@ -86,10 +86,15 @@ class CartItemSerializer(serializers.ModelSerializer):
         user = self.context["request"].user
         product_id = validated_data.pop("product_id")
         pickup_store = validated_data.pop("pickup_store", None)
+        pickup_date = validated_data.pop("pickup_date", None)
 
         try:
             return CartService.add_or_update_item(
-                user=user, product_id=product_id, pickup_store=pickup_store, **validated_data
+                user=user,
+                product_id=product_id,
+                pickup_store=pickup_store,
+                pickup_date=pickup_date,
+                **validated_data,
             )
         except CartValidationError as exc:
             raise serializers.ValidationError({"detail": str(exc)}) from exc

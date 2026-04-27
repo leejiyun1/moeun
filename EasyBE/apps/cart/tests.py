@@ -57,6 +57,7 @@ class CartItemViewSetTest(APITestCase):
             min_items=2,
             max_items=3,
             allow_duplicate_items=True,
+            allowed_item_scope=PackagePolicy.AllowedItemScope.ALL_PRODUCTS,
         )
 
         # GIVEN: 2개의 판매 상품(Product) - 하나는 단일 술, 하나는 패키지
@@ -90,7 +91,7 @@ class CartItemViewSetTest(APITestCase):
         [성공] 장바구니에 패키지 상품을 추가하는 경우
         """
         # GIVEN: 장바구니에 추가할 패키지 상품 정보
-        url = reverse("cart-item-list")
+        url = reverse("cart:cart-item-list")
         data = {
             "product_id": str(self.product_package.id),
             "quantity": 1,
@@ -108,7 +109,7 @@ class CartItemViewSetTest(APITestCase):
         self.product_package.status = Product.Status.INACTIVE
         self.product_package.save(update_fields=["status", "updated_at"])
 
-        url = reverse("cart-item-list")
+        url = reverse("cart:cart-item-list")
         data = {
             "product_id": str(self.product_package.id),
             "quantity": 1,
@@ -126,7 +127,7 @@ class CartItemViewSetTest(APITestCase):
         # GIVEN: 사용자의 장바구니에 2개의 다른 상품이 담겨 있음
         CartItem.objects.create(user=self.user, product=self.product_drink, quantity=3)  # 10000 * 3 = 30000
         CartItem.objects.create(user=self.user, product=self.product_package, quantity=1)  # 25000 * 1 = 25000
-        url = reverse("cart-item-list")
+        url = reverse("cart:cart-item-list")
 
         # WHEN: 장바구니 목록 조회 API를 호출
         response = self.client.get(url)
@@ -168,7 +169,7 @@ class CartItemViewSetTest(APITestCase):
             ],
         )
 
-        url = reverse("cart-item-list")
+        url = reverse("cart:cart-item-list")
         response = self.client.get(url)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -181,7 +182,7 @@ class CartItemViewSetTest(APITestCase):
         """
         # GIVEN: 장바구니에 상품이 1개 담겨 있음
         cart_item = CartItem.objects.create(user=self.user, product=self.product_drink, quantity=1)
-        url = reverse("cart-item-detail", kwargs={"pk": cart_item.pk})
+        url = reverse("cart:cart-item-detail", kwargs={"pk": cart_item.pk})
         data = {"quantity": 5}  # 사용자가 + 버튼을 여러 번 눌러 수량을 5로 변경
 
         # WHEN: 수량 변경 API(PATCH)를 호출
@@ -199,7 +200,7 @@ class CartItemViewSetTest(APITestCase):
         """
         # GIVEN: 장바구니에 제거할 상품이 존재함
         cart_item = CartItem.objects.create(user=self.user, product=self.product_drink, quantity=3)
-        url = reverse("cart-item-detail", kwargs={"pk": cart_item.pk})
+        url = reverse("cart:cart-item-detail", kwargs={"pk": cart_item.pk})
         data = {"quantity": 0}  # 사용자가 - 버튼을 눌러 수량을 0으로 변경
 
         # WHEN: 수량 변경 API(PATCH)를 호출
@@ -216,7 +217,7 @@ class CartItemViewSetTest(APITestCase):
         """
         # GIVEN: 장바구니에 상품이 담겨 있음
         cart_item = CartItem.objects.create(user=self.user, product=self.product_drink, quantity=1)
-        url = reverse("cart-item-detail", kwargs={"pk": cart_item.pk})
+        url = reverse("cart:cart-item-detail", kwargs={"pk": cart_item.pk})
 
         # WHEN: 특정 장바구니 항목 조회 API를 호출
         response = self.client.get(url)
@@ -232,7 +233,7 @@ class CartItemViewSetTest(APITestCase):
         """
         # GIVEN: 존재하지 않는 장바구니 항목 ID
         non_existent_pk = "99999999-9999-9999-9999-999999999999"  # UUID 형식에 맞게 임의의 값 설정
-        url = reverse("cart-item-detail", kwargs={"pk": non_existent_pk})
+        url = reverse("cart:cart-item-detail", kwargs={"pk": non_existent_pk})
 
         # WHEN: 존재하지 않는 장바구니 항목 조회 API를 호출
         response = self.client.get(url)
@@ -246,7 +247,7 @@ class CartItemViewSetTest(APITestCase):
         """
         # GIVEN: 장바구니에 삭제할 상품이 존재함
         cart_item = CartItem.objects.create(user=self.user, product=self.product_drink, quantity=1)
-        url = reverse("cart-item-detail", kwargs={"pk": cart_item.pk})
+        url = reverse("cart:cart-item-detail", kwargs={"pk": cart_item.pk})
 
         # WHEN: 특정 장바구니 항목 삭제 API를 호출
         response = self.client.delete(url)
@@ -261,7 +262,7 @@ class CartItemViewSetTest(APITestCase):
         """
         # GIVEN: 존재하지 않는 장바구니 항목 ID
         non_existent_pk = "99999999-9999-9999-9999-999999999999"
-        url = reverse("cart-item-detail", kwargs={"pk": non_existent_pk})
+        url = reverse("cart:cart-item-detail", kwargs={"pk": non_existent_pk})
 
         # WHEN: 존재하지 않는 장바구니 항목 삭제 API를 호출
         response = self.client.delete(url)
@@ -275,7 +276,7 @@ class CartItemViewSetTest(APITestCase):
         """
         # GIVEN: 장바구니에 이미 상품이 1개 담겨 있음
         CartItem.objects.create(user=self.user, product=self.product_drink, quantity=1)
-        url = reverse("cart-item-list")
+        url = reverse("cart:cart-item-list")
         data = {
             "product_id": str(self.product_drink.id),
             "quantity": 2,  # 기존 1개에 2개를 더 추가
@@ -298,7 +299,7 @@ class CartItemViewSetTest(APITestCase):
         other_cart_item = CartItem.objects.create(user=self.other_user, product=self.product_drink, quantity=1)
 
         # WHEN: 현재 사용자가 다른 사용자의 아이템을 수정하려고 시도
-        detail_url = reverse("cart-item-detail", kwargs={"pk": other_cart_item.pk})
+        detail_url = reverse("cart:cart-item-detail", kwargs={"pk": other_cart_item.pk})
         patch_response = self.client.patch(detail_url, {"quantity": 2})
 
         # THEN: 다른 사용자의 아이템 접근은 404 에러를 반환
