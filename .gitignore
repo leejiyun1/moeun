@@ -14,6 +14,8 @@ lerna-debug.log*
 .env
 .env.*
 *.local
+envs/*.env
+!envs/*.env.example
 env/
 venv/
 ENV/
@@ -59,6 +61,17 @@ coverage/
 *.njsproj
 *.sln
 *.sw?
+
+# Agent-local instructions
+AGENTS.md
+agents.md
+AGENT.md
+agent.md
+**/AGENTS.md
+**/agents.md
+**/AGENT.md
+**/agent.md
+.agents/
 
 # Local backups
 *.backup.*

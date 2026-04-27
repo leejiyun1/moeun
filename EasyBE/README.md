@@ -177,12 +177,13 @@ hanjan-backend/
 ├── resources/
 │   ├── nginx/                 # Nginx 설정
 │   └── scripts/               # 코드 포매팅 스크립트
-├── docker-compose.local.yml
-├── docker-compose.prod.yml
 ├── Dockerfile
+├── Dockerfile.dev
 ├── requirements.txt
 └── manage.py
 ```
+
+참고: 현재 저장소는 루트 monorepo 기준으로 관리한다. 로컬 통합 실행은 루트의 `docker-compose.local.yml` 과 `docs/DOCKER_LOCAL_ENVIRONMENT.md` 를 기준으로 한다.
 
 ---
 

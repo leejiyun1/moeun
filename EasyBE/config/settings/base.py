@@ -6,8 +6,13 @@ from typing import Optional
 from dotenv import load_dotenv
 
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
+WORKSPACE_DIR = BASE_DIR.parent
 
-load_dotenv(dotenv_path=BASE_DIR / "envs/.local.env")
+for env_path in (
+    WORKSPACE_DIR / "envs/backend.local.env",
+    BASE_DIR / "envs/.local.env",
+):
+    load_dotenv(dotenv_path=env_path)
 
 SECRET_KEY: Optional[str] = os.getenv("DJANGO_SECRET_KEY")
 if not SECRET_KEY:
