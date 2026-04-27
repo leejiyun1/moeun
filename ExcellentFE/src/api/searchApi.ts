@@ -9,22 +9,24 @@ export interface ProductSearchResponse {
   results: Product[]
 }
 
-type QueryParamValue =
+export type QueryParamValue =
   | string
   | number
   | Array<string | number>
   | undefined
   | null
 
+export type SearchQueryParams = Record<string, QueryParamValue>
+
 export async function fetchProducts(
-  params?: Record<string, QueryParamValue>
+  params?: SearchQueryParams
 ): Promise<ProductSearchResponse> {
   const filteredParams: Record<string, string | number | (string | number)[]> =
     {}
   if (params) {
     Object.entries(params).forEach(([key, value]) => {
       if (value !== undefined && value !== null) {
-        filteredParams[key] = value as any
+        filteredParams[key] = value
       }
     })
   }

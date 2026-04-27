@@ -106,7 +106,7 @@ const MainStep = ({ setStep }: MainStepProps) => {
           text: '나는 어떤 입맛일까? 테스트 후 나만의 전통주를 찾아보세요!', // 공유 내용
           url: window.location.href, // 공유 URL (현재 페이지)
         })
-      } catch (error) {
+      } catch {
         // 사용자가 공유를 취소하거나 오류가 발생했을 때
       }
     } else {

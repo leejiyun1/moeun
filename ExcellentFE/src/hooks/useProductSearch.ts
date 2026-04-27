@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
-import { fetchProducts } from '@/api/searchApi'
+import { fetchProducts, type SearchQueryParams } from '@/api/searchApi'
 
-export const useProductSearch = (searchParams: Record<string, any> | null) => {
+export const useProductSearch = (searchParams: SearchQueryParams | null) => {
   const { data, isLoading, isError } = useQuery({
     queryKey: ['SearchList', searchParams],
     queryFn: () => fetchProducts(searchParams ?? {}),

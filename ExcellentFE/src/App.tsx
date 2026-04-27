@@ -2,31 +2,32 @@ import Layout from '@/components/layout/Layout'
 import MyPageLayout from '@/components/layout/MyPageLayout'
 import { RequireAuth } from '@/components/RequireAuth'
 import { ROUTE_PATHS } from '@/constants/routePaths'
-import Login from '@/pages/auth/Login'
-import SocialCallback from '@/pages/auth/SocialCallback'
-import Cart from '@/pages/Cart'
-import Home from '@/pages/Index'
-import AccountEdit from '@/pages/my-page/AccountEdit'
-import OrderHistory from '@/pages/my-page/OrderHistory'
-import TasteProfile from '@/pages/my-page/TasteProfile'
-import TastingHistory from '@/pages/my-page/TastingHistory'
-import NotFound from '@/pages/NotFound'
-import Search from '@/pages/Search'
-import TestMain from '@/pages/tasteTest'
 import { useAuthStore } from '@/stores/authStore'
 import { setOnUnauthorized } from '@/utils/axios'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { useEffect } from 'react'
+import { lazy, Suspense, useEffect } from 'react'
 import { Navigate, Route, Routes, useNavigate } from 'react-router-dom'
 import './App.css'
-import Package from '@/pages/Package'
-import Feedback from '@/pages/Feedback'
-import Detail from '@/pages/Detail'
 import ScrollToTop from '@/components/common/ScrollToTop'
-import AdultCallback from '@/pages/auth/AdultCallback'
-import AdultAuthManual from '@/pages/auth/AdultAuthManual'
 
 const queryClient = new QueryClient()
+
+const Login = lazy(() => import('@/pages/auth/Login'))
+const SocialCallback = lazy(() => import('@/pages/auth/SocialCallback'))
+const AdultCallback = lazy(() => import('@/pages/auth/AdultCallback'))
+const AdultAuthManual = lazy(() => import('@/pages/auth/AdultAuthManual'))
+const Cart = lazy(() => import('@/pages/Cart'))
+const Home = lazy(() => import('@/pages/Index'))
+const Package = lazy(() => import('@/pages/Package'))
+const Search = lazy(() => import('@/pages/Search'))
+const Feedback = lazy(() => import('@/pages/Feedback'))
+const Detail = lazy(() => import('@/pages/Detail'))
+const TestMain = lazy(() => import('@/pages/tasteTest'))
+const AccountEdit = lazy(() => import('@/pages/my-page/AccountEdit'))
+const OrderHistory = lazy(() => import('@/pages/my-page/OrderHistory'))
+const TasteProfile = lazy(() => import('@/pages/my-page/TasteProfile'))
+const TastingHistory = lazy(() => import('@/pages/my-page/TastingHistory'))
+const NotFound = lazy(() => import('@/pages/NotFound'))
 
 function App() {
   const navigate = useNavigate()
@@ -40,56 +41,61 @@ function App() {
 
   useEffect(() => {
     initializeAuth()
-  }, [])
+  }, [initializeAuth])
 
   return (
     <QueryClientProvider client={queryClient}>
       <ScrollToTop />
-      <Routes>
-        <Route path="/login" element={<Login />} />
-        <Route path="/auth/:provider/callback" element={<SocialCallback />} />
-        <Route path="/auth/adult-manual" element={<AdultAuthManual />} />
-        <Route
-          path="/auth/adult-verification/callback"
-          element={<AdultCallback />}
-        />
-
-        <Route element={<Layout />}>
-          <Route path="/" element={<Home />} />
-          <Route path="package" element={<Package />} />
-          <Route path="test" element={<TestMain />} />
-          <Route path="search" element={<Search />} />
-          <Route path="feedback" element={<Feedback />} />
-          <Route path="product/:id" element={<Detail />} />
-          <Route path="package/:id" element={<Detail />} />
+      <Suspense fallback={null}>
+        <Routes>
+          <Route path="/login" element={<Login />} />
           <Route
-            path="cart"
-            element={
-              <RequireAuth>
-                <Cart />
-              </RequireAuth>
-            }
+            path="/auth/:provider/callback"
+            element={<SocialCallback />}
+          />
+          <Route path="/auth/adult-manual" element={<AdultAuthManual />} />
+          <Route
+            path="/auth/adult-verification/callback"
+            element={<AdultCallback />}
           />
 
-          {/* 마이페이지 라우팅 */}
-          <Route
-            path="mypage"
-            element={
-              <RequireAuth>
-                <MyPageLayout />
-              </RequireAuth>
-            }
-          >
-            <Route index element={<Navigate to="taste-profile" replace />} />
-            <Route path="taste-profile" element={<TasteProfile />} />
-            <Route path="account-edit" element={<AccountEdit />} />
-            <Route path="order-history" element={<OrderHistory />} />
-            <Route path="tasting-history" element={<TastingHistory />} />
-          </Route>
+          <Route element={<Layout />}>
+            <Route path="/" element={<Home />} />
+            <Route path="package" element={<Package />} />
+            <Route path="test" element={<TestMain />} />
+            <Route path="search" element={<Search />} />
+            <Route path="feedback" element={<Feedback />} />
+            <Route path="product/:id" element={<Detail />} />
+            <Route path="package/:id" element={<Detail />} />
+            <Route
+              path="cart"
+              element={
+                <RequireAuth>
+                  <Cart />
+                </RequireAuth>
+              }
+            />
 
-          <Route path="*" element={<NotFound />} />
-        </Route>
-      </Routes>
+            {/* 마이페이지 라우팅 */}
+            <Route
+              path="mypage"
+              element={
+                <RequireAuth>
+                  <MyPageLayout />
+                </RequireAuth>
+              }
+            >
+              <Route index element={<Navigate to="taste-profile" replace />} />
+              <Route path="taste-profile" element={<TasteProfile />} />
+              <Route path="account-edit" element={<AccountEdit />} />
+              <Route path="order-history" element={<OrderHistory />} />
+              <Route path="tasting-history" element={<TastingHistory />} />
+            </Route>
+
+            <Route path="*" element={<NotFound />} />
+          </Route>
+        </Routes>
+      </Suspense>
     </QueryClientProvider>
   )
 }

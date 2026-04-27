@@ -17,7 +17,7 @@ export const usePagination = <T>({
     if (items.length > 0 && currentPage > totalPages) {
       setCurrentPage(totalPages)
     }
-  }, [items.length, totalPages])
+  }, [currentPage, items.length, totalPages])
 
   const paginatedData = items.slice(
     (currentPage - 1) * pageSize,
