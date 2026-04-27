@@ -5,10 +5,10 @@ ALLOWED_HOSTS = ["*"]
 
 # Static files (CSS, JavaScript, Images)
 STATIC_URL = "static/"
-STATIC_ROOT = BASE_DIR / "staticfiles"
+STATIC_ROOT = ARTIFACTS_DIR / "backend" / "staticfiles"
 
 MEDIA_URL = "media/"
-MEDIA_ROOT = BASE_DIR / "media"
+MEDIA_ROOT = ARTIFACTS_DIR / "backend" / "media"
 
 INTERNAL_IPS = [
     "127.0.0.1",

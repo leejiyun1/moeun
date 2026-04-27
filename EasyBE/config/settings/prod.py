@@ -32,10 +32,11 @@ DATABASES: Dict[str, Dict[str, Any]] = {  # type: ignore[no-redef]
 }
 
 # Static files 설정
+ARTIFACTS_DIR = Path(os.getenv("ARTIFACTS_DIR", "/root/hanjan"))  # type: ignore[assignment]
 STATIC_URL = "/static/"
-STATIC_ROOT = "/root/hanjan/static"
+STATIC_ROOT = ARTIFACTS_DIR / "static"
 MEDIA_URL = "/media/"
-MEDIA_ROOT = "/root/hanjan/media"
+MEDIA_ROOT = ARTIFACTS_DIR / "media"
 
 # CORS 설정 (프로덕션)
 CORS_ALLOWED_ORIGINS = [

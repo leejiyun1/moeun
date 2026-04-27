@@ -45,6 +45,16 @@ db.sqlite3-journal
 media/
 staticfiles/
 
+# Root build/runtime artifacts
+artifacts/*
+!artifacts/.gitkeep
+!artifacts/backend/
+artifacts/backend/*
+!artifacts/backend/.gitkeep
+!artifacts/frontend/
+artifacts/frontend/*
+!artifacts/frontend/.gitkeep
+
 # Node
 node_modules/
 **/node_modules/

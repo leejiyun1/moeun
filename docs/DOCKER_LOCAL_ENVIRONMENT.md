@@ -31,6 +31,12 @@ db
 redis
 - Redis
 - local Docker volume
+
+artifacts
+- 루트 `artifacts/`
+- frontend build output: `artifacts/frontend/dist`
+- backend collected static/media: `artifacts/backend/staticfiles`, `artifacts/backend/media`
+- Git 제외, 디렉터리 기준만 유지
 ```
 
 ## 실행 파일
@@ -42,6 +48,7 @@ redis
 - `envs/frontend.local.env`: 로컬 프론트 실제 환경 변수, Git 제외
 - `envs/backend.local.env.example`: 백엔드 env 예시, Git 포함
 - `envs/frontend.local.env.example`: 프론트 env 예시, Git 포함
+- `artifacts/`: 개발/운영 산출물 루트 기준 디렉터리, Git 제외
 
 ## 실행
 
@@ -78,6 +85,23 @@ production server -> production cloud DB
 ```
 
 운영 DB 접속 정보는 `backend.local.env`에 넣지 않는다.
+
+## 산출물 경로 원칙
+
+개발과 운영 모두 산출물은 소스 디렉터리 안이 아니라 루트 기준 디렉터리로 모은다.
+
+```text
+artifacts/
+  backend/
+    staticfiles/
+    media/
+  frontend/
+    dist/
+```
+
+로컬 Docker에서는 `ARTIFACTS_DIR=/workspace/artifacts`, `VITE_BUILD_OUT_DIR=/workspace/artifacts/frontend/dist`를 주입한다.
+
+호스트에서 직접 실행해도 기본값은 루트 `artifacts/`를 사용한다.
 
 ## 추후 production 전환
 

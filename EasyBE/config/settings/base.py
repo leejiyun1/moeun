@@ -7,6 +7,7 @@ from dotenv import load_dotenv
 
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 WORKSPACE_DIR = BASE_DIR.parent
+ARTIFACTS_DIR = Path(os.getenv("ARTIFACTS_DIR", WORKSPACE_DIR / "artifacts"))
 
 for env_path in (
     WORKSPACE_DIR / "envs/backend.local.env",

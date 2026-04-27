@@ -45,4 +45,5 @@ jobs:
           VITE_BBATON_CLIENT_ID: ""
           VITE_BBATON_REDIRECT_URI: ""
           VITE_KAKAO_APP_KEY: ""
+          VITE_BUILD_OUT_DIR: ../artifacts/frontend/dist
         run: npm run build

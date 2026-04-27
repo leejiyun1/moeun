@@ -7,6 +7,12 @@ import svgr from 'vite-plugin-svgr'
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react(), tailwindcss(), svgr()],
+  build: {
+    outDir:
+      process.env.VITE_BUILD_OUT_DIR ??
+      path.resolve(__dirname, '../artifacts/frontend/dist'),
+    emptyOutDir: true,
+  },
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
