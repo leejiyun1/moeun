@@ -35,13 +35,13 @@ const AdminLogin = () => {
   }
 
   return (
-    <main className="flex min-h-screen items-center justify-center bg-[#2f2923] px-6 text-[#2f2923]">
-      <section className="w-full max-w-[440px] rounded-[32px] bg-[#f7f2ea] p-8 shadow-[0_32px_80px_rgba(0,0,0,0.24)]">
-        <p className="mb-3 text-sm font-bold tracking-[0.24em] text-[#b0644f] uppercase">
-          Moeun Admin
+    <main className="flex min-h-screen items-center justify-center bg-white px-6 text-[#333333]">
+      <section className="w-full max-w-[440px] rounded-[20px] border border-[#d9d9d9] bg-[#f8f8f8] p-8">
+        <p className="mb-3 text-sm font-bold tracking-[0.18em] text-[#f2544b] uppercase">
+          Admin
         </p>
         <h1 className="text-[34px] font-bold">관리자 로그인</h1>
-        <p className="mt-3 text-[#6f6258]">
+        <p className="mt-3 text-[#666666]">
           운영자 전용 페이지입니다. 관리자 계정으로만 접근할 수 있습니다.
         </p>
 
@@ -52,7 +52,7 @@ const AdminLogin = () => {
               value={identifier}
               onChange={(event) => setIdentifier(event.target.value)}
               autoComplete="username"
-              className="h-13 rounded-2xl border border-[#ddcfc2] bg-white px-4 outline-none focus:border-[#b0644f]"
+              className="h-13 rounded-[12px] border border-[#d9d9d9] bg-white px-4 outline-none focus:border-[#f2544b]"
               placeholder="admin@test.com"
             />
           </label>
@@ -63,13 +63,13 @@ const AdminLogin = () => {
               onChange={(event) => setPassword(event.target.value)}
               type="password"
               autoComplete="current-password"
-              className="h-13 rounded-2xl border border-[#ddcfc2] bg-white px-4 outline-none focus:border-[#b0644f]"
+              className="h-13 rounded-[12px] border border-[#d9d9d9] bg-white px-4 outline-none focus:border-[#f2544b]"
               placeholder="비밀번호"
             />
           </label>
 
           {errorMessage && (
-            <p className="rounded-2xl bg-[#fff0ed] p-4 text-sm font-semibold text-[#b04432]">
+            <p className="rounded-[12px] bg-[#fff0ed] p-4 text-sm font-semibold text-[#f2544b]">
               {errorMessage}
             </p>
           )}
@@ -77,7 +77,7 @@ const AdminLogin = () => {
           <button
             type="submit"
             disabled={isSubmitting}
-            className="h-13 rounded-2xl bg-[#b0644f] font-bold text-white transition hover:bg-[#964e3d] disabled:cursor-not-allowed disabled:bg-[#c8aaa0]"
+            className="h-13 rounded-[60px] bg-[#f2544b] font-bold text-white transition hover:bg-[#e04439] disabled:cursor-not-allowed disabled:bg-[#d9d9d9]"
           >
             {isSubmitting ? '확인 중...' : '관리자 로그인'}
           </button>

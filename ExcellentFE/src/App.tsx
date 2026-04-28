@@ -64,48 +64,6 @@ function App() {
           />
           <Route path="admin/login" element={<AdminLogin />} />
 
-          <Route
-            path="admin"
-            element={
-              <RequireAdmin>
-                <AdminHome />
-              </RequireAdmin>
-            }
-          />
-          <Route
-            path="admin/products"
-            element={
-              <RequireAdmin>
-                <AdminPlaceholder
-                  title="상품 관리"
-                  description="일반 상품과 패키지 상품을 관리하는 화면입니다."
-                />
-              </RequireAdmin>
-            }
-          />
-          <Route
-            path="admin/products/new"
-            element={
-              <RequireAdmin>
-                <AdminPlaceholder
-                  title="상품 등록"
-                  description="일반 상품과 패키지 상품을 등록하는 화면입니다."
-                />
-              </RequireAdmin>
-            }
-          />
-          <Route
-            path="admin/package-policies"
-            element={
-              <RequireAdmin>
-                <AdminPlaceholder
-                  title="패키지 정책"
-                  description="시음 가능 여부와 패키지 구성 정책을 관리하는 화면입니다."
-                />
-              </RequireAdmin>
-            }
-          />
-
           <Route element={<Layout />}>
             <Route path="/" element={<Home />} />
             <Route path="package" element={<Package />} />
@@ -114,6 +72,47 @@ function App() {
             <Route path="feedback" element={<Feedback />} />
             <Route path="product/:id" element={<Detail />} />
             <Route path="package/:id" element={<Detail />} />
+            <Route
+              path="admin"
+              element={
+                <RequireAdmin>
+                  <AdminHome />
+                </RequireAdmin>
+              }
+            />
+            <Route
+              path="admin/products"
+              element={
+                <RequireAdmin>
+                  <AdminPlaceholder
+                    title="상품 관리"
+                    description="일반 상품과 패키지 상품을 관리하는 화면입니다."
+                  />
+                </RequireAdmin>
+              }
+            />
+            <Route
+              path="admin/products/new"
+              element={
+                <RequireAdmin>
+                  <AdminPlaceholder
+                    title="상품 등록"
+                    description="일반 상품과 패키지 상품을 등록하는 화면입니다."
+                  />
+                </RequireAdmin>
+              }
+            />
+            <Route
+              path="admin/package-policies"
+              element={
+                <RequireAdmin>
+                  <AdminPlaceholder
+                    title="패키지 정책"
+                    description="시음 가능 여부와 패키지 구성 정책을 관리하는 화면입니다."
+                  />
+                </RequireAdmin>
+              }
+            />
             <Route
               path="cart"
               element={

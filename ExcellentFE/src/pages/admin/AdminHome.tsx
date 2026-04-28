@@ -16,31 +16,29 @@ const adminCards = [
 
 const AdminHome = () => {
   return (
-    <main className="min-h-screen bg-[#f7f2ea] px-10 py-12 text-[#2f2923]">
-      <div className="mx-auto max-w-[1120px]">
-        <div className="mb-10">
-          <p className="mb-3 text-sm font-bold tracking-[0.24em] text-[#b0644f] uppercase">
-            Moeun Admin
+    <main className="min-h-screen bg-white px-10 pt-[150px] pb-24 text-[#333333]">
+      <div className="mx-auto w-[1280px]">
+        <div className="mb-12 border-b border-[#d9d9d9] pb-8">
+          <p className="mb-3 text-sm font-bold tracking-[0.18em] text-[#f2544b] uppercase">
+            Admin
           </p>
-          <h1 className="text-[42px] leading-tight font-bold">
-            운영자 관리 페이지
-          </h1>
-          <p className="mt-4 max-w-[680px] text-lg text-[#6f6258]">
+          <h1 className="text-[36px] leading-tight font-bold">관리자 페이지</h1>
+          <p className="mt-4 max-w-[680px] text-lg text-[#666666]">
             상품, 패키지, 시음 정책을 운영 기준으로 관리하기 위한 내부
             화면입니다.
           </p>
         </div>
 
-        <section className="grid grid-cols-1 gap-5 md:grid-cols-2">
+        <section className="grid grid-cols-1 gap-6 md:grid-cols-2">
           {adminCards.map((card) => (
             <Link
               key={card.to}
               to={card.to}
-              className="rounded-[28px] border border-[#e4d8cc] bg-white p-8 shadow-[0_20px_60px_rgba(94,64,43,0.08)] transition hover:-translate-y-1 hover:border-[#c47d62]"
+              className="rounded-[20px] border border-[#d9d9d9] bg-[#f8f8f8] p-8 transition hover:-translate-y-1 hover:border-[#f2544b] hover:bg-white"
             >
               <h2 className="text-2xl font-bold">{card.title}</h2>
-              <p className="mt-3 text-[#6f6258]">{card.description}</p>
-              <span className="mt-8 inline-block font-bold text-[#b0644f]">
+              <p className="mt-3 text-[#666666]">{card.description}</p>
+              <span className="mt-8 inline-block font-bold text-[#f2544b]">
                 관리하러 가기
               </span>
             </Link>

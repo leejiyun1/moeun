@@ -8,22 +8,25 @@ interface AdminPlaceholderProps {
 
 const AdminPlaceholder = ({ title, description }: AdminPlaceholderProps) => {
   return (
-    <main className="min-h-screen bg-[#f7f2ea] px-10 py-12 text-[#2f2923]">
-      <div className="mx-auto max-w-[960px] rounded-[32px] border border-[#e4d8cc] bg-white p-10 shadow-[0_20px_60px_rgba(94,64,43,0.08)]">
-        <p className="mb-3 text-sm font-bold tracking-[0.24em] text-[#b0644f] uppercase">
-          Moeun Admin
+    <main className="min-h-screen bg-white px-10 pt-[150px] pb-24 text-[#333333]">
+      <div className="mx-auto w-[1280px]">
+        <p className="mb-3 text-sm font-bold tracking-[0.18em] text-[#f2544b] uppercase">
+          Admin
         </p>
-        <h1 className="text-[36px] font-bold">{title}</h1>
-        <p className="mt-4 text-lg text-[#6f6258]">{description}</p>
-        <p className="mt-8 rounded-2xl bg-[#f7f2ea] p-5 text-[#6f6258]">
-          이 화면은 다음 단계에서 목록, 등록, 수정 기능을 연결할 예정입니다.
-        </p>
-        <Link
-          to={ROUTE_PATHS.ADMIN.INDEX}
-          className="mt-8 inline-block font-bold text-[#b0644f]"
-        >
-          관리자 홈으로 돌아가기
-        </Link>
+        <div className="rounded-[20px] border border-[#d9d9d9] bg-[#f8f8f8] p-10">
+          <h1 className="text-[36px] font-bold">{title}</h1>
+          <p className="mt-4 text-lg text-[#666666]">{description}</p>
+          <p className="mt-8 rounded-[16px] bg-white p-5 text-[#666666]">
+            이 화면은 다음 단계에서 목록, 등록, 수정 기능을 연결할
+            예정입니다.
+          </p>
+          <Link
+            to={ROUTE_PATHS.ADMIN.INDEX}
+            className="mt-8 inline-block font-bold text-[#f2544b]"
+          >
+            관리자 홈으로 돌아가기
+          </Link>
+        </div>
       </div>
     </main>
   )
