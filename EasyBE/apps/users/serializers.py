@@ -40,6 +40,13 @@ class UserSerializer(serializers.ModelSerializer):
         fields = ["nickname", "email", "role", "created_at", "notification_agreed"]
 
 
+class AdminLoginSerializer(serializers.Serializer):
+    """관리자 ID/PW 로그인 요청."""
+
+    identifier = serializers.CharField()
+    password = serializers.CharField(write_only=True, trim_whitespace=False)
+
+
 class UserUpdateSerializer(serializers.ModelSerializer):
     """사용자 정보 수정용 시리얼라이저 (닉네임, 알림 동의)"""
 

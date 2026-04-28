@@ -13,7 +13,12 @@ export const RequireAdmin = ({ children }: { children: React.ReactNode }) => {
   if (!isLoggedIn) {
     const redirect = encodeURIComponent(location.pathname + location.search)
 
-    return <Navigate to={`${ROUTE_PATHS.LOGIN}?redirect=${redirect}`} replace />
+    return (
+      <Navigate
+        to={`${ROUTE_PATHS.ADMIN.LOGIN}?redirect=${redirect}`}
+        replace
+      />
+    )
   }
 
   if (user?.user_info.role !== 'ADMIN') {

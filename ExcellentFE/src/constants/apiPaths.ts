@@ -5,6 +5,7 @@ export const BASE_URL = import.meta.env.VITE_API_URL
 export const API_PATHS = {
   AUTH: {
     LOGIN: (provider: SocialProvider) => `/auth/login/${provider}`,
+    ADMIN_LOGIN: '/auth/admin/login/',
     STATE: '/auth/state',
     TOKEN_REFRESH: '/auth/token/refresh',
     ADULT_AUTH_TOKEN:

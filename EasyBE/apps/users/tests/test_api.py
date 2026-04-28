@@ -81,3 +81,49 @@ class TasteProfileAPITest(TestCase):
         # 분석 설명이 생성되었는지 확인
         self.assertIsNotNone(data["description"])
         self.assertNotEqual(data["description"], "")
+
+
+class AdminLoginAPITest(TestCase):
+    def setUp(self):
+        self.client = APIClient()
+        self.url = reverse("users:v1:admin_login")
+        self.admin = User.objects.create_user(
+            nickname="admin@test.com",
+            email="admin@test.com",
+            role=User.Role.ADMIN,
+        )
+        self.admin.set_password("test1234")
+        self.admin.save(update_fields=["password"])
+        self.user = User.objects.create_user(nickname="normal", email="normal@test.com")
+        self.user.set_password("test1234")
+        self.user.save(update_fields=["password"])
+
+    def test_admin_login_success(self):
+        response = self.client.post(
+            self.url,
+            {"identifier": "admin@test.com", "password": "test1234"},
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIn("access", response.data)
+        self.assertIn("refresh", response.data)
+        self.assertEqual(response.data["user_info"]["role"], User.Role.ADMIN)
+
+    def test_admin_login_rejects_normal_user(self):
+        response = self.client.post(
+            self.url,
+            {"identifier": "normal", "password": "test1234"},
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+    def test_admin_login_rejects_invalid_password(self):
+        response = self.client.post(
+            self.url,
+            {"identifier": "admin@test.com", "password": "wrong-password"},
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)

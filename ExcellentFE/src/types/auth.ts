@@ -26,6 +26,24 @@ export interface SocialLoginUser {
   auth_type: string
 }
 
+export interface AdminLoginRequest {
+  identifier: string
+  password: string
+}
+
+export interface AdminLoginResponse {
+  success: boolean
+  access: string
+  refresh: string
+  user_info: {
+    nickname: string
+    email: string | null
+    role: string
+    created_at: string
+    notification_agreed: boolean
+  }
+}
+
 export interface RefreshTokenResponse {
   access: string
   refresh: string

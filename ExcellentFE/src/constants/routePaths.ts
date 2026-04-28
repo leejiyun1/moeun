@@ -23,6 +23,7 @@ export const ROUTE_PATHS = {
 
   ADMIN: {
     INDEX: '/admin',
+    LOGIN: '/admin/login',
     PRODUCTS: '/admin/products',
     PRODUCT_NEW: '/admin/products/new',
     PACKAGE_POLICIES: '/admin/package-policies',

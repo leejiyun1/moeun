@@ -10,6 +10,7 @@ from apps.users.views.user_restore_code_view import (
 )
 
 from .views import (
+    AdminLoginView,
     GoogleLoginView,
     KakaoLoginView,
     NaverLoginView,
@@ -34,6 +35,7 @@ v1_patterns = [
         "auth/adult-verification/complete", CompleteAdultVerificationView.as_view(), name="complete_adult_verification"
     ),
     # JWT 토큰 관련
+    path("auth/admin/login/", AdminLoginView.as_view(), name="admin_login"),
     path("auth/token/refresh", TokenRefreshView.as_view(), name="token_refresh"),
     path("auth/logout", LogoutView.as_view(), name="logout"),
     # 사용자 프로필 관리

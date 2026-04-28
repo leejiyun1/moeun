@@ -29,6 +29,7 @@ const OrderHistory = lazy(() => import('@/pages/my-page/OrderHistory'))
 const TasteProfile = lazy(() => import('@/pages/my-page/TasteProfile'))
 const TastingHistory = lazy(() => import('@/pages/my-page/TastingHistory'))
 const NotFound = lazy(() => import('@/pages/NotFound'))
+const AdminLogin = lazy(() => import('@/pages/admin/AdminLogin'))
 const AdminHome = lazy(() => import('@/pages/admin/AdminHome'))
 const AdminPlaceholder = lazy(() => import('@/pages/admin/AdminPlaceholder'))
 
@@ -61,6 +62,7 @@ function App() {
             path="/auth/adult-verification/callback"
             element={<AdultCallback />}
           />
+          <Route path="admin/login" element={<AdminLogin />} />
 
           <Route
             path="admin"

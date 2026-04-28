@@ -1,6 +1,8 @@
 import { API_PATHS, BASE_URL } from '@/constants/apiPaths'
 import {
   type RefreshTokenResponse,
+  type AdminLoginRequest,
+  type AdminLoginResponse,
   type SocialLoginRequest,
   type SocialLoginTempToken,
   type SocialLoginUser,
@@ -12,6 +14,13 @@ import axios from 'axios'
 const HEADERS = { headers: { 'Content-Type': 'application/json' } }
 
 export const authApi = {
+  adminLogin: async (
+    payload: AdminLoginRequest
+  ): Promise<AdminLoginResponse> => {
+    const { data } = await axiosInstance.post(API_PATHS.AUTH.ADMIN_LOGIN, payload)
+    return data
+  },
+
   state: async (state: string) => {
     const { data } = await axiosInstance.post(API_PATHS.AUTH.STATE, { state })
     return data
