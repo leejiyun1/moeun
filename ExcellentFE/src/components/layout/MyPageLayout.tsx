@@ -1,7 +1,8 @@
 import { Z_INDEX } from '@/foundations/zIndex'
+import { useAuthStore } from '@/stores/authStore'
 import { NavLink, Outlet } from 'react-router-dom'
 
-const menuItems = [
+const baseMenuItems = [
   { to: 'taste-profile', label: '나의 입맛 프로필' },
   { to: 'order-history', label: '주문/배송 내역' },
   { to: 'tasting-history', label: '나의 시음 히스토리' },
@@ -9,6 +10,12 @@ const menuItems = [
 ]
 
 const MyPageLayout = () => {
+  const { user } = useAuthStore()
+  const isAdmin = user?.user_info.role === 'ADMIN'
+  const menuItems = isAdmin
+    ? [...baseMenuItems, { to: '/admin', label: '관리자' }]
+    : baseMenuItems
+
   return (
     <>
       <nav

@@ -9,7 +9,6 @@ from rest_framework.generics import (
     ListCreateAPIView,
     RetrieveUpdateDestroyAPIView,
 )
-from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 
 from apps.products.selectors import PackagePolicySelector, ProductSelector
@@ -23,6 +22,7 @@ from apps.products.serializers.product.detail import ProductDetailSerializer
 from apps.products.serializers.product.list import ProductListSerializer
 from apps.products.serializers.product.update import ProductUpdateSerializer
 from apps.products.services import PackagePolicyCommandService, ProductCommandService
+from apps.users.permissions import IsAdminRole
 
 from ..pagination import SearchPagination
 
@@ -35,7 +35,7 @@ class IndividualProductCreateView(CreateAPIView):
     """개별 상품 생성 (관리자용)"""
 
     serializer_class = IndividualProductCreateSerializer
-    permission_classes = [AllowAny]
+    permission_classes = [IsAdminRole]
 
     @extend_schema(
         summary="개별 상품 생성",
@@ -52,7 +52,7 @@ class PackageProductCreateView(CreateAPIView):
     """패키지 상품 생성 (관리자용)"""
 
     serializer_class = PackageProductCreateSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAdminRole]
 
     @extend_schema(
         summary="패키지 상품 생성",
@@ -70,7 +70,7 @@ class DrinksForPackageView(ListAPIView):
 
     serializer_class = DrinkForPackageSerializer
     pagination_class = SearchPagination
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAdminRole]
 
     @extend_schema(
         summary="패키지 생성용 술 목록",
@@ -91,7 +91,7 @@ class PackagePolicyManageListView(ListCreateAPIView):
     """패키지 정책 목록/생성 (관리자용)"""
 
     serializer_class = PackagePolicySerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAdminRole]
     pagination_class = SearchPagination
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
     search_fields = ["name"]
@@ -120,7 +120,7 @@ class PackagePolicyManageView(RetrieveUpdateDestroyAPIView):
     """패키지 정책 조회/수정/비활성화 (관리자용)"""
 
     serializer_class = PackagePolicySerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAdminRole]
 
     @extend_schema(
         summary="패키지 정책 조회", description="패키지 구성/할인 정책을 조회합니다.", tags=["관리자 - 패키지 정책"]
@@ -159,7 +159,7 @@ class ProductManageView(RetrieveUpdateDestroyAPIView):
     """제품 관리 (관리자용)"""
 
     serializer_class = ProductDetailSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAdminRole]
     lookup_field = "pk"
 
     @extend_schema(
@@ -213,7 +213,7 @@ class ProductManageListView(ListAPIView):
 
     serializer_class = ProductListSerializer
     pagination_class = SearchPagination
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAdminRole]
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
     search_fields = ["drink__name", "package__name", "description"]
     ordering_fields = ["price", "created_at", "view_count", "status"]

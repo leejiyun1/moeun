@@ -31,6 +31,11 @@ class BaseAPITestCase(APITestCase):
 class BreweryAPITest(BaseAPITestCase):
     """양조장 API 테스트"""
 
+    def setUp(self):
+        super().setUp()
+        self.admin_user = TestDataCreator.create_user(nickname="testadmin", role=User.Role.ADMIN)
+        self.client.force_authenticate(user=self.admin_user)
+
     def test_brewery_list_api(self):
         """양조장 목록 API 테스트"""
         url = reverse("products:v1:breweries-list")
@@ -333,7 +338,7 @@ class AdminAPITest(BaseAPITestCase):
 
     def setUp(self):
         super().setUp()
-        self.admin_user = TestDataCreator.create_user(is_staff=True)
+        self.admin_user = TestDataCreator.create_user(nickname="testadmin", role=User.Role.ADMIN)
 
     def test_drinks_for_package_list(self):
         """패키지용 술 목록 API 테스트"""
@@ -352,6 +357,16 @@ class AdminAPITest(BaseAPITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertIn("results", response.data)
+
+    def test_product_manage_list_rejects_non_admin(self):
+        """일반 사용자는 관리자 상품 목록에 접근할 수 없다."""
+        user = TestDataCreator.create_user(nickname="testnormal", email="normal@example.com")
+        self.client.force_authenticate(user=user)
+
+        url = reverse("products:v1:products-manage-list")
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_package_policy_create_with_allowed_products(self):
         """관리자는 허용 상품 범위 정책을 생성할 수 있다."""

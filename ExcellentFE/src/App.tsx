@@ -1,5 +1,6 @@
 import Layout from '@/components/layout/Layout'
 import MyPageLayout from '@/components/layout/MyPageLayout'
+import { RequireAdmin } from '@/components/RequireAdmin'
 import { RequireAuth } from '@/components/RequireAuth'
 import { ROUTE_PATHS } from '@/constants/routePaths'
 import { useAuthStore } from '@/stores/authStore'
@@ -28,6 +29,8 @@ const OrderHistory = lazy(() => import('@/pages/my-page/OrderHistory'))
 const TasteProfile = lazy(() => import('@/pages/my-page/TasteProfile'))
 const TastingHistory = lazy(() => import('@/pages/my-page/TastingHistory'))
 const NotFound = lazy(() => import('@/pages/NotFound'))
+const AdminHome = lazy(() => import('@/pages/admin/AdminHome'))
+const AdminPlaceholder = lazy(() => import('@/pages/admin/AdminPlaceholder'))
 
 function App() {
   const navigate = useNavigate()
@@ -57,6 +60,48 @@ function App() {
           <Route
             path="/auth/adult-verification/callback"
             element={<AdultCallback />}
+          />
+
+          <Route
+            path="admin"
+            element={
+              <RequireAdmin>
+                <AdminHome />
+              </RequireAdmin>
+            }
+          />
+          <Route
+            path="admin/products"
+            element={
+              <RequireAdmin>
+                <AdminPlaceholder
+                  title="상품 관리"
+                  description="일반 상품과 패키지 상품을 관리하는 화면입니다."
+                />
+              </RequireAdmin>
+            }
+          />
+          <Route
+            path="admin/products/new"
+            element={
+              <RequireAdmin>
+                <AdminPlaceholder
+                  title="상품 등록"
+                  description="일반 상품과 패키지 상품을 등록하는 화면입니다."
+                />
+              </RequireAdmin>
+            }
+          />
+          <Route
+            path="admin/package-policies"
+            element={
+              <RequireAdmin>
+                <AdminPlaceholder
+                  title="패키지 정책"
+                  description="시음 가능 여부와 패키지 구성 정책을 관리하는 화면입니다."
+                />
+              </RequireAdmin>
+            }
           />
 
           <Route element={<Layout />}>

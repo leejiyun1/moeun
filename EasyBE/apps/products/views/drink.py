@@ -7,6 +7,7 @@ from rest_framework.generics import ListAPIView
 
 from apps.products.models import Drink
 from apps.products.serializers import DrinkListSerializer
+from apps.users.permissions import IsAdminRole
 
 from .pagination import SearchPagination
 
@@ -16,6 +17,7 @@ class DrinkListView(ListAPIView):
 
     serializer_class = DrinkListSerializer
     pagination_class = SearchPagination
+    permission_classes = [IsAdminRole]
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
     filterset_fields = ["alcohol_type", "brewery"]
     search_fields = ["name", "brewery__name"]

@@ -7,10 +7,10 @@ from rest_framework.generics import (
     RetrieveAPIView,
     RetrieveUpdateDestroyAPIView,
 )
-from rest_framework.permissions import IsAuthenticated
 
 from apps.products.models import Brewery
 from apps.products.serializers import BreweryListSerializer, BrewerySerializer
+from apps.users.permissions import IsAdminRole
 
 from .pagination import SearchPagination
 
@@ -20,6 +20,7 @@ class BreweryListView(ListAPIView):
 
     serializer_class = BreweryListSerializer
     pagination_class = SearchPagination
+    permission_classes = [IsAdminRole]
 
     @extend_schema(
         summary="양조장 목록 조회",
@@ -40,6 +41,7 @@ class BreweryDetailView(RetrieveAPIView):
 
     serializer_class = BrewerySerializer
     lookup_field = "pk"
+    permission_classes = [IsAdminRole]
 
     @extend_schema(
         summary="양조장 상세 조회",
@@ -59,7 +61,7 @@ class BreweryCreateView(CreateAPIView):
     """양조장 생성"""
 
     serializer_class = BrewerySerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAdminRole]
 
     @extend_schema(
         summary="양조장 생성",
@@ -79,7 +81,7 @@ class BreweryManageView(RetrieveUpdateDestroyAPIView):
     """양조장 관리 (조회/수정/삭제)"""
 
     serializer_class = BrewerySerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAdminRole]
     lookup_field = "pk"
 
     @extend_schema(

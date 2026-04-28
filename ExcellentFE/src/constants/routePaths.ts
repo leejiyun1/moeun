@@ -21,5 +21,12 @@ export const ROUTE_PATHS = {
     TASTING_HISTORY: '/mypage/tasting-history',
   },
 
+  ADMIN: {
+    INDEX: '/admin',
+    PRODUCTS: '/admin/products',
+    PRODUCT_NEW: '/admin/products/new',
+    PACKAGE_POLICIES: '/admin/package-policies',
+  },
+
   NOT_FOUND: '*',
 } as const

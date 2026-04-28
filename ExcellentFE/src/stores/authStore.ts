@@ -7,6 +7,7 @@ import { create } from 'zustand'
 
 interface AuthState {
   isLoggedIn: boolean
+  isAuthInitialized: boolean
   user: UserProfile | null
   login: () => Promise<void>
   logout: () => void
@@ -15,17 +16,18 @@ interface AuthState {
 
 export const useAuthStore = create<AuthState>((set) => ({
   isLoggedIn: false,
+  isAuthInitialized: false,
   user: null,
 
   login: async () => {
     try {
       const user = await userApi.getProfile()
-      set({ isLoggedIn: true, user })
+      set({ isLoggedIn: true, isAuthInitialized: true, user })
     } catch (error) {
       tokenStorage.removeAccessToken()
       tokenStorage.removeRefreshToken()
       tokenStorage.removeTempToken()
-      set({ isLoggedIn: false, user: null })
+      set({ isLoggedIn: false, isAuthInitialized: true, user: null })
       showError(getAxiosErrorMessage(error, ERROR_MESSAGE.LOGIN_FAILED))
     }
   },
@@ -33,24 +35,24 @@ export const useAuthStore = create<AuthState>((set) => ({
   logout: () => {
     tokenStorage.removeAccessToken()
     tokenStorage.removeRefreshToken()
-    set({ isLoggedIn: false, user: null })
+    set({ isLoggedIn: false, isAuthInitialized: true, user: null })
   },
 
   initializeAuth: async () => {
     const token = tokenStorage.getAccessToken()
 
     if (!token) {
-      set({ isLoggedIn: false, user: null })
+      set({ isLoggedIn: false, isAuthInitialized: true, user: null })
       return
     }
 
     try {
       const user = await userApi.getProfile()
-      set({ isLoggedIn: true, user })
+      set({ isLoggedIn: true, isAuthInitialized: true, user })
     } catch (error) {
       tokenStorage.removeAccessToken()
       tokenStorage.removeRefreshToken()
-      set({ isLoggedIn: false, user: null })
+      set({ isLoggedIn: false, isAuthInitialized: true, user: null })
       showError(getAxiosErrorMessage(error, ERROR_MESSAGE.LOGIN_FAILED))
     }
   },

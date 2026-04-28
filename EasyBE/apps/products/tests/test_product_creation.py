@@ -28,7 +28,7 @@ class BaseProductCreationTestCase(APITestCase):
     """상품 생성 테스트 기본 클래스"""
 
     def setUp(self):
-        self.user = TestDataCreator.create_user()
+        self.user = TestDataCreator.create_user(role=User.Role.ADMIN)
         self.client.force_authenticate(user=self.user)
         self.breweries = TestDataCreator.create_breweries()
 
@@ -141,7 +141,7 @@ class IndividualProductCreationTransactionTest(TransactionTestCase):
 
     def setUp(self):
         self.breweries = TestDataCreator.create_breweries()
-        self.user = TestDataCreator.create_user()
+        self.user = TestDataCreator.create_user(role=User.Role.ADMIN)
 
     def tearDown(self):
         TestDataCreator.clean_all_data()
