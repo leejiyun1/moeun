@@ -23,7 +23,7 @@ class _CartProductSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Product
-        fields = ["id", "name", "price", "main_image"]
+        fields = ["id", "name", "price", "is_tasting_available", "main_image"]
 
     def get_main_image(self, obj):
         """상품의 메인 이미지를 반환합니다."""
@@ -52,10 +52,7 @@ class CartItemSerializer(serializers.ModelSerializer):
         allow_null=True,
     )
     pickup_date = serializers.DateField(required=False, allow_null=True)
-
-    # READ-ONLY fields for displaying cart items
-    pickup_store_name = serializers.CharField(source="pickup_store.name", read_only=True)
-    pickup_store_contact = serializers.CharField(source="pickup_store.contact", read_only=True)
+    pickup_store = StoreSerializer(read_only=True)
 
     class Meta:
         model = CartItem
@@ -66,16 +63,13 @@ class CartItemSerializer(serializers.ModelSerializer):
             "quantity",
             "subtotal",
             "pickup_store_id",
+            "pickup_store",
             "pickup_date",
-            "pickup_store_name",
-            "pickup_store_contact",
         ]
         read_only_fields = [
             "id",
             "product",
             "subtotal",
-            "pickup_store_name",
-            "pickup_store_contact",
         ]
 
     def get_subtotal(self, obj):

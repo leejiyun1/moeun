@@ -14,7 +14,7 @@ from apps.products.selectors import ProductSelector
 from apps.products.serializers.product.detail import ProductDetailSerializer
 from apps.products.serializers.product.list import ProductListSerializer
 
-from ...services import ProductService
+from ...services import ProductSearchService, ProductService
 from ...services.like_service import LikeService
 from ..pagination import SearchPagination
 
@@ -63,7 +63,7 @@ class ProductSearchView(BaseProductListView):
         return super().list(request, *args, **kwargs)
 
     def get_queryset(self):
-        return ProductSelector.get_search_queryset(self.request.query_params)
+        return ProductSearchService.get_search_queryset(self.request.query_params)
 
 
 class ProductDetailView(RetrieveAPIView):

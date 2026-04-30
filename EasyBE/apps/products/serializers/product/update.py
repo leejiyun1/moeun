@@ -23,6 +23,7 @@ class ProductUpdateSerializer(serializers.Serializer):
     is_limited_edition = serializers.BooleanField(required=False)
     is_premium = serializers.BooleanField(required=False)
     is_organic = serializers.BooleanField(required=False)
+    is_tasting_available = serializers.BooleanField(required=False)
     status = serializers.ChoiceField(choices=Product.Status.choices, required=False)
     images = ProductImageCreateSerializer(many=True, required=False)
     drink_info = serializers.DictField(required=False)

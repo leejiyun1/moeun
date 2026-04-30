@@ -27,6 +27,7 @@ class ProductBaseCreateSerializer(serializers.Serializer):
     is_limited_edition = serializers.BooleanField(default=False)
     is_premium = serializers.BooleanField(default=False)
     is_organic = serializers.BooleanField(default=False)
+    is_tasting_available = serializers.BooleanField(default=False)
 
     # 이미지
     images = ProductImageCreateSerializer(many=True)

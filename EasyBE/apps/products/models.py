@@ -267,6 +267,7 @@ class Product(models.Model):
     is_limited_edition = models.BooleanField(default=False, help_text="리미티드 에디션")
     is_premium = models.BooleanField(default=False, help_text="프리미엄")
     is_organic = models.BooleanField(default=False, help_text="유기농")
+    is_tasting_available = models.BooleanField(default=False, help_text="시음 가능 여부")
 
     # 통계
     view_count = models.PositiveIntegerField(default=0, help_text="조회수")

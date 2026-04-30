@@ -12,6 +12,7 @@ from apps.products.models import (
     Product,
     ProductImage,
 )
+from apps.stores.models import Store
 
 # ERD 기반 모델 임포트 (products 앱이 수정되었다고 가정)
 from apps.users.models import User
@@ -79,6 +80,7 @@ class CartItemViewSetTest(APITestCase):
         ProductImage.objects.create(
             product=cls.product_package, image_url="https://example.com/package.jpg", is_main=True
         )
+        cls.store = Store.objects.create(name="테스트 픽업 매장", address="서울시 테스트구", contact="010-0000-0000")
 
     def setUp(self):
         """
@@ -193,6 +195,26 @@ class CartItemViewSetTest(APITestCase):
         cart_item.refresh_from_db()
         self.assertEqual(cart_item.quantity, 5)
         self.assertEqual(response.data["quantity"], 5)
+
+    def test_update_pickup_info(self):
+        """장바구니 항목의 픽업 매장과 날짜를 수정할 수 있다."""
+        cart_item = CartItem.objects.create(user=self.user, product=self.product_drink, quantity=1)
+        url = reverse("cart:cart-item-detail", kwargs={"pk": cart_item.pk})
+
+        response = self.client.patch(
+            url,
+            {
+                "pickup_store_id": self.store.id,
+                "pickup_date": "2026-05-10",
+            },
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        cart_item.refresh_from_db()
+        self.assertEqual(cart_item.pickup_store, self.store)
+        self.assertEqual(str(cart_item.pickup_date), "2026-05-10")
+        self.assertEqual(response.data["pickup_store"]["name"], self.store.name)
 
     def test_remove_item_by_updating_quantity_to_zero(self):
         """

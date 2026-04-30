@@ -1,4 +1,4 @@
-import TestContainer from '@/components/test/TestContainer'
+import TestContainer from '@/components/taste-test/TestContainer'
 
 const TestMain = () => {
   return <TestContainer />

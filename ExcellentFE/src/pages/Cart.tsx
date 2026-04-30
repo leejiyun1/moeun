@@ -4,10 +4,27 @@ import ItemRowContent from '@/components/common/ItemRowContent'
 import { useUserCart } from '@/hooks/cart/useUserCart'
 import { Equal } from 'lucide-react'
 import useCartItem from '@/hooks/cart/useCartItem'
+import { useStores } from '@/hooks/store/useStores'
+import { cartApi } from '@/api/productApi'
+import { useMutation } from '@tanstack/react-query'
 
 const Cart = () => {
   const { data, invalidateCart } = useUserCart()
+  const { data: stores = [] } = useStores()
   const { postOrderMutation } = useUserPostOrder()
+  const updatePickupMutation = useMutation({
+    mutationFn: ({
+      itemId,
+      pickup,
+    }: {
+      itemId: number
+      pickup: {
+        pickup_store_id?: number | null
+        pickup_date?: string | null
+      }
+    }) => cartApi.UPDATE(String(itemId), pickup),
+    onSuccess: invalidateCart,
+  })
   const { onCheckChange, checkedTotalPrice, checkedItems } = useCartItem({
     data,
     onQuantityChange: invalidateCart,
@@ -16,6 +33,12 @@ const Cart = () => {
       0
     ),
   })
+
+  const selectedCartItems =
+    data?.cart_items?.filter((item) => checkedItems.includes(item.id)) ?? []
+  const hasMissingPickup = selectedCartItems.some(
+    (item) => !item.pickup_store || !item.pickup_date
+  )
 
   return (
     <div className="mt-25 flex flex-col items-center justify-center">
@@ -26,6 +49,10 @@ const Cart = () => {
         onQuantityChange={invalidateCart}
         checkedItems={checkedItems}
         onCheckChange={onCheckChange}
+        stores={stores}
+        onPickupChange={(itemId, pickup) =>
+          updatePickupMutation.mutate({ itemId, pickup })
+        }
       />
       {data?.cart_items && data.cart_items.length > 0 && (
         <>
@@ -56,9 +83,13 @@ const Cart = () => {
                 alert('결제할 상품을 선택해주세요.')
                 return
               }
+              if (hasMissingPickup) {
+                alert('선택한 상품의 픽업 매장과 날짜를 모두 입력해주세요.')
+                return
+              }
               postOrderMutation.mutate(checkedItems)
             }}
-            disabled={postOrderMutation.isPending}
+            disabled={postOrderMutation.isPending || updatePickupMutation.isPending}
           >
             {postOrderMutation.isPending ? '결제 처리 중...' : '결제하기'}
           </Button>

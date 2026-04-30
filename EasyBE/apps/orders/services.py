@@ -27,10 +27,16 @@ class MissingPickupInfoError(OrderCreationError):
     pass
 
 
+class InvalidCartSelectionError(OrderCreationError):
+    """선택한 장바구니 항목이 유효하지 않을 때 발생하는 예외"""
+
+    pass
+
+
 class OrderService:
     @staticmethod
     @transaction.atomic
-    def create_order_from_cart(user):
+    def create_order_from_cart(user, cart_item_ids=None, package_draft_ids=None):
         cart_items = CartItem.objects.filter(user=user).select_related("product", "pickup_store")
         package_drafts = (
             PackageDraft.objects.filter(user=user)
@@ -38,6 +44,10 @@ class OrderService:
             .select_related("policy", "pickup_store")
             .prefetch_related("items__product")
         )
+        if cart_item_ids is not None:
+            cart_items = OrderService._filter_selected_cart_items(cart_items, cart_item_ids)
+        if package_draft_ids is not None:
+            package_drafts = OrderService._filter_selected_package_drafts(package_drafts, package_draft_ids)
 
         if not cart_items.exists() and not package_drafts.exists():
             raise CartIsEmptyError("장바구니가 비어있습니다.")
@@ -71,6 +81,34 @@ class OrderService:
         package_drafts.update(status=PackageDraft.Status.ORDERED)
 
         return order
+
+    @staticmethod
+    def _filter_selected_cart_items(queryset, cart_item_ids):
+        try:
+            selected_ids = {int(item_id) for item_id in cart_item_ids}
+        except (TypeError, ValueError) as exc:
+            raise InvalidCartSelectionError("장바구니 항목 선택값이 올바르지 않습니다.") from exc
+        if not selected_ids:
+            return queryset.none()
+
+        selected_queryset = queryset.filter(id__in=selected_ids)
+        if selected_queryset.count() != len(selected_ids):
+            raise InvalidCartSelectionError("선택한 장바구니 항목 중 유효하지 않은 항목이 있습니다.")
+        return selected_queryset
+
+    @staticmethod
+    def _filter_selected_package_drafts(queryset, package_draft_ids):
+        try:
+            selected_ids = {int(draft_id) for draft_id in package_draft_ids}
+        except (TypeError, ValueError) as exc:
+            raise InvalidCartSelectionError("커스텀 패키지 선택값이 올바르지 않습니다.") from exc
+        if not selected_ids:
+            return queryset.none()
+
+        selected_queryset = queryset.filter(id__in=selected_ids)
+        if selected_queryset.count() != len(selected_ids):
+            raise InvalidCartSelectionError("선택한 커스텀 패키지 중 유효하지 않은 항목이 있습니다.")
+        return selected_queryset
 
     @staticmethod
     def _create_custom_package_snapshots(order, package_drafts):

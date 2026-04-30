@@ -2,6 +2,7 @@ from drf_spectacular.utils import extend_schema
 from rest_framework.response import Response
 
 from apps.products.selectors import ProductSelector
+from apps.products.services import ProductRecommendationService
 
 from .public import BaseProductListView
 
@@ -66,17 +67,24 @@ class PopularProductsView(BaseSectionView):
 class RecommendedProductsView(BaseSectionView):
     """추천 전통주"""
 
-    section_title = "추천 전통주"
-    section_type = ProductSelector.SECTION_RECOMMENDED
     section_limit = 8
 
     @extend_schema(
         summary="추천 전통주",
-        description="개별 술 상품 중 추천 전통주 8개를 반환합니다. (메인페이지용)",
+        description="로그인 사용자는 취향 기반 추천을, 비로그인 사용자는 fallback 추천을 반환합니다. (메인페이지용)",
         tags=["메인페이지"],
     )
     def get(self, request, *args, **kwargs):
-        return super().list(request, *args, **kwargs)
+        user = request.user if request.user.is_authenticated else None
+        result = ProductRecommendationService.get_recommendations(user=user, limit=self.section_limit)
+        serializer = self.get_serializer(result.products, many=True)
+        return Response(
+            {
+                "title": result.title,
+                "recommendation_mode": result.mode,
+                "products": serializer.data,
+            }
+        )
 
 
 # ============================================================================

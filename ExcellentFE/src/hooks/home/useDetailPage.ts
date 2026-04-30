@@ -16,19 +16,6 @@ export const useDetailPage = () => {
   const onDecreaseQuantity = () =>
     setLocalQuantity((prev) => (prev > 1 ? prev - 1 : 1))
 
-  const [dropdownValues, setDropdownValues] = useState({
-    orderRegion: '',
-    pickupStore: '',
-    pickupDate: '',
-  })
-
-  const handleDropdownChange = (key: string, value: string) => {
-    setDropdownValues((prev) => ({
-      ...prev,
-      [key]: value,
-    }))
-  }
-
   const { mutate: addCart } = useAddCart()
 
   const handleAddToCart = () => {
@@ -58,8 +45,6 @@ export const useDetailPage = () => {
     error,
     isLoading,
     productId,
-    dropdownValues,
-    handleDropdownChange,
     localQuantity,
     onIncreaseQuantity,
     onDecreaseQuantity,

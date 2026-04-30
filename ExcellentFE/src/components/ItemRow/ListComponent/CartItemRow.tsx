@@ -12,9 +12,13 @@ const CartItemRow = ({
   name,
   quantity,
   price,
+  pickupStoreId,
+  pickupDate,
   pickupName,
   pickupAddress,
   pickupContact,
+  stores = [],
+  onPickupChange,
   onCheckChange,
   checked,
   onQuantityChange,
@@ -72,9 +76,44 @@ const CartItemRow = ({
       </div>
 
       <div className="w-[25%] min-w-[150px] text-[#666666]">
-        <p className="mb-2 text-lg text-[#333333] underline">{pickupName}</p>
-        <p className="text-sm">{pickupAddress}</p>
-        <p className="text-sm">{pickupContact}</p>
+        <select
+          value={pickupStoreId ?? ''}
+          onChange={(event) =>
+            onPickupChange?.({
+              pickup_store_id: event.target.value
+                ? Number(event.target.value)
+                : null,
+            })
+          }
+          className="mb-2 w-full rounded border border-[#d9d9d9] px-3 py-2 text-sm text-[#333333]"
+          aria-label={`${name} 픽업 매장 선택`}
+        >
+          <option value="">픽업 매장 선택</option>
+          {stores.map((store) => (
+            <option key={store.id} value={store.id}>
+              {store.name}
+            </option>
+          ))}
+        </select>
+        <input
+          type="date"
+          value={pickupDate ?? ''}
+          onChange={(event) =>
+            onPickupChange?.({ pickup_date: event.target.value || null })
+          }
+          className="mb-2 w-full rounded border border-[#d9d9d9] px-3 py-2 text-sm text-[#333333]"
+          aria-label={`${name} 픽업 날짜 선택`}
+        />
+        {pickupName ? (
+          <>
+            <p className="text-sm">{pickupAddress}</p>
+            <p className="text-sm">{pickupContact}</p>
+          </>
+        ) : (
+          <p className="text-sm text-[#f2544b]">
+            주문 전 픽업 정보를 선택해주세요.
+          </p>
+        )}
       </div>
     </div>
   )

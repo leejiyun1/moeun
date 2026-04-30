@@ -9,7 +9,7 @@ class PackagePolicyAllowedProductSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Product
-        fields = ["id", "name", "price", "status", "main_image"]
+        fields = ["id", "name", "price", "status", "is_tasting_available", "main_image"]
 
     def get_main_image(self, obj):
         for image in obj.images.all():

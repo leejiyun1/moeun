@@ -1,11 +1,9 @@
 import { Minus, Plus } from 'lucide-react'
 import DetailCard from '@/components/common/cards/DetailCard'
 import StarRating from '@/components/common/StarRating'
-import Dropdown from '@/components/common/Dropdown'
 import Button from '@/components/common/Button'
 import type { ProductDetail } from '@/types/product'
 import { cn } from '@/utils/cn'
-import { DROPDOWN_FIELDS } from '@/constants/detailPage'
 
 interface DetailProductProps {
   data: ProductDetail
@@ -13,8 +11,6 @@ interface DetailProductProps {
   onIncreaseQuantity: () => void
   onDecreaseQuantity: () => void
   isDecreaseDisabled?: boolean
-  dropdownValues: Record<string, string>
-  handleDropdownChange: (key: string, value: string) => void
   onAddCart: () => void
   onPurchase: () => void
 }
@@ -25,8 +21,6 @@ const DetailProduct = ({
   onIncreaseQuantity,
   onDecreaseQuantity,
   isDecreaseDisabled,
-  dropdownValues,
-  handleDropdownChange,
   onAddCart,
   onPurchase,
 }: DetailProductProps) => {
@@ -98,21 +92,9 @@ const DetailProduct = ({
             </div>
           </div>
 
-          {DROPDOWN_FIELDS.map((field) => (
-            <div
-              key={field.key}
-              className="flex items-center justify-between gap-2 text-[#333333]"
-            >
-              <div className="font-semibold text-[#333333]">{field.label}</div>
-              <Dropdown
-                options={field.options}
-                value={dropdownValues[field.key]}
-                onChange={(value) => handleDropdownChange(field.key, value)}
-                placeholder={field.placeholder}
-                className="h-[30px] w-[463px] cursor-pointer"
-              />
-            </div>
-          ))}
+          <p className="rounded bg-[#fff7f6] px-4 py-3 text-sm text-[#f2544b]">
+            픽업 매장과 날짜는 장바구니에서 선택할 수 있습니다.
+          </p>
         </div>
 
         <div className="mt-6">

@@ -9,7 +9,7 @@ const adminCards = [
   },
   {
     title: '패키지 정책',
-    description: '시음 가능 여부와 패키지 구성 규칙을 관리합니다.',
+    description: '패키지 구성 수량, 중복 허용, 허용 범위, 할인을 관리합니다.',
     to: ROUTE_PATHS.ADMIN.PACKAGE_POLICIES,
   },
 ]
@@ -24,7 +24,7 @@ const AdminHome = () => {
           </p>
           <h1 className="text-[36px] leading-tight font-bold">관리자 페이지</h1>
           <p className="mt-4 max-w-[680px] text-lg text-[#666666]">
-            상품, 패키지, 시음 정책을 운영 기준으로 관리하기 위한 내부
+            상품과 패키지 정책을 운영 기준으로 관리하기 위한 내부
             화면입니다.
           </p>
         </div>

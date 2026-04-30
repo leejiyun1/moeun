@@ -27,6 +27,7 @@ export interface Product {
   is_limited_edition: boolean
   is_premium: boolean
   is_award_winning: boolean
+  is_tasting_available: boolean
   view_count: number
   like_count: number
   status: string

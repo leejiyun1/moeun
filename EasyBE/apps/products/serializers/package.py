@@ -114,8 +114,6 @@ class PackageCreateSerializer(serializers.Serializer):
             total_quantity = sum(item["quantity"] for item in items)
             if not 2 <= total_quantity <= 5:
                 raise serializers.ValidationError({"items": "패키지 총 구성 수량은 2~5개여야 합니다."})
-            if any(item["quantity"] > 1 for item in items):
-                raise serializers.ValidationError({"items": "중복 수량은 패키지 정책이 있을 때만 사용할 수 있습니다."})
             return
 
         total_quantity = sum(item["quantity"] for item in items)

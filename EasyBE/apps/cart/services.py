@@ -114,7 +114,12 @@ class CartPackageDraftService:
         products_by_id = CartPackageDraftService._get_active_products_by_id(
             [item["product_id"] for item in normalized_items]
         )
-        CartPackageDraftService._validate_policy(policy, normalized_items, products_by_id)
+        CartPackageDraftService._validate_policy(
+            policy,
+            normalized_items,
+            products_by_id,
+            is_tasting_selected=is_tasting_selected,
+        )
         prices = CartPackageDraftService._calculate_prices(policy, normalized_items, products_by_id)
 
         draft = PackageDraft.objects.create(
@@ -148,7 +153,12 @@ class CartPackageDraftService:
         products_by_id = CartPackageDraftService._get_active_products_by_id(
             [item["product_id"] for item in normalized_items]
         )
-        CartPackageDraftService._validate_policy(policy, normalized_items, products_by_id)
+        CartPackageDraftService._validate_policy(
+            policy,
+            normalized_items,
+            products_by_id,
+            is_tasting_selected=data.get("is_tasting_selected", draft.is_tasting_selected),
+        )
         prices = CartPackageDraftService._calculate_prices(policy, normalized_items, products_by_id)
 
         for field, value in data.items():
@@ -214,7 +224,13 @@ class CartPackageDraftService:
         return products_by_id
 
     @staticmethod
-    def _validate_policy(policy: PackagePolicy, items: list[dict], products_by_id: dict[str, Product]) -> None:
+    def _validate_policy(
+        policy: PackagePolicy,
+        items: list[dict],
+        products_by_id: dict[str, Product],
+        *,
+        is_tasting_selected: bool = False,
+    ) -> None:
         total_quantity = sum(item["quantity"] for item in items)
         if not policy.min_items <= total_quantity <= policy.max_items:
             raise PackageDraftValidationError(
@@ -224,6 +240,9 @@ class CartPackageDraftService:
             raise PackageDraftValidationError("이 패키지 정책은 같은 상품 중복 구성을 허용하지 않습니다.")
 
         selected_products = [products_by_id[item["product_id"]] for item in items]
+        if is_tasting_selected and any(not product.is_tasting_available for product in selected_products):
+            raise PackageDraftValidationError("시음이 불가능한 상품이 포함되어 있습니다.")
+
         if policy.allowed_item_scope == PackagePolicy.AllowedItemScope.SINGLE_PRODUCTS:
             if any(product.drink_id is None for product in selected_products):
                 raise PackageDraftValidationError("이 패키지 정책은 단일 상품만 허용합니다.")

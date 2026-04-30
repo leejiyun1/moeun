@@ -162,6 +162,7 @@ class ProductDetailSerializer(serializers.ModelSerializer):
             "is_limited_edition",
             "is_premium",
             "is_organic",
+            "is_tasting_available",
             "view_count",
             "order_count",
             "like_count",

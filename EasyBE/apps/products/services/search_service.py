@@ -9,7 +9,7 @@ from django.http import QueryDict
 from apps.products.selectors import ProductSelector
 
 
-class SearchService:
+class ProductSearchService:
     """상품 검색 및 필터링 관련 비즈니스 로직"""
 
     @staticmethod
@@ -117,12 +117,12 @@ class SearchService:
         Returns:
             Dict: 검색 통계 정보
         """
-        queryset = SearchService.get_search_queryset(query_params)
+        queryset = ProductSearchService.get_search_queryset(query_params)
 
         return {
             "total_count": queryset.count(),
-            "has_filters": SearchService._has_active_filters(query_params),
-            "applied_filters": SearchService._get_applied_filters(query_params),
+            "has_filters": ProductSearchService._has_active_filters(query_params),
+            "applied_filters": ProductSearchService._get_applied_filters(query_params),
         }
 
     @staticmethod

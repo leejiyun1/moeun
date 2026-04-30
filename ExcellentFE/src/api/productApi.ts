@@ -3,6 +3,19 @@ import { API_PATHS } from '@/constants/apiPaths'
 import type { ProductDetail } from '@/types/product'
 import type { CartResponse } from '@/types/cart'
 
+export interface AddCartPayload {
+  product_id: string
+  quantity: number
+  pickup_store_id?: number | null
+  pickup_date?: string | null
+}
+
+export interface UpdateCartPayload {
+  quantity?: number
+  pickup_store_id?: number | null
+  pickup_date?: string | null
+}
+
 export const mainProductApi = {
   MonthProducts: async () => {
     const response = await axiosInstance.get(API_PATHS.PRODUCTS.MONTH)
@@ -35,13 +48,8 @@ export const mainProductApi = {
 }
 
 export const cartApi = {
-  ADD: async (product_id: string, quantity: number) => {
-    const response = await axiosInstance.post(API_PATHS.CART.ADD, {
-      product_id,
-      quantity,
-      pickup_store_id: 1,
-      pickup_date: '2025-08-16',
-    })
+  ADD: async (payload: AddCartPayload) => {
+    const response = await axiosInstance.post(API_PATHS.CART.ADD, payload)
     return response.data
   },
   GET: async (): Promise<CartResponse> => {
@@ -52,10 +60,8 @@ export const cartApi = {
     const response = await axiosInstance.delete(API_PATHS.CART.DELETE(id))
     return response.data
   },
-  UPDATE: async (id: string, quantity: number) => {
-    const response = await axiosInstance.patch(API_PATHS.CART.UPDATE(id), {
-      quantity,
-    })
+  UPDATE: async (id: string, payload: UpdateCartPayload) => {
+    const response = await axiosInstance.patch(API_PATHS.CART.UPDATE(id), payload)
     return response.data
   },
 }

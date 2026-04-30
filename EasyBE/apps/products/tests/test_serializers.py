@@ -113,7 +113,16 @@ class DrinkSerializerTest(BaseSerializerTestCase):
         serializer = DrinkForPackageSerializer(self.drink)
         data = serializer.data
 
-        expected_fields = {"id", "name", "brewery", "alcohol_type", "abv", "main_image", "price"}
+        expected_fields = {
+            "id",
+            "name",
+            "brewery",
+            "alcohol_type",
+            "abv",
+            "main_image",
+            "price",
+            "is_tasting_available",
+        }
         self.assertEqual(set(data.keys()), expected_fields)
 
         brewery_data = data["brewery"]
@@ -218,6 +227,7 @@ class ProductSerializerTest(BaseSerializerTestCase):
             "is_limited_edition",
             "is_premium",
             "is_award_winning",
+            "is_tasting_available",
             "view_count",
             "like_count",
             "status",

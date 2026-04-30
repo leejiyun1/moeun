@@ -167,8 +167,6 @@ hanjan-backend/
 │   │   ├── models.py
 │   │   ├── serializers.py
 │   │   └── views.py
-│   ├── adminpanel/            # 관리자 시스템
-│   │   └── views.py
 │   └── common/                # 공통 유틸리티
 │       └── middleware.py
 ├── core/

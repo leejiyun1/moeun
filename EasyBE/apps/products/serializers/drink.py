@@ -95,10 +95,11 @@ class DrinkForPackageSerializer(serializers.ModelSerializer):
     brewery = BrewerySimpleSerializer(read_only=True)
     main_image = serializers.SerializerMethodField()
     price = serializers.SerializerMethodField()
+    is_tasting_available = serializers.SerializerMethodField()
 
     class Meta:
         model = Drink
-        fields = ["id", "name", "brewery", "alcohol_type", "abv", "main_image", "price"]
+        fields = ["id", "name", "brewery", "alcohol_type", "abv", "main_image", "price", "is_tasting_available"]
 
     def _get_product(self, obj) -> Optional[Product]:
         try:
@@ -123,3 +124,8 @@ class DrinkForPackageSerializer(serializers.ModelSerializer):
         """술의 개별 상품 가격 반환"""
         product = self._get_product(obj)
         return product.price if product else None
+
+    @extend_schema_field(serializers.BooleanField)
+    def get_is_tasting_available(self, obj) -> bool:
+        product = self._get_product(obj)
+        return bool(product and product.is_tasting_available)

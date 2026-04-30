@@ -8,8 +8,6 @@ const Detail = () => {
     data,
     isLoading,
     error,
-    dropdownValues,
-    handleDropdownChange,
     localQuantity,
     onIncreaseQuantity,
     onDecreaseQuantity,
@@ -46,8 +44,6 @@ const Detail = () => {
         quantity={localQuantity}
         onIncreaseQuantity={onIncreaseQuantity}
         onDecreaseQuantity={onDecreaseQuantity}
-        dropdownValues={dropdownValues}
-        handleDropdownChange={handleDropdownChange}
         onAddCart={handleAddToCart}
         onPurchase={handlePurchase}
       />

@@ -1,4 +1,4 @@
-import TestButton from '@/components/test/TestButton.tsx'
+import TestButton from '@/components/taste-test/TestButton.tsx'
 import { useEffect, useState } from 'react'
 import type {
   AnswerType,

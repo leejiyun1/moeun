@@ -25,7 +25,7 @@ const useCartItem = ({
 
   const updateQuantityMutation = useMutation({
     mutationFn: ({ id, quantity }: { id: string; quantity: number }) =>
-      cartApi.UPDATE(id, quantity),
+      cartApi.UPDATE(id, { quantity }),
     onSuccess: (_, variables) => {
       onQuantityChange?.(variables.quantity)
     },

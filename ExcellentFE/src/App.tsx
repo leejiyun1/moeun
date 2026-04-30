@@ -31,7 +31,13 @@ const TastingHistory = lazy(() => import('@/pages/my-page/TastingHistory'))
 const NotFound = lazy(() => import('@/pages/NotFound'))
 const AdminLogin = lazy(() => import('@/pages/admin/AdminLogin'))
 const AdminHome = lazy(() => import('@/pages/admin/AdminHome'))
-const AdminPlaceholder = lazy(() => import('@/pages/admin/AdminPlaceholder'))
+const AdminProducts = lazy(() => import('@/pages/admin/AdminProducts'))
+const AdminProductCreate = lazy(
+  () => import('@/pages/admin/AdminProductCreate')
+)
+const AdminPackagePolicies = lazy(
+  () => import('@/pages/admin/AdminPackagePolicies')
+)
 
 function App() {
   const navigate = useNavigate()
@@ -84,10 +90,7 @@ function App() {
               path="admin/products"
               element={
                 <RequireAdmin>
-                  <AdminPlaceholder
-                    title="상품 관리"
-                    description="일반 상품과 패키지 상품을 관리하는 화면입니다."
-                  />
+                  <AdminProducts />
                 </RequireAdmin>
               }
             />
@@ -95,10 +98,7 @@ function App() {
               path="admin/products/new"
               element={
                 <RequireAdmin>
-                  <AdminPlaceholder
-                    title="상품 등록"
-                    description="일반 상품과 패키지 상품을 등록하는 화면입니다."
-                  />
+                  <AdminProductCreate />
                 </RequireAdmin>
               }
             />
@@ -106,10 +106,7 @@ function App() {
               path="admin/package-policies"
               element={
                 <RequireAdmin>
-                  <AdminPlaceholder
-                    title="패키지 정책"
-                    description="시음 가능 여부와 패키지 구성 정책을 관리하는 화면입니다."
-                  />
+                  <AdminPackagePolicies />
                 </RequireAdmin>
               }
             />

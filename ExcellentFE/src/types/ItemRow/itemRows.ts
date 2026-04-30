@@ -1,3 +1,5 @@
+import type { Store } from '@/api/store'
+
 export interface Product {
   id?: string | number
   name?: string
@@ -45,6 +47,8 @@ export interface ItemRowType {
   pickupName?: string
   pickupAddress?: string
   pickupContact?: string
+  pickupStoreId?: number
+  pickupDate?: string | null
 
   product?: Product
   subtotal?: string
@@ -71,10 +75,12 @@ export interface ItemRowType {
   user?: string
 
   pickup_store?: {
+    id?: number
     name?: string
     address?: string
-    contact?: string
-  }
+    contact?: string | null
+  } | null
+  pickup_date?: string | null
 
   rating?: number
   sweetness?: string
@@ -97,22 +103,16 @@ export interface ItemRowType {
 export interface CartItemRowProps extends ItemRowType {
   detailId?: string | number
   checked?: boolean
+  stores?: Store[]
   onCheckChange?: (checked: boolean) => void
+  onPickupChange?: (pickup: {
+    pickup_store_id?: number | null
+    pickup_date?: string | null
+  }) => void
   onQuantityChange?: (newQuantity: number) => void
 }
 
 export interface ItemRowListProps
   extends Omit<CartItemRowProps, 'onQuantityChange'> {
   onQuantityChange?: (itemIndex: number, newQuantity: number) => void
-}
-
-export interface CartMockDataType {
-  id: number
-  customer: number
-  single_items: CartSingleItem[]
-  packages: CartPackageItem[]
-  total_price: string
-  final_total: string
-  created_at: string
-  updated_at: string
 }

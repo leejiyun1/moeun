@@ -277,6 +277,7 @@ def get_individual_product_creation_data(brewery_id):
         "description": "부드럽고 달콤한 프리미엄 막걸리입니다.",
         "description_image_url": "https://cdn.example.com/desc.jpg",
         **PRODUCT_FEATURES["premium_gift"],
+        "is_tasting_available": True,
         "images": [
             {"image_url": "https://cdn.example.com/main.jpg", "is_main": True},
             {"image_url": "https://cdn.example.com/detail.jpg", "is_main": False},
@@ -299,5 +300,6 @@ def get_package_product_creation_data(drink_ids):
         "description_image_url": "https://cdn.example.com/package-desc.jpg",
         "is_gift_suitable": True,
         "is_premium": True,
+        "is_tasting_available": True,
         "images": [{"image_url": "https://cdn.example.com/package-main.jpg", "is_main": True}],
     }

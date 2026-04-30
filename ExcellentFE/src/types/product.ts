@@ -70,6 +70,7 @@ export interface ProductDetail {
   is_limited_edition: boolean
   is_premium: boolean
   is_organic: boolean
+  is_tasting_available: boolean
   view_count: number
   order_count: number
   like_count: number
@@ -99,9 +100,12 @@ export interface Product {
   short_description?: string
   brewery_name?: string
   is_featured?: boolean
+  recommendation_score?: number | null
+  recommendation_reason?: string | null
   description?: string
   discount_rate?: number
   is_on_sale?: boolean
+  is_tasting_available?: boolean
   view_count?: number
   order_count?: number
   like_count?: number

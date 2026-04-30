@@ -224,8 +224,6 @@ class ProductCommandService:
         if not policy:
             if not 2 <= total_quantity <= 5:
                 raise ValueError("패키지 총 구성 수량은 2~5개여야 합니다.")
-            if any(item.get("quantity", 1) > 1 for item in items_data):
-                raise ValueError("중복 수량은 패키지 정책이 있을 때만 사용할 수 있습니다.")
             return
 
         if not policy.min_items <= total_quantity <= policy.max_items:

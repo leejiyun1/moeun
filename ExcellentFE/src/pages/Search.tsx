@@ -42,6 +42,7 @@ const Search = () => {
     is_limited_edition: item.is_limited_edition,
     is_premium: item.is_premium,
     is_award_winning: item.is_award_winning,
+    is_tasting_available: item.is_tasting_available,
     view_count: item.view_count,
     like_count: item.like_count,
     status: item.status,

@@ -4,10 +4,10 @@ import testTestBg from '@/assets/images/tasteTest/testTestBg.png'
 import leftArrow from '@/assets/icons/tasteTest/leftArrow.svg?react'
 
 import { useState } from 'react'
-import MainStep from '@/components/test/MainStep.tsx'
-import ProgressStep from '@/components/test/ProgressStep.tsx'
+import MainStep from '@/components/taste-test/MainStep.tsx'
+import ProgressStep from '@/components/taste-test/ProgressStep.tsx'
 import Icon from '@/components/common/Icon'
-import ResultStep from '@/components/test/ResultStep.tsx'
+import ResultStep from '@/components/taste-test/ResultStep.tsx'
 import type { TasteTestResult } from '@/types/tasteTypes'
 
 //분기 처리를 위한 테스트 페이지의 가장 큰 컴포넌트

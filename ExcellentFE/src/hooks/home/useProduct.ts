@@ -1,5 +1,10 @@
 import { useMutation, useQuery } from '@tanstack/react-query'
-import { mainProductApi, getProductDetail, cartApi } from '@/api/productApi'
+import {
+  mainProductApi,
+  getProductDetail,
+  cartApi,
+  type AddCartPayload,
+} from '@/api/productApi'
 import type { ProductDetail } from '@/types/product'
 import type { ProductResponse } from '@/types/home'
 
@@ -78,12 +83,6 @@ export const useProductDetail = (id: string) => {
 
 export const useAddCart = () => {
   return useMutation({
-    mutationFn: ({
-      product_id,
-      quantity,
-    }: {
-      product_id: string
-      quantity: number
-    }) => cartApi.ADD(product_id, quantity),
+    mutationFn: (payload: AddCartPayload) => cartApi.ADD(payload),
   })
 }

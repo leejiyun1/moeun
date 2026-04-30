@@ -13,8 +13,8 @@ from apps.products.selectors import ProductSelector
 from apps.products.services import (
     LikeService,
     ProductCommandService,
+    ProductSearchService,
     ProductService,
-    SearchService,
 )
 
 from .test_data import (
@@ -130,23 +130,26 @@ class ProductCommandServiceTest(BaseServiceTestCase):
         self.assertEqual(item.drink, drinks[0])
         self.assertEqual(item.quantity, 3)
 
-    def test_create_package_product_rejects_quantity_without_policy(self):
+    def test_create_fixed_package_product_allows_quantity_without_policy(self):
         drinks = self.test_data["drinks"]
 
-        with self.assertRaises(ValueError):
-            ProductCommandService.create_package_product(
-                package_data={
-                    "name": "정책 없는 중복 세트",
-                    "type": "CURATED",
-                    "items": [{"drink_id": drinks[0].id, "quantity": 3, "sort_order": 0}],
-                },
-                product_data={
-                    "price": 30000,
-                    "description": "정책 없이 같은 술을 3개 담은 세트",
-                    "description_image_url": "https://cdn.example.com/products/invalid-set-desc.jpg",
-                },
-                images_data=[{"image_url": "https://cdn.example.com/products/invalid-set-main.jpg", "is_main": True}],
-            )
+        product = ProductCommandService.create_package_product(
+            package_data={
+                "name": "정책 없는 중복 세트",
+                "type": "CURATED",
+                "items": [{"drink_id": drinks[0].id, "quantity": 3, "sort_order": 0}],
+            },
+            product_data={
+                "price": 30000,
+                "description": "정책 없이 같은 술을 3개 담은 세트",
+                "description_image_url": "https://cdn.example.com/products/fixed-set-desc.jpg",
+            },
+            images_data=[{"image_url": "https://cdn.example.com/products/fixed-set-main.jpg", "is_main": True}],
+        )
+
+        item = PackageItem.objects.get(package=product.package)
+        self.assertIsNone(product.package.policy)
+        self.assertEqual(item.quantity, 3)
 
     def test_deactivate_product(self):
         product = self.individual_products[0]
@@ -339,8 +342,8 @@ class LikeServiceTest(BaseServiceTestCase):
         self.assertTrue(LikeService.check_user_liked_product(self.user, str(product.pk)))
 
 
-class SearchServiceTest(BaseServiceTestCase):
-    """SearchService 테스트"""
+class ProductSearchServiceTest(BaseServiceTestCase):
+    """ProductSearchService 테스트"""
 
     def test_apply_taste_filters(self):
         """맛 프로필 필터 적용 테스트"""
@@ -349,7 +352,7 @@ class SearchServiceTest(BaseServiceTestCase):
 
         query_params = QueryDict("sweetness=3.0&acidity=2.5")
 
-        filtered_queryset = SearchService.apply_taste_filters(queryset, query_params)
+        filtered_queryset = ProductSearchService.apply_taste_filters(queryset, query_params)
 
         # 필터가 적용되었는지 확인 (쿼리 변화)
         self.assertNotEqual(str(queryset.query), str(filtered_queryset.query))
@@ -363,7 +366,7 @@ class SearchServiceTest(BaseServiceTestCase):
         queryset = Product.objects.filter(status="ACTIVE")
         query_params = QueryDict("premium=true")
 
-        filtered_queryset = SearchService.apply_category_filters(queryset, query_params)
+        filtered_queryset = ProductSearchService.apply_category_filters(queryset, query_params)
 
         # 프리미엄 상품만 반환되는지 확인
         for product in filtered_queryset:
@@ -379,7 +382,7 @@ class SearchServiceTest(BaseServiceTestCase):
 
         query_params = QueryDict("premium=true&gift_suitable=true")
 
-        queryset = SearchService.get_search_queryset(query_params)
+        queryset = ProductSearchService.get_search_queryset(query_params)
 
         self.assertIn(product, queryset)
         for filtered_product in queryset:
@@ -390,7 +393,7 @@ class SearchServiceTest(BaseServiceTestCase):
         """유효한 검색 파라미터 검증 테스트"""
         query_params = QueryDict("sweetness=3.0&acidity=2.5&body=4.0")
 
-        errors = SearchService.validate_search_params(query_params)
+        errors = ProductSearchService.validate_search_params(query_params)
 
         # 에러가 없어야 함
         self.assertEqual(len(errors), 0)
@@ -399,7 +402,7 @@ class SearchServiceTest(BaseServiceTestCase):
         """잘못된 검색 파라미터 검증 테스트"""
         query_params = QueryDict("sweetness=6.0&acidity=invalid&body=-1.0")
 
-        errors = SearchService.validate_search_params(query_params)
+        errors = ProductSearchService.validate_search_params(query_params)
 
         # 에러가 있어야 함
         self.assertGreater(len(errors), 0)
@@ -411,7 +414,7 @@ class SearchServiceTest(BaseServiceTestCase):
         """적용된 필터 목록 반환 테스트"""
         query_params = QueryDict("sweetness=3.0&premium=true&invalid_param=test")
 
-        applied_filters = SearchService._get_applied_filters(query_params)
+        applied_filters = ProductSearchService._get_applied_filters(query_params)
 
         # 유효한 필터만 반환되는지 확인
         self.assertIn("sweetness", applied_filters)

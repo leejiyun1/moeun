@@ -42,12 +42,23 @@ export const API_PATHS = {
     MAKGEOLLI: '/products/makgeolli/',
     REGIONAL: '/products/regional/',
   },
+  ADMIN: {
+    PRODUCTS: '/products/manage/',
+    PRODUCT_INDIVIDUAL_CREATE: '/products/individual/create/',
+    PRODUCT_PACKAGE_CREATE: '/products/package/create/',
+    DRINKS_FOR_PACKAGE: '/drinks/for-package/',
+    PACKAGE_POLICIES: '/package-policies/manage/',
+    BREWERIES: '/breweries/',
+  },
   SEARCHPRODUCTS: {
     SEARCH: '/products/search/',
   },
   ORDER: {
     LIST: '/orders/order-items/',
     CREATE_FROM_CART: '/orders/create_from_cart/',
+  },
+  STORES: {
+    LIST: '/stores/',
   },
   CART: {
     ADD: '/cart/',

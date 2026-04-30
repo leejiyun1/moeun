@@ -13,6 +13,8 @@ export interface HomePageData {
 }
 
 export interface ProductResponse {
+  title?: string
+  recommendation_mode?: 'personalized' | 'fallback'
   products?: Product[]
   results?: Product[]
 }

@@ -13,7 +13,6 @@ class ProductSelector:
 
     SECTION_MONTHLY = "monthly"
     SECTION_POPULAR = "popular"
-    SECTION_RECOMMENDED = "recommended"
     SECTION_FEATURED = "featured"
     SECTION_AWARD_WINNING = "award_winning"
     SECTION_MAKGEOLLI = "makgeolli"
@@ -122,8 +121,6 @@ class ProductSelector:
             queryset = queryset.filter(package__isnull=False).order_by("-view_count")
         elif section_type == ProductSelector.SECTION_FEATURED:
             queryset = queryset.filter(package__isnull=False).order_by("-created_at")
-        elif section_type == ProductSelector.SECTION_RECOMMENDED:
-            queryset = queryset.filter(drink__isnull=False).order_by("-created_at")
         elif section_type == ProductSelector.SECTION_MONTHLY:
             queryset = queryset.filter(drink__isnull=False).order_by("-view_count")
             limit = 3

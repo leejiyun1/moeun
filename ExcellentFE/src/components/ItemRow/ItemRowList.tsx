@@ -14,9 +14,13 @@ const ItemRowList = (props: CartItemRowProps) => {
           name={props.product?.name || ''}
           quantity={props.quantity || 0}
           price={props.subtotal || '0'}
+          pickupStoreId={props.pickup_store?.id}
+          pickupDate={props.pickup_date}
           pickupName={props.pickup_store?.name || ''}
           pickupAddress={props.pickup_store?.address || ''}
           pickupContact={props.pickup_store?.contact || ''}
+          stores={props.stores}
+          onPickupChange={props.onPickupChange}
           onQuantityChange={props.onQuantityChange}
           checked={props.checked}
           onCheckChange={props.onCheckChange}
@@ -35,7 +39,6 @@ const ItemRowList = (props: CartItemRowProps) => {
           price={props.price || '0'}
           feedback_id={props?.feedback_id || null}
           product={props.product}
-          user="임시"
         />
       )
 

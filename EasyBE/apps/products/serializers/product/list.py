@@ -14,6 +14,8 @@ class ProductListSerializer(serializers.ModelSerializer):
     main_image_url = serializers.SerializerMethodField()
     brewery_name = serializers.SerializerMethodField()
     alcohol_type = serializers.SerializerMethodField()
+    recommendation_score = serializers.SerializerMethodField()
+    recommendation_reason = serializers.SerializerMethodField()
 
     # 할인 관련 계산 필드
     discount_rate = serializers.SerializerMethodField()
@@ -40,10 +42,13 @@ class ProductListSerializer(serializers.ModelSerializer):
             "is_limited_edition",
             "is_premium",
             "is_award_winning",
+            "is_tasting_available",
             "view_count",
             "like_count",
             "status",
             "created_at",
+            "recommendation_score",
+            "recommendation_reason",
         ]
 
     @extend_schema_field(serializers.CharField)
@@ -75,6 +80,14 @@ class ProductListSerializer(serializers.ModelSerializer):
         if obj.drink:
             return obj.drink.alcohol_type
         return None
+
+    @extend_schema_field(serializers.FloatField(allow_null=True))
+    def get_recommendation_score(self, obj) -> Optional[float]:
+        return getattr(obj, "recommendation_score", None)
+
+    @extend_schema_field(serializers.CharField(allow_null=True))
+    def get_recommendation_reason(self, obj) -> Optional[str]:
+        return getattr(obj, "recommendation_reason", None)
 
     @extend_schema_field(serializers.FloatField)
     def get_discount_rate(self, obj) -> float:

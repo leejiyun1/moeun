@@ -7,7 +7,7 @@ import urlShare from '@/assets/icons/tasteTest/urlShare.svg'
 
 import { useEffect, useState } from 'react'
 import Icon from '@/components/common/Icon'
-import TestButton from '@/components/test/TestButton.tsx'
+import TestButton from '@/components/taste-test/TestButton.tsx'
 import type { TestType } from '@/types/tasteTypes'
 
 const SNS_SHARE = [

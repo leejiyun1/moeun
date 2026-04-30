@@ -6,6 +6,7 @@ from rest_framework import status
 from rest_framework.test import APITestCase
 
 from apps.products.models import PackagePolicy
+from apps.users.models import PreferTasteProfile
 
 from .test_helpers import TestDataCreator
 
@@ -100,6 +101,7 @@ class ProductSearchAPITest(BaseAPITestCase):
             "is_limited_edition",
             "is_premium",
             "is_award_winning",
+            "is_tasting_available",
             "view_count",
             "like_count",
             "status",
@@ -288,8 +290,34 @@ class MainPageSectionAPITest(BaseAPITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertIn("title", response.data)
+        self.assertIn("recommendation_mode", response.data)
         self.assertIn("products", response.data)
         self.assertEqual(response.data["title"], "추천 전통주")
+        self.assertEqual(response.data["recommendation_mode"], "fallback")
+
+    def test_recommended_products_api_uses_taste_profile(self):
+        """로그인 사용자는 취향 프로필 기반 추천을 받는다."""
+        user = TestDataCreator.create_user(nickname="testrecommend", email="recommend@example.com")
+        PreferTasteProfile.objects.create(
+            user=user,
+            sweetness_level=4.2,
+            acidity_level=2.1,
+            body_level=3.0,
+            carbonation_level=3.5,
+            bitterness_level=1.2,
+            aroma_level=3.8,
+        )
+        self.client.force_authenticate(user=user)
+
+        url = reverse("products:v1:products-recommended")
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["title"], "취향 기반 추천 전통주")
+        self.assertEqual(response.data["recommendation_mode"], "personalized")
+        self.assertEqual(response.data["products"][0]["name"], "우리쌀막걸리")
+        self.assertIsNotNone(response.data["products"][0]["recommendation_score"])
+        self.assertIsNotNone(response.data["products"][0]["recommendation_reason"])
 
     def test_featured_products_api(self):
         """추천 패키지 API 테스트"""

@@ -9,6 +9,7 @@ from apps.orders.models import Order, OrderItem
 from apps.orders.serializers import FlatOrderItemSerializer, OrderSerializer
 from apps.orders.services import (
     CartIsEmptyError,
+    InvalidCartSelectionError,
     MissingPickupInfoError,
     OrderCreationError,
     OrderService,
@@ -37,11 +38,16 @@ class OrderViewSet(viewsets.ModelViewSet):
         장바구니의 모든 상품으로 주문을 생성
         """
         try:
-            order = OrderService.create_order_from_cart(user=request.user)
+            has_selection = "item_ids" in request.data or "package_draft_ids" in request.data
+            order = OrderService.create_order_from_cart(
+                user=request.user,
+                cart_item_ids=request.data.get("item_ids", []) if has_selection else None,
+                package_draft_ids=request.data.get("package_draft_ids", []) if has_selection else None,
+            )
             serializer = self.get_serializer(order)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
 
-        except (CartIsEmptyError, MissingPickupInfoError) as e:
+        except (CartIsEmptyError, MissingPickupInfoError, InvalidCartSelectionError) as e:
             return Response({"detail": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
         except OrderCreationError as e:

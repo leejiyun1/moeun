@@ -2,6 +2,7 @@ import type { ItemRowType } from '@/types/ItemRow/itemRows'
 import useItemRow from '@/hooks/useItemRow'
 import ItemRowLabel from '@/components/ItemRow/ItemRowLabel'
 import ItemRowList from '@/components/ItemRow/ItemRowList'
+import type { Store } from '@/api/store'
 
 interface ItemRowProps {
   items: ItemRowType[]
@@ -9,6 +10,11 @@ interface ItemRowProps {
   onQuantityChange?: () => void
   checkedItems?: number[]
   onCheckChange?: (itemId: number, isChecked: boolean) => void
+  stores?: Store[]
+  onPickupChange?: (
+    itemId: number,
+    pickup: { pickup_store_id?: number | null; pickup_date?: string | null }
+  ) => void
 }
 
 const ItemRowContent = ({
@@ -17,6 +23,8 @@ const ItemRowContent = ({
   onQuantityChange,
   checkedItems,
   onCheckChange,
+  stores,
+  onPickupChange,
 }: ItemRowProps) => {
   const { itemList, handleQuantityChange } = useItemRow(items || [])
 
@@ -43,6 +51,10 @@ const ItemRowContent = ({
           checked={checkedItems?.includes(item.id as number)}
           onCheckChange={(isChecked) =>
             onCheckChange?.(item.id as number, isChecked)
+          }
+          stores={stores}
+          onPickupChange={(pickup) =>
+            onPickupChange?.(item.id as number, pickup)
           }
           onQuantityChange={async (newQuantity: number) => {
             await handleQuantityChange(idx, newQuantity)

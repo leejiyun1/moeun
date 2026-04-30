@@ -85,6 +85,62 @@ class OrderFromCartAPITest(APITestCase):
         # 장바구니 비워졌는지 확인
         self.assertEqual(CartItem.objects.filter(user=self.user).count(), 0)
 
+    def test_create_order_from_cart_uses_selected_item_ids(self):
+        """선택한 장바구니 항목만 주문으로 생성한다."""
+        selected_item = CartItem.objects.create(
+            user=self.user,
+            product=self.product1,
+            quantity=1,
+            pickup_store=self.store1,
+            pickup_date=date.today(),
+        )
+        unselected_item = CartItem.objects.create(
+            user=self.user,
+            product=self.product2,
+            quantity=1,
+            pickup_store=self.store1,
+            pickup_date=date.today(),
+        )
+
+        response = self.client.post(self.create_order_url, {"item_ids": [selected_item.id]}, format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        order = Order.objects.get()
+        self.assertEqual(order.total_price, 10000)
+        self.assertEqual(order.items.count(), 1)
+        self.assertFalse(CartItem.objects.filter(pk=selected_item.pk).exists())
+        self.assertTrue(CartItem.objects.filter(pk=unselected_item.pk).exists())
+
+    def test_create_order_from_cart_selection_does_not_include_unselected_package_draft(self):
+        """선택 주문 요청에서는 선택하지 않은 커스텀 패키지를 함께 주문하지 않는다."""
+        selected_item = CartItem.objects.create(
+            user=self.user,
+            product=self.product1,
+            quantity=1,
+            pickup_store=self.store1,
+            pickup_date=date.today(),
+        )
+        draft = CartPackageDraftService.create_draft(
+            user=self.user,
+            policy_id=self.package_policy.id,
+            display_name="선택하지 않은 세트",
+            items=[
+                {"product_id": str(self.product1.id), "quantity": 1},
+                {"product_id": str(self.product2.id), "quantity": 1},
+            ],
+            pickup_store=self.store1,
+            pickup_date=date.today(),
+        )
+
+        response = self.client.post(self.create_order_url, {"item_ids": [selected_item.id]}, format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        order = Order.objects.get()
+        self.assertEqual(order.total_price, 10000)
+        self.assertFalse(OrderCustomPackage.objects.filter(order=order).exists())
+        draft.refresh_from_db()
+        self.assertEqual(draft.status, draft.Status.DRAFT)
+
     def test_create_order_from_cart_includes_custom_package_snapshot(self):
         """장바구니 커스텀 패키지는 주문 생성 시 snapshot으로 고정된다."""
         draft = CartPackageDraftService.create_draft(

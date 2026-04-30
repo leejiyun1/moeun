@@ -74,6 +74,7 @@ class IndividualProductCreationAPITest(BaseProductCreationTestCase):
         self.assertEqual(product.original_price, 18000)
         self.assertEqual(product.discount, 3000)
         self.assertTrue(product.is_premium)
+        self.assertTrue(product.is_tasting_available)
 
         # 생성된 이미지 검증
         images = ProductImage.objects.filter(product=product)
@@ -197,7 +198,16 @@ class PackageProductCreationAPITest(BaseProductCreationTestCase):
 
         if response.data["results"]:
             first_drink = response.data["results"][0]
-            expected_fields = {"id", "name", "brewery", "alcohol_type", "abv", "main_image", "price"}
+            expected_fields = {
+                "id",
+                "name",
+                "brewery",
+                "alcohol_type",
+                "abv",
+                "main_image",
+                "price",
+                "is_tasting_available",
+            }
             self.assertTrue(expected_fields.issubset(set(first_drink.keys())))
 
             # 양조장 정보 포함 확인
@@ -235,6 +245,7 @@ class PackageProductCreationAPITest(BaseProductCreationTestCase):
         self.assertEqual(product.price, 80000)
         self.assertEqual(product.original_price, 95000)
         self.assertEqual(product.discount, 15000)
+        self.assertTrue(product.is_tasting_available)
 
         # 응답 데이터 검증
         response_data = response.data
@@ -242,6 +253,23 @@ class PackageProductCreationAPITest(BaseProductCreationTestCase):
         self.assertEqual(response_data["product_type"], "package")
         self.assertIsNone(response_data["drink"])
         self.assertIsNotNone(response_data["package"])
+
+    def test_create_fixed_package_product_allows_duplicate_quantity_without_policy(self):
+        """고정 패키지는 정책 없이도 같은 술 수량을 지정할 수 있다."""
+        url = reverse("products:v1:products-package-create")
+        creation_data = get_package_product_creation_data([self.drinks[0].id, self.drinks[1].id])
+        creation_data["package_info"].pop("drink_ids")
+        creation_data["package_info"]["items"] = [
+            {"drink_id": self.drinks[0].id, "quantity": 3, "sort_order": 0},
+        ]
+
+        response = self.client.post(url, creation_data, format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        package = Package.objects.get(name="관리자 추천 전통주 세트")
+        item = package.items.get()
+        self.assertEqual(item.drink, self.drinks[0])
+        self.assertEqual(item.quantity, 3)
 
     def test_create_package_validation_errors(self):
         """패키지 생성 유효성 검사 테스트"""
@@ -288,7 +316,7 @@ class PackageProductCreationTransactionTest(TransactionTestCase):
     def setUp(self):
         self.breweries = TestDataCreator.create_breweries()
         self.drinks = TestDataCreator.create_drinks(self.breweries)
-        self.user = TestDataCreator.create_user()
+        self.user = TestDataCreator.create_user(role=User.Role.ADMIN)
 
     def tearDown(self):
         TestDataCreator.clean_all_data()
