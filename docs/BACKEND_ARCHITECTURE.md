@@ -9,6 +9,8 @@
 
 제품 도메인 모델은 `docs/PRODUCT_DOMAIN_MODEL.md` 를 함께 본다.
 
+사용자/관리자 플로우별 코드 책임은 `docs/SERVICE_FLOW_SPEC.md` 를 함께 본다.
+
 ## 결론
 
 이 백엔드는 `Django app 분리`는 유지하되, 각 앱 내부를 `thin view + serializer + service + selector` 구조로 정리하는 방향이 가장 맞다.

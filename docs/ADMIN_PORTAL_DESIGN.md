@@ -248,8 +248,8 @@ DELETE /api/v1/package-policies/{id}/manage/
 
 보강 필요:
 
-- 관리 API 권한을 관리자 전용으로 제한
-- 일반 상품 생성 API가 `AllowAny` 인 부분 수정
+- 운영 공개 전 관리 API 권한이 모두 관리자 전용인지 재검증
+- 상품 생성/수정/삭제 API의 permission 정책 통일
 - 양조장/술 등록 흐름이 실제 어드민 화면에서 충분한지 확인
 - 이미지 URL 입력 방식과 향후 파일 업로드 전환 계획 정리
 
