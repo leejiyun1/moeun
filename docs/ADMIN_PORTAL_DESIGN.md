@@ -18,6 +18,32 @@
 
 최근 백엔드에서는 상품/패키지/시음 정책을 운영 기준에 맞게 정리하기 시작했다. 따라서 다음 단계는 그 구조를 사용할 수 있는 별도 관리자 화면이다.
 
+## 현재 구현 상태
+
+현재 1차 관리자 기본 기능은 구현되어 있다.
+
+구현된 범위:
+
+- `/admin/login` 관리자 전용 로그인
+- 마이페이지 내부 관리자 진입구
+- 관리자 보호 라우트
+- 관리자 홈
+- 상품 목록
+- 일반 상품 등록
+- 고정 패키지 상품 등록
+- 패키지 정책 목록
+- 패키지 정책 등록
+- 상품 단위 시음 가능 여부 설정
+
+아직 부족한 범위:
+
+- 상품 수정 화면
+- 상품 이미지 파일 업로드
+- 양조장/술 원본 데이터 등록 화면
+- 커스텀 패키지 draft 운영 확인 화면
+- 주문/픽업 운영 화면
+- 후기 검수 화면
+
 ## 1차 목표
 
 1차 어드민은 판매 전체 운영 시스템이 아니라, 상품 운영을 위한 최소 관리자 페이지로 잡는다.
@@ -61,22 +87,19 @@
 
 현재 주의점:
 
-- 일부 관리 API가 `IsAuthenticated` 또는 `AllowAny` 수준으로 열려 있다.
-- 별도 어드민 페이지 구현 전, 관리 API 권한을 관리자 전용으로 보강해야 한다.
+- 운영 공개 전 관리 API 권한 정책을 다시 확인해야 한다.
+- 관리자 로그인은 별도 숨김 진입구로 유지하되, 실제 권한 검증은 백엔드에서도 보장해야 한다.
 
 ## 화면 구조
 
-권장 라우트:
+현재 라우트:
 
 ```text
+/admin/login
 /admin
 /admin/products
 /admin/products/new
-/admin/products/:id
-/admin/packages/new
 /admin/package-policies
-/admin/package-policies/new
-/admin/package-policies/:id
 ```
 
 진입 방식:
@@ -88,12 +111,14 @@
 - `/admin/login` 은 숨겨진 관리자 로그인 입구로만 유지한다.
 - 로그인 후 관리자 화면은 일반 페이지와 같은 레이아웃 안에서 보여준다.
 
-1차에서는 화면 수를 줄이기 위해 아래처럼 시작해도 된다.
+추가 예정 라우트:
 
 ```text
-/admin/products
-/admin/products/new
-/admin/package-policies
+/admin/products/:id
+/admin/package-policies/:id
+/admin/orders
+/admin/pickups
+/admin/feedbacks
 ```
 
 ## 기능 기준
@@ -230,27 +255,28 @@ DELETE /api/v1/package-policies/{id}/manage/
 
 ## 프론트 구조
 
-권장 구조:
+현재 구조:
 
 ```text
 src/pages/admin/
-src/components/admin/
-src/hooks/admin/
 src/api/admin/
 src/types/admin/
+src/constants/admin.ts
 ```
 
 규칙:
 
-- `pages/admin` 은 화면 조합만 담당한다.
+- `pages/admin` 은 화면 조합과 1차 폼 상태를 담당한다.
 - API 호출은 `src/api/admin` 으로 모은다.
 - React Query query key는 admin 도메인 기준으로 중앙화한다.
-- 폼 기본값과 선택지는 상수로 분리한다.
+- 폼 기본값과 선택지는 `src/constants/admin.ts`로 분리한다.
 - 상품 등록 폼은 일반 상품과 패키지 상품의 공통 필드를 공유하되, 타입별 상세 필드는 분리한다.
+
+추후 화면이 커지면 `components/admin`과 `hooks/admin`으로 폼 조합과 데이터 조합을 분리한다.
 
 ## 백엔드 구조
 
-1차에서는 기존 products 관리 API를 사용한다.
+1차에서는 products 도메인의 관리 API를 사용한다.
 
 다만 운영 공개 전에는 아래를 먼저 보강한다.
 
@@ -262,25 +288,26 @@ src/types/admin/
 
 ## 구현 순서
 
-1. 관리 API 권한 보강
-2. 프론트 admin 보호 라우트 추가
-3. 관리자에게만 마이페이지 내부 관리자 메뉴 노출
-4. admin 레이아웃 추가
-5. admin API client와 타입 정의
-6. 상품 목록 화면
-7. 패키지 정책 목록/생성 화면
-8. 일반 상품 등록 화면
-9. 패키지 상품 등록 화면
-10. 검증 및 문서 갱신
+완료:
 
-현재 구현 상태:
+- 프론트 admin 보호 라우트 추가
+- 관리자에게만 마이페이지 내부 관리자 메뉴 노출
+- admin 레이아웃 추가
+- admin API client와 타입 정의
+- 상품 목록 화면
+- 패키지 정책 목록/생성 화면
+- 일반 상품 등록 화면
+- 패키지 상품 등록 화면
+- 상품 단위 시음 가능 여부 반영
 
-- 상품 목록 화면은 관리 API와 연결한다.
-- 일반 상품 등록 화면은 관리 API와 연결한다.
-- 패키지 상품 등록 화면은 관리 API와 연결한다.
-- 패키지 정책 목록/등록 화면은 관리 API와 연결한다.
-- 상품 단위 시음 가능 여부는 모델/API/관리자 등록 화면에 반영한다.
-- 상품 수정은 다음 단계다.
+다음 순서:
+
+1. 관리 API 권한 재점검
+2. 상품 수정 화면
+3. 양조장/술 원본 데이터 입력 방식 결정
+4. 이미지 URL 입력을 파일 업로드로 바꿀지 결정
+5. 운영 데이터 입력 시나리오 검증
+
 
 ## 완료 기준
 

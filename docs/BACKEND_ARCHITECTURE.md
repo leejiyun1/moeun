@@ -7,7 +7,7 @@
 - `레이어 규칙`: view / serializer / service / model 기준
 - `우선 리팩터링 대상`: 어디부터 손댈지
 
-제품 모델 초안은 `docs/PRODUCT_DOMAIN_MODEL.md` 를 함께 본다.
+제품 도메인 모델은 `docs/PRODUCT_DOMAIN_MODEL.md` 를 함께 본다.
 
 ## 결론
 
@@ -463,6 +463,53 @@ HTTP Request
 - model은 자기 상태만
 - cross-domain write는 service orchestration으로 이동
 
+## 현재 반영된 구조
+
+### products
+
+반영 완료:
+
+- public/admin/section 조회를 selector 기준으로 정리했다.
+- 검색은 `ProductSearchService`가 담당한다.
+- 추천은 `ProductRecommendationService`가 담당한다.
+- 관리자 상품 생성/수정/비활성화는 `ProductCommandService` 기준으로 전환했다.
+- 관리자 패키지 정책 생성/수정/비활성화는 `PackagePolicyCommandService` 기준으로 추가했다.
+- 고정 패키지 구성 수정은 `PackageItem.quantity` 기반 수량 교체를 지원한다.
+- 상품 단위 시음 가능 여부는 `Product.is_tasting_available`로 관리한다.
+
+현재 한계:
+
+- 추천 점수 계산, 후보 조회, 추천 이유 생성이 아직 하나의 추천 서비스 안에 있다.
+- 고정 패키지 구성품은 아직 `Drink` 기준이다.
+- 관리 API 권한 정책은 운영 공개 전 한 번 더 점검해야 한다.
+
+### cart / orders
+
+반영 완료:
+
+- 일반 장바구니 상품은 `pickup_store`, `pickup_date`를 가진다.
+- 커스텀 패키지는 `cart.PackageDraft` / `PackageDraftItem` 으로 분리했다.
+- 주문 생성 시 일반 상품은 `OrderItem`, 커스텀 패키지는 `OrderCustomPackage` snapshot으로 고정한다.
+- 프론트가 선택한 장바구니 항목 기준으로 주문을 생성할 수 있다.
+- 선택한 일반 상품에 픽업 정보가 없으면 주문을 막는다.
+
+현재 한계:
+
+- 커스텀 패키지 draft의 장바구니 UI와 픽업 정보 입력 흐름은 아직 충분하지 않다.
+- 픽업 가능 날짜, 영업일, 마감 시간 정책은 아직 중앙 설정으로 분리되지 않았다.
+
+### admin
+
+반영 완료:
+
+- 별도 빈 Django 앱 `adminpanel`은 제거했다.
+- 관리자 화면은 프론트 `pages/admin`에서 관리한다.
+- 관리 API는 각 도메인 앱의 admin view/service를 사용한다.
+
+원칙:
+
+- 관리자 기능을 별도 앱으로 몰기보다, 도메인별 관리 API를 두고 프론트 admin 화면이 이를 조합한다.
+
 ## 구현 우선순위
 
 ### P0
@@ -480,19 +527,11 @@ HTTP Request
 
 ### P2
 
-- `products` read path를 selector 중심으로 통일
-- `products` create/update/delete 를 command service 중심으로 전환
+- 추천 scorer/candidate/reason builder 분리
+- `products` read path의 selector 기준 추가 정리
+- `products` create/update/delete 에러 응답 형식 정리
 - 통계 갱신 정책 재정의
 - 이미지/외부 스토리지 adapter 분리
-
-진행 상태:
-
-- `products` 는 public/admin/section 조회를 selector 기준으로 정리했다.
-- 관리자 상품 생성/수정/비활성화는 `ProductCommandService` 기준으로 전환했다.
-- 관리자 패키지 정책 생성/수정/비활성화는 `PackagePolicyCommandService` 기준으로 추가했다.
-- 현재 패키지 구성 수정은 `PackageItem.quantity` 기반 수량 교체까지 지원한다.
-- product 기준 커스텀 패키지 draft는 `cart.PackageDraft` / `PackageDraftItem` 으로 분리했다.
-- 주문 생성 시 커스텀 패키지는 `orders.OrderCustomPackage` snapshot 으로 고정한다.
 
 ## 설계 채택 기준
 
