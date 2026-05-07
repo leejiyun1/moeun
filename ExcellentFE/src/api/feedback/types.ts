@@ -1,13 +1,6 @@
 export interface FeedbackRequest {
   order_item_id: number
   overall_rating: number
-  sweetness?: number
-  acidity?: number
-  body?: number
-  carbonation?: number
-  bitterness?: number
-  aroma?: number
-  photo_url?: string
   comment?: string
   files: File[] | null
 }
@@ -17,12 +10,6 @@ export interface Feedback {
   product_id?: string
   order_item: number | string
   rating: number
-  sweetness?: string
-  acidity?: string
-  body?: string
-  carbonation?: string
-  bitterness?: string
-  aroma?: string
   comment: string
   image_url?: string
   product_name: string

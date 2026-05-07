@@ -22,14 +22,6 @@ const useTastingReview = (orderItemId?: number, onClose?: () => void) => {
     setReview((prev) => ({ ...prev, [field]: value }))
   }
 
-  const clearTasteFitScore = (field: keyof Omit<TastingReview, 'rating'>) => {
-    setReview((prev) => {
-      const next = { ...prev }
-      delete next[field]
-      return next
-    })
-  }
-
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFiles = e.target.files
     if (!selectedFiles) return
@@ -65,12 +57,6 @@ const useTastingReview = (orderItemId?: number, onClose?: () => void) => {
     return {
       order_item_id: Number(orderItemId ?? 0),
       overall_rating: review.rating,
-      sweetness: review.sweetness,
-      acidity: review.acidity,
-      body: review.body,
-      carbonation: review.carbonation,
-      bitterness: review.bitterness,
-      aroma: review.aroma,
       comment,
       files: files.length > 0 ? files : null,
     }
@@ -122,7 +108,6 @@ const useTastingReview = (orderItemId?: number, onClose?: () => void) => {
     imagePreviews,
     maxImages: MAX_IMAGES,
     updateReview,
-    clearTasteFitScore,
     handleFileChange,
     setComment,
     openModal,

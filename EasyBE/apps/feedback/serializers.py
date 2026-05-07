@@ -2,7 +2,7 @@
 
 from rest_framework import serializers
 
-from .models import TASTE_TAG_CHOICES, Feedback
+from .models import Feedback
 
 
 class FeedbackSerializer(serializers.ModelSerializer):
@@ -22,14 +22,7 @@ class FeedbackSerializer(serializers.ModelSerializer):
             "id",
             "order_item",  # 필수 필드
             "rating",
-            "sweetness",
-            "acidity",
-            "body",
-            "carbonation",
-            "bitterness",
-            "aroma",
             "comment",
-            "selected_tags",
             "image",  # 업로드용
             "image_url",  # 응답용
             "product_name",
@@ -42,20 +35,6 @@ class FeedbackSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = ["id", "view_count", "created_at", "updated_at"]
 
-    def to_internal_value(self, data):
-        """multipart form-data에서도 기존 태그 배열을 안정적으로 받는다."""
-        if hasattr(data, "getlist"):
-            data = data.copy()
-            values = data.getlist("selected_tags")
-            indexed_values = []
-            for key in data.keys():
-                if key.startswith("selected_tags["):
-                    indexed_values.extend(data.getlist(key))
-            merged_values = values + indexed_values
-            if merged_values:
-                data.setlist("selected_tags", merged_values)
-        return super().to_internal_value(data)
-
     def validate_order_item(self, value):
         """order_item 유효성 검사"""
         if not value:
@@ -67,15 +46,6 @@ class FeedbackSerializer(serializers.ModelSerializer):
             if value.order.user != request.user:
                 raise serializers.ValidationError("본인의 주문에 대해서만 피드백을 작성할 수 있습니다.")
 
-        return value
-
-    def validate_selected_tags(self, value):
-        """선택된 태그 유효성 검사"""
-        if value:
-            valid_tags = [choice[0] for choice in TASTE_TAG_CHOICES]
-            invalid_tags = [tag for tag in value if tag not in valid_tags]
-            if invalid_tags:
-                raise serializers.ValidationError(f"허용되지 않은 태그: {invalid_tags}. " f"유효한 태그: {valid_tags}")
         return value
 
     def validate_image(self, value):
@@ -189,7 +159,6 @@ class FeedbackListSerializer(serializers.ModelSerializer):
             "id",
             "rating",
             "comment",
-            "selected_tags",
             "image_url",
             "product_name",
             "product_id",  # 추가

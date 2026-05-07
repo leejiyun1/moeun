@@ -67,9 +67,9 @@ class TasteProfileAPITest(TestCase):
 
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
-    def test_taste_profile_with_reviews(self):
-        """리뷰가 있는 경우 분석 설명 테스트"""
-        # 프로필 생성 및 리뷰 수 설정
+    def test_taste_profile_with_learning_data(self):
+        """후기 분석 데이터가 있는 경우 분석 설명 테스트"""
+        # 프로필 생성 및 후기 분석 반영 수 설정
         profile = PreferTasteProfile.objects.create(
             user=self.user, sweetness_level=Decimal("4.5"), acidity_level=Decimal("3.5"), total_reviews_count=5
         )

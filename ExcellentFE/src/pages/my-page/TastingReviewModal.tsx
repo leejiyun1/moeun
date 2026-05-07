@@ -2,7 +2,6 @@ import Button from '@/components/common/Button'
 import Modal from '@/components/common/Modal'
 import ReviewRatingSection from '@/components/common/review-modal/ReviewRatingSection'
 import ReviewSummaryForm from '@/components/common/review-modal/ReviewSummaryForm'
-import TasteFitSlider from '@/components/common/review-modal/TasteFitSlider'
 import useTastingReview from '@/hooks/order/useTastingReview'
 import { useAuthStore } from '@/stores/authStore'
 
@@ -20,7 +19,6 @@ const TastingReviewModal = ({
   const {
     review,
     updateReview,
-    clearTasteFitScore,
     comment,
     setComment,
     handleFileChange,
@@ -40,21 +38,13 @@ const TastingReviewModal = ({
     >
       <div className="mt-5 flex flex-col items-center justify-center text-lg text-[#666666]">
         <p>제품이 {user?.user_info?.nickname}님의 취향에 맞으셨나요?</p>
-        <p>
-          시음 후기 작성을 통해 더 적합한 전통주를 추천받고, 나만의 시음 후기를
-          통해
-        </p>
-        <p>나의 맛의 지문 정확도를 높여보세요!</p>
+        <p>시음하며 느낀 점을 간단히 기록해주세요.</p>
+        <p>후기는 다른 분들이 전통주를 고를 때 참고됩니다.</p>
       </div>
       <div className="w-full">
         <ReviewRatingSection
           review={review}
           updateReview={updateReview}
-        />
-        <TasteFitSlider
-          review={review}
-          updateReview={updateReview}
-          clearTasteFitScore={clearTasteFitScore}
         />
         <ReviewSummaryForm
           comment={comment}

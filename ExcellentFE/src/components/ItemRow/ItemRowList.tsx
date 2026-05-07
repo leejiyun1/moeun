@@ -53,12 +53,6 @@ const ItemRowList = (props: CartItemRowProps) => {
               : ''
           }
           feedback={props.comment || ''}
-          sweetness={props.sweetness}
-          acidity={props.acidity}
-          body={props.body}
-          carbonation={props.carbonation}
-          aroma={props.aroma}
-          bitterness={props.bitterness}
         />
       )
     }

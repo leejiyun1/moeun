@@ -41,7 +41,6 @@ ProductRecommendationService
 향후 추가할 입력:
 
 - 리뷰 평점
-- 리뷰의 맛별 입맛 적합도
 - 후기 텍스트 분석 결과
 - 좋아요
 - 조회/클릭
@@ -105,7 +104,7 @@ ProductRecommendationService
 책임:
 
 - 취향 프로필과 상품 맛 프로필의 유사도 계산
-- 리뷰의 입맛 적합도 기반 신호 반영
+- 정제된 후기 텍스트 분석 신호 반영
 - 운영 가중치 반영
 - fallback 점수 계산
 
@@ -182,4 +181,4 @@ Feedback
 3. `RecommendationCandidateSelector` 분리
 4. `RecommendationScorer` 분리
 5. `RecommendationReasonBuilder` 분리
-6. 리뷰 태그/분석 구조 반영 후 scorer 입력 확장
+6. 후기 텍스트 분석 구조 반영 후 scorer 입력 확장

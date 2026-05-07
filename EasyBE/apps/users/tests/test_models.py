@@ -7,7 +7,6 @@ from django.contrib.auth import get_user_model
 from django.test import TestCase
 
 from apps.users.models import PreferTasteProfile
-from apps.users.utils.taste_analysis import TasteAnalysisService
 
 User = get_user_model()
 
@@ -18,32 +17,6 @@ class PreferTasteProfileModelTest(TestCase):
     def setUp(self):
         self.user = User.objects.create_user(nickname="testuser", email="test@example.com")
         self.profile = PreferTasteProfile.objects.create(user=self.user)
-
-    @patch.object(TasteAnalysisService, "update_taste_profile_from_feedback")
-    def test_update_from_review_calls_service(self, mock_update):
-        """update_from_review가 TasteAnalysisService를 호출하는지 테스트"""
-        mock_feedback = Mock()
-
-        self.profile.update_from_review(mock_feedback)
-
-        # 서비스 메서드가 올바른 인수로 호출되었는지 확인
-        mock_update.assert_called_once_with(self.profile, mock_feedback)
-
-    def test_review_without_taste_fit_score_does_not_increment_review_count(self):
-        """입맛 적합도 입력이 없는 리뷰는 프로필 학습 카운트에 포함하지 않는다."""
-        mock_feedback = Mock(
-            sweetness=None,
-            acidity=None,
-            body=None,
-            carbonation=None,
-            bitterness=None,
-            aroma=None,
-        )
-
-        TasteAnalysisService.update_taste_profile_from_feedback(self.profile, mock_feedback)
-
-        self.profile.refresh_from_db()
-        self.assertEqual(self.profile.total_reviews_count, 0)
 
     def test_get_taste_scores_dict(self):
         """get_taste_scores_dict 메서드 테스트"""

@@ -9,11 +9,11 @@ class MessageGenerator:
     """사용자 메시지 생성"""
 
     @staticmethod
-    def generate_preview_message(review_count: int, test_influence: float, change_count: int) -> str:
+    def generate_preview_message(learning_count: int, test_influence: float, change_count: int) -> str:
         """재테스트 미리보기 메시지 생성"""
-        if review_count < 5:
+        if learning_count < 5:
             base_msg = f"초기 단계라 테스트 결과가 {int(test_influence * 100)}% 반영됩니다."
-        elif review_count < 20:
+        elif learning_count < 20:
             base_msg = f"기존 학습과 새 테스트 결과를 {int(test_influence * 100)}% 비율로 조합합니다."
         else:
             base_msg = f"오랜 경험이 쌓여서 새 테스트 결과는 {int(test_influence * 100)}%만 반영됩니다."

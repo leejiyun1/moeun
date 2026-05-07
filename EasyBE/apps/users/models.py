@@ -210,12 +210,6 @@ class PreferTasteProfile(models.Model):
 
         self.save()
 
-    def update_from_review(self, feedback):
-        """피드백을 바탕으로 취향 점수 업데이트 (진화하는 방식)"""
-        from apps.users.utils.taste_analysis import TasteAnalysisService
-
-        TasteAnalysisService.update_taste_profile_from_feedback(self, feedback)
-
     def handle_retake(self, new_test_result):
         """재테스트 처리 (기존 학습 보존하면서 새로운 성향 반영)"""
         from apps.users.utils.taste_analysis import TasteAnalysisService

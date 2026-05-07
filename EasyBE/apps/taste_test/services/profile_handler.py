@@ -22,7 +22,7 @@ class ProfileHandler:
             profile, profile_created = PreferTasteProfile.objects.get_or_create(user=user)
 
             if profile_created or profile.total_reviews_count == 0:
-                # 첫 테스트 또는 리뷰 경험이 없는 경우
+                # 첫 테스트 또는 후기 분석 기반 학습 데이터가 없는 경우
                 profile.initialize_from_test_result(test_result)
                 return MessageGenerator.generate_profile_action_message("initialized")
 
@@ -69,10 +69,10 @@ class ProfileHandler:
             new_base_scores = TASTE_PROFILES.get(enum_value, TASTE_PROFILES["GOURMET"])
 
             # 영향력 계산
-            review_count = profile.total_reviews_count
-            if review_count < 5:
+            learning_count = profile.total_reviews_count
+            if learning_count < 5:
                 test_influence = 0.8
-            elif review_count < 20:
+            elif learning_count < 20:
                 test_influence = 0.4
             else:
                 test_influence = 0.1
@@ -114,10 +114,10 @@ class ProfileHandler:
                     "name"
                 ],
                 "influence_rate": f"{int(test_influence * 100)}%",
-                "review_count": review_count,
+                "learning_count": learning_count,
                 "predicted_changes": preview_changes,
                 "message": MessageGenerator.generate_preview_message(
-                    review_count, test_influence, len(preview_changes)
+                    learning_count, test_influence, len(preview_changes)
                 ),
             }
 

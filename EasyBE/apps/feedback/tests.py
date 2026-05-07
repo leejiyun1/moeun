@@ -3,14 +3,13 @@ from decimal import Decimal
 from unittest.mock import patch
 
 from django.contrib.auth import get_user_model
-from django.core.exceptions import ValidationError
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase
 from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
 
-from apps.feedback.models import TASTE_TAG_CHOICES, Feedback
+from apps.feedback.models import Feedback
 from apps.orders.models import Order, OrderItem
 from apps.products.models import Brewery, Drink, Product
 from apps.stores.models import Store
@@ -68,16 +67,10 @@ class FeedbackModelTest(TestCase):
             user=self.user,
             order_item=self.order_item,
             rating=5,
-            sweetness=Decimal("3.0"),
-            acidity=Decimal("2.5"),
-            body=Decimal("4.0"),
             comment="정말 맛있는 소주입니다!",
-            selected_tags=["달콤한", "부드러운"],
         )
         self.assertEqual(feedback.rating, 5)
-        self.assertEqual(feedback.sweetness, Decimal("3.0"))
-        self.assertEqual(len(feedback.selected_tags), 2)
-        self.assertIn("달콤한", feedback.selected_tags)
+        self.assertEqual(feedback.comment, "정말 맛있는 소주입니다!")
 
     def test_feedback_str_method(self):
         feedback = Feedback.objects.create(
@@ -138,21 +131,6 @@ class FeedbackModelTest(TestCase):
         mock_delete_file.assert_called_once_with("https://example.com/image.jpg")
         feedback.refresh_from_db()
         self.assertIsNone(feedback.image_url)
-
-    def test_invalid_tags_validation(self):
-        feedback = Feedback(
-            user=self.user, order_item=self.order_item, rating=4, selected_tags=["잘못된태그", "달콤한"]
-        )
-        with self.assertRaises(ValidationError):
-            feedback.clean()
-
-    def test_valid_tags_validation(self):
-        valid_tags = [choice[0] for choice in TASTE_TAG_CHOICES[:3]]
-        feedback = Feedback(user=self.user, order_item=self.order_item, rating=4, selected_tags=valid_tags)
-        try:
-            feedback.clean()
-        except ValidationError:
-            self.fail("valid tags should not raise ValidationError")
 
     def test_review_count_increment_on_save(self):
         initial_review_count = self.product.review_count
@@ -227,35 +205,6 @@ class FeedbackQuerySetTest(TestCase):
         self.assertIn(high_feedback, high_rated_feedbacks)
         self.assertNotIn(low_feedback, high_rated_feedbacks)
 
-    def test_with_taste_profile_queryset(self):
-        with_taste = Feedback.objects.create(
-            user=self.user, order_item=self.order_item, rating=4, sweetness=Decimal("3.0")
-        )
-        order_item2 = OrderItem.objects.create(
-            order=self.order,
-            product=self.product,
-            quantity=1,
-            price=Decimal("15000"),
-            pickup_day=date.today(),
-            pickup_store=self.store,
-        )
-        without_taste = Feedback.objects.create(user=self.user, order_item=order_item2, rating=4)
-        order_item3 = OrderItem.objects.create(
-            order=self.order,
-            product=self.product,
-            quantity=1,
-            price=Decimal("15000"),
-            pickup_day=date.today(),
-            pickup_store=self.store,
-        )
-        with_aroma_only = Feedback.objects.create(
-            user=self.user, order_item=order_item3, rating=4, aroma=Decimal("4.5")
-        )
-        taste_profile_feedbacks = Feedback.objects.with_taste_profile()
-        self.assertIn(with_taste, taste_profile_feedbacks)
-        self.assertIn(with_aroma_only, taste_profile_feedbacks)
-        self.assertNotIn(without_taste, taste_profile_feedbacks)
-
 
 class FeedbackAPITest(APITestCase):
     """Feedback API 테스트"""
@@ -300,11 +249,7 @@ class FeedbackAPITest(APITestCase):
         data = {
             "order_item": self.order_item.id,
             "rating": 5,
-            "sweetness": "3.5",
-            "acidity": "2.0",
-            "body": "4.0",
             "comment": "정말 맛있습니다!",
-            "selected_tags": ["달콤한", "부드러운"],
         }
         url = reverse("feedback:v1:feedbacks-list")
         response = self.client.post(url, data, format="json")
@@ -313,22 +258,6 @@ class FeedbackAPITest(APITestCase):
         feedback = Feedback.objects.first()
         self.assertEqual(feedback.user, self.user)
         self.assertEqual(feedback.rating, 5)
-
-    def test_create_feedback_with_taste_fit_scores(self):
-        self.client.force_authenticate(user=self.user)
-        data = {
-            "order_item": self.order_item.id,
-            "rating": 5,
-            "comment": "달달하고 향이 좋아서 편했습니다.",
-            "sweetness": "5.0",
-            "aroma": "4.5",
-        }
-        url = reverse("feedback:v1:feedbacks-list")
-        response = self.client.post(url, data, format="json")
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        feedback = Feedback.objects.get()
-        self.assertEqual(feedback.sweetness, Decimal("5.0"))
-        self.assertEqual(feedback.aroma, Decimal("4.5"))
 
     def test_create_feedback_invalid_image_format(self):
         """잘못된 이미지 형식 테스트"""
@@ -422,11 +351,3 @@ class FeedbackAPITest(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), 1)
         self.assertEqual(response.data[0]["id"], feedback.id)
-
-    def test_invalid_tag_validation_api(self):
-        self.client.force_authenticate(user=self.user)
-        data = {"order_item": self.order_item.id, "rating": 4, "selected_tags": ["잘못된태그", "달콤한"]}
-        url = reverse("feedback:v1:feedbacks-list")
-        response = self.client.post(url, data, format="json")
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertIn("selected_tags", response.data)

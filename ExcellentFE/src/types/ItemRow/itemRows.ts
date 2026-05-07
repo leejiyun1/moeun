@@ -83,12 +83,6 @@ export interface ItemRowType {
   pickup_date?: string | null
 
   rating?: number
-  sweetness?: string
-  acidity?: string
-  body?: string
-  carbonation?: string
-  aroma?: string
-  bitterness?: string
   created_at?: string
   updated_at?: string
   masked_username?: string

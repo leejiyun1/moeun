@@ -21,22 +21,6 @@ const createFormDataFromFeedback = (data: FeedbackRequest): FormData => {
     })
   }
 
-  const tasteFitFields = [
-    'sweetness',
-    'acidity',
-    'body',
-    'carbonation',
-    'bitterness',
-    'aroma',
-  ] as const
-
-  tasteFitFields.forEach((field) => {
-    const value = data[field]
-    if (value !== undefined) {
-      formData.set(field, String(value))
-    }
-  })
-
   return formData
 }
 
