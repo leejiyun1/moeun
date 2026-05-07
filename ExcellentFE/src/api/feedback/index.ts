@@ -8,13 +8,6 @@ const createFormDataFromFeedback = (data: FeedbackRequest): FormData => {
   const fields = {
     order_item: String(data.order_item_id),
     rating: String(Math.round(data.overall_rating)),
-    sweetness: String(data.sweetness),
-    acidity: String(data.acidity),
-    body: String(data.body),
-    carbonation: String(data.carbonation),
-    bitterness: String(data.bitter),
-    aroma: String(data.aroma),
-    confidence: String(Math.round(data.confidence)),
     comment: data.comment ?? '',
   }
 
@@ -28,10 +21,15 @@ const createFormDataFromFeedback = (data: FeedbackRequest): FormData => {
     })
   }
 
-  // 태그 추가
-  if (data.taste_tag?.length) {
-    data.taste_tag.forEach((tag, index) => {
-      formData.append(`selected_tags[${index}]`, tag)
+  if (data.positive_tags?.length) {
+    data.positive_tags.forEach((tag) => {
+      formData.append('positive_tags', tag)
+    })
+  }
+
+  if (data.negative_tags?.length) {
+    data.negative_tags.forEach((tag) => {
+      formData.append('negative_tags', tag)
     })
   }
 

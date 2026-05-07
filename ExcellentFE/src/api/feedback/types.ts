@@ -1,17 +1,11 @@
 export interface FeedbackRequest {
   order_item_id: number
-  sweetness: number
-  acidity: number
-  body: number
-  carbonation: number
-  bitter: number
-  aroma: number
-  confidence: number
   overall_rating: number
-  taste_tag: string[]
+  positive_tags: string[]
+  negative_tags: string[]
   photo_url?: string
   comment?: string
-  files: FileList | null
+  files: File[] | null
 }
 
 export interface Feedback {
@@ -27,7 +21,9 @@ export interface Feedback {
   aroma?: string
   confidence?: number
   comment: string
-  selected_tags?: string
+  selected_tags?: string[] | null
+  positive_tags?: string[]
+  negative_tags?: string[]
   image_url?: string
   product_name: string
   masked_username: string

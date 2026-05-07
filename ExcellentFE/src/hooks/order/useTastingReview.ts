@@ -1,17 +1,10 @@
-import { useState } from 'react'
+import { useState, type Dispatch, type SetStateAction } from 'react'
 import useSubmitFeedback from '@/hooks/order/useSubmitFeedback'
 import type { TastingReview, TastingSubmitData } from '@/types/feedback'
 import { MAX_SELECTED_TAGS } from '@/constants/feedbackReview'
 import type { FeedbackRequest } from '@/api/feedback/types'
 
 const INITIAL_REVIEW_STATE: TastingReview = {
-  sweetness: 0,
-  acidity: 0,
-  body: 0,
-  confidence: 0,
-  carbonation: 0,
-  bitter: 0,
-  aroma: 0,
   rating: 0,
 }
 
@@ -22,7 +15,8 @@ const useTastingReview = (orderItemId?: number, onClose?: () => void) => {
   const [files, setFiles] = useState<File[]>([])
   const [imagePreviews, setImagePreviews] = useState<string[]>([])
   const [comment, setComment] = useState('')
-  const [selectedTags, setSelectedTags] = useState<string[]>([])
+  const [positiveTags, setPositiveTags] = useState<string[]>([])
+  const [negativeTags, setNegativeTags] = useState<string[]>([])
   const [isOpen, setIsOpen] = useState(false)
 
   const mutation = useSubmitFeedback()
@@ -58,8 +52,11 @@ const useTastingReview = (orderItemId?: number, onClose?: () => void) => {
     e.target.value = ''
   }
 
-  const handleToggleTag = (tagValue: string) => {
-    setSelectedTags((prev) => {
+  const toggleTag = (
+    tagValue: string,
+    setTags: Dispatch<SetStateAction<string[]>>
+  ) => {
+    setTags((prev) => {
       const hasTag = prev.includes(tagValue)
       if (hasTag) return prev.filter((v) => v !== tagValue)
       if (prev.length >= MAX_SELECTED_TAGS) return prev
@@ -67,29 +64,29 @@ const useTastingReview = (orderItemId?: number, onClose?: () => void) => {
     })
   }
 
+  const handleTogglePositiveTag = (tagValue: string) => {
+    toggleTag(tagValue, setPositiveTags)
+  }
+
+  const handleToggleNegativeTag = (tagValue: string) => {
+    toggleTag(tagValue, setNegativeTags)
+  }
+
   const validateReview = (): boolean => {
     return (
-      review.sweetness >= 0 &&
-      review.acidity >= 0 &&
-      review.body >= 0 &&
-      review.confidence >= 0 &&
       review.rating > 0 &&
-      selectedTags.length > 2
+      (comment.trim().length > 0 ||
+        positiveTags.length > 0 ||
+        negativeTags.length > 0)
     )
   }
 
   const createSubmitData = (): TastingSubmitData => {
     return {
       order_item_id: Number(orderItemId ?? 0),
-      sweetness: review.sweetness,
-      acidity: review.acidity,
-      body: review.body,
-      confidence: review.confidence,
-      carbonation: review.carbonation,
-      bitter: review.bitter,
-      aroma: review.aroma,
       overall_rating: review.rating,
-      taste_tag: selectedTags,
+      positive_tags: positiveTags,
+      negative_tags: negativeTags,
       comment,
       files: files.length > 0 ? files : null,
     }
@@ -100,7 +97,8 @@ const useTastingReview = (orderItemId?: number, onClose?: () => void) => {
     setFiles([])
     setImagePreviews([])
     setComment('')
-    setSelectedTags([])
+    setPositiveTags([])
+    setNegativeTags([])
   }
 
   const openModal = () => setIsOpen(true)
@@ -113,7 +111,7 @@ const useTastingReview = (orderItemId?: number, onClose?: () => void) => {
   const handleSubmit = () => {
     if (!validateReview()) {
       /* TODO: ux적으로 좋지 않음 추후 개선 필요 */
-      alert('필수 부분을 모두 입력해주세요.')
+      alert('평점과 후기 또는 태그를 입력해주세요.')
       return false
     }
 
@@ -138,13 +136,15 @@ const useTastingReview = (orderItemId?: number, onClose?: () => void) => {
   return {
     review,
     comment,
-    selectedTags,
+    positiveTags,
+    negativeTags,
     isOpen,
     imagePreviews,
     maxImages: MAX_IMAGES,
     updateReview,
     handleFileChange,
-    handleToggleTag,
+    handleTogglePositiveTag,
+    handleToggleNegativeTag,
     setComment,
     openModal,
     closeModal,

@@ -140,6 +140,13 @@
 - 직접 맛 점수 입력은 사용자가 느낀 맛과 사용자의 선호도를 구분하기 어렵다.
 - 리뷰 입력 부담이 크면 실제 운영에서 데이터가 쌓이기 어렵다.
 
+반영 완료:
+
+- 프론트 리뷰 작성 화면에서 직접 맛 점수/신뢰도 슬라이더를 제거했다.
+- 좋았던 점/아쉬웠던 점 태그를 분리했다.
+- 백엔드 `Feedback`에 `positive_tags`, `negative_tags`를 추가했다.
+- 기존 `selected_tags`는 호환용으로 유지한다.
+
 설계 기준:
 
 - 상세 설계는 `docs/REVIEW_TASTE_LEARNING_DESIGN.md` 를 따른다.
@@ -149,8 +156,7 @@
 
 해야 할 일:
 
-- 직접 맛 점수 입력 UI 제거 또는 숨김.
-- 좋았던 점/아쉬웠던 점 태그 UI 추가.
+- `FeedbackCommandService`로 후기 저장 부수효과를 이동한다.
 - `FeedbackAnalysis`와 `TasteProfileUpdateLog` 모델 설계 반영.
 - `FeedbackAnalysisService`, `TasteProfileLearningService` 추가.
 

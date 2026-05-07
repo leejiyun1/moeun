@@ -1,21 +1,29 @@
 import Button from '@/components/common/Button'
 import StarRating from '@/components/common/StarRating'
-import { TASTE_TAGS, MAX_SELECTED_TAGS } from '@/constants/feedbackReview'
+import {
+  MAX_SELECTED_TAGS,
+  NEGATIVE_FEEDBACK_TAGS,
+  POSITIVE_FEEDBACK_TAGS,
+} from '@/constants/feedbackReview'
 import type { TastingReview } from '@/types/feedback'
 import { cn } from '@/utils/cn'
 
 interface ReviewStarTagProps {
   review: TastingReview
   updateReview: (field: keyof TastingReview, value: number) => void
-  selectedTags: string[]
-  handleToggleTag: (tagValue: string) => void
+  positiveTags: string[]
+  negativeTags: string[]
+  handleTogglePositiveTag: (tagValue: string) => void
+  handleToggleNegativeTag: (tagValue: string) => void
 }
 
 const ReviewStarTag = ({
   review,
   updateReview,
-  selectedTags,
-  handleToggleTag,
+  positiveTags,
+  negativeTags,
+  handleTogglePositiveTag,
+  handleToggleNegativeTag,
 }: ReviewStarTagProps) => {
   return (
     <>
@@ -29,29 +37,65 @@ const ReviewStarTag = ({
           onChange={(value) => updateReview('rating', value)}
         />
       </div>
-      <div className="mt-12 flex flex-wrap gap-2">
-        {TASTE_TAGS.map((tag) => {
-          const isSelected = selectedTags.includes(tag.value)
-          return (
-            <Button
-              key={tag.value}
-              variant="VARIANT10"
-              onClick={() => handleToggleTag(tag.value)}
-              className={cn(
-                'border-[#f2544b]',
-                isSelected
-                  ? 'bg-[#f2544b] text-white'
-                  : 'text-[#f2544b] hover:bg-[#fff1f0]'
-              )}
-            >
-              {tag.label}
-            </Button>
-          )
-        })}
+      <div className="mt-12">
+        <p className="mb-4 text-lg font-bold text-[#333333]">
+          좋았던 점을 선택해주세요
+        </p>
+        <div className="flex flex-wrap gap-2">
+          {POSITIVE_FEEDBACK_TAGS.map((tag) => {
+            const isSelected = positiveTags.includes(tag.value)
+            return (
+              <Button
+                key={tag.value}
+                variant="VARIANT10"
+                onClick={() => handleTogglePositiveTag(tag.value)}
+                className={cn(
+                  'border-[#f2544b]',
+                  isSelected
+                    ? 'bg-[#f2544b] text-white'
+                    : 'text-[#f2544b] hover:bg-[#fff1f0]'
+                )}
+              >
+                {tag.label}
+              </Button>
+            )
+          })}
+        </div>
+        <p className="mt-3 text-xs text-[#666666]">
+          최대 {MAX_SELECTED_TAGS}개 선택 ({positiveTags.length}/
+          {MAX_SELECTED_TAGS})
+        </p>
       </div>
-      <p className="mt-3 text-xs text-[#666666]">
-        {MAX_SELECTED_TAGS}개 선택 ({selectedTags.length}/{MAX_SELECTED_TAGS})
-      </p>
+
+      <div className="mt-8">
+        <p className="mb-4 text-lg font-bold text-[#333333]">
+          아쉬웠던 점이 있다면 선택해주세요
+        </p>
+        <div className="flex flex-wrap gap-2">
+          {NEGATIVE_FEEDBACK_TAGS.map((tag) => {
+            const isSelected = negativeTags.includes(tag.value)
+            return (
+              <Button
+                key={tag.value}
+                variant="VARIANT10"
+                onClick={() => handleToggleNegativeTag(tag.value)}
+                className={cn(
+                  'border-[#777777]',
+                  isSelected
+                    ? 'bg-[#333333] text-white'
+                    : 'text-[#555555] hover:bg-[#f2f2f2]'
+                )}
+              >
+                {tag.label}
+              </Button>
+            )
+          })}
+        </div>
+        <p className="mt-3 text-xs text-[#666666]">
+          최대 {MAX_SELECTED_TAGS}개 선택 ({negativeTags.length}/
+          {MAX_SELECTED_TAGS})
+        </p>
+      </div>
     </>
   )
 }

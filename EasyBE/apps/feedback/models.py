@@ -6,8 +6,8 @@ from django.conf import settings
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 
-# 태그 선택지 정의
-TASTE_TAG_CHOICES = [
+# 기존 단순 태그. 기존 데이터와 API 호환을 위해 유지한다.
+LEGACY_TASTE_TAGS = [
     ("과일향", "과일향"),
     ("꽃향기", "꽃향기"),
     ("곡물향", "곡물향"),
@@ -23,6 +23,32 @@ TASTE_TAG_CHOICES = [
     ("단맛", "단맛"),
     ("쓴맛", "쓴맛"),
     ("산미", "산미"),
+]
+
+REVIEW_TAG_DEFINITIONS = [
+    {"label": "달달함", "sentiment": "positive", "taste_axis": "sweetness"},
+    {"label": "상큼함", "sentiment": "positive", "taste_axis": "acidity"},
+    {"label": "묵직함", "sentiment": "positive", "taste_axis": "body"},
+    {"label": "톡 쏘는 느낌", "sentiment": "positive", "taste_axis": "carbonation"},
+    {"label": "쌉쌀함", "sentiment": "positive", "taste_axis": "bitterness"},
+    {"label": "향긋함", "sentiment": "positive", "taste_axis": "aroma"},
+    {"label": "너무 달다", "sentiment": "negative", "taste_axis": "sweetness"},
+    {"label": "너무 시다", "sentiment": "negative", "taste_axis": "acidity"},
+    {"label": "너무 묵직하다", "sentiment": "negative", "taste_axis": "body"},
+    {"label": "탄산이 부담스럽다", "sentiment": "negative", "taste_axis": "carbonation"},
+    {"label": "너무 쓰다", "sentiment": "negative", "taste_axis": "bitterness"},
+    {"label": "향이 강하다", "sentiment": "negative", "taste_axis": "aroma"},
+]
+
+POSITIVE_REVIEW_TAGS = [tag["label"] for tag in REVIEW_TAG_DEFINITIONS if tag["sentiment"] == "positive"]
+NEGATIVE_REVIEW_TAGS = [tag["label"] for tag in REVIEW_TAG_DEFINITIONS if tag["sentiment"] == "negative"]
+VALID_REVIEW_TAGS = {tag["label"] for tag in REVIEW_TAG_DEFINITIONS}
+VALID_LEGACY_TAGS = {tag[0] for tag in LEGACY_TASTE_TAGS}
+VALID_FEEDBACK_TAGS = VALID_REVIEW_TAGS | VALID_LEGACY_TAGS
+
+# 외부 import 호환용 이름.
+TASTE_TAG_CHOICES = LEGACY_TASTE_TAGS + [
+    (tag["label"], tag["label"]) for tag in REVIEW_TAG_DEFINITIONS if tag["label"] not in VALID_LEGACY_TAGS
 ]
 
 
@@ -162,6 +188,8 @@ class Feedback(models.Model):
     selected_tags = models.JSONField(
         null=True, blank=True, help_text="선택한 맛/느낌 태그들 (예: ['과일향', '달콤한', '부드러운'])"
     )
+    positive_tags = models.JSONField(default=list, blank=True, help_text="좋았던 점 태그 목록")
+    negative_tags = models.JSONField(default=list, blank=True, help_text="아쉬웠던 점 태그 목록")
 
     # 조회 관련
     view_count = models.PositiveIntegerField(default=0, help_text="피드백 조회수")
@@ -217,12 +245,25 @@ class Feedback(models.Model):
     def clean(self):
         """태그 검증"""
         if self.selected_tags:
-            valid_tags = [choice[0] for choice in TASTE_TAG_CHOICES]
-            invalid_tags = [tag for tag in self.selected_tags if tag not in valid_tags]
+            invalid_tags = [tag for tag in self.selected_tags if tag not in VALID_FEEDBACK_TAGS]
             if invalid_tags:
                 from django.core.exceptions import ValidationError
 
                 raise ValidationError(f"허용되지 않은 태그: {invalid_tags}")
+
+        if self.positive_tags:
+            invalid_tags = [tag for tag in self.positive_tags if tag not in POSITIVE_REVIEW_TAGS]
+            if invalid_tags:
+                from django.core.exceptions import ValidationError
+
+                raise ValidationError(f"허용되지 않은 좋았던 점 태그: {invalid_tags}")
+
+        if self.negative_tags:
+            invalid_tags = [tag for tag in self.negative_tags if tag not in NEGATIVE_REVIEW_TAGS]
+            if invalid_tags:
+                from django.core.exceptions import ValidationError
+
+                raise ValidationError(f"허용되지 않은 아쉬웠던 점 태그: {invalid_tags}")
 
     def delete_image(self):
         """이미지 삭제 (S3/NCP에서)"""

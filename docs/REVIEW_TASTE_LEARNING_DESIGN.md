@@ -51,9 +51,11 @@
 
 - 백엔드 원본 모델명은 `Feedback`이다.
 - 프론트 사용자 화면에서는 `리뷰/후기`라고 부른다.
-- 현재 `Feedback`에는 직접 맛 점수 필드와 `selected_tags` JSONField가 이미 있다.
-- 현재 프론트에는 별점, 맛 점수 슬라이더, 신뢰도 슬라이더, 단순 맛 태그가 있다.
-- 목표 구조에서는 직접 맛 점수/신뢰도 입력을 사용자 흐름에서 제거하고, 긍정 태그와 부정 태그를 분리한다.
+- `Feedback`에는 기존 직접 맛 점수 필드와 `selected_tags` JSONField가 남아 있다.
+- 1차 적용으로 `positive_tags`, `negative_tags`를 추가했다.
+- 프론트 리뷰 작성 화면에서는 맛 점수/신뢰도 슬라이더를 제거했다.
+- 프론트 리뷰 작성 화면은 별점, 후기, 좋았던 점 태그, 아쉬웠던 점 태그, 이미지 입력으로 구성한다.
+- 직접 맛 점수 필드는 기존 데이터와 화면 표시 호환을 위해 deprecated 상태로 유지한다.
 
 예:
 
@@ -239,8 +241,9 @@ NEGATIVE
 
 1차 변경 방향:
 
-- 사용자 입력 API에서는 직접 맛 점수와 신뢰도 입력을 받지 않는다.
-- `selected_tags`는 임시로 유지하되 긍정/부정 그룹을 표현할 수 있게 계약을 정리한다.
+- 사용자 입력 API에서는 직접 맛 점수와 신뢰도 입력을 보내지 않는다.
+- `positive_tags`, `negative_tags`로 긍정/부정 태그를 분리한다.
+- `selected_tags`는 기존 응답/표시 호환을 위해 `positive_tags + negative_tags`로 같이 채운다.
 - 장기적으로 `selected_tags` JSONField는 `FeedbackTagSelection`으로 분리한다.
 - 직접 맛 점수 필드는 당장 삭제하지 않고 deprecated 처리한다. 기존 데이터와 화면 표시 호환 때문이다.
 
@@ -468,7 +471,7 @@ rating_weight = 1.0
 }
 ```
 
-현재 프론트/백엔드 계약은 `selected_tags` 기반이다. 위 요청 형태는 목표 계약이며, 구현 시 기존 `selected_tags`와의 호환 기간을 둔다.
+현재 1차 구현은 `positive_tags`, `negative_tags`를 받는다. `selected_tags`는 호환용으로 같이 유지한다.
 
 리뷰 작성 응답:
 
@@ -522,12 +525,18 @@ rating_weight = 1.0
 
 ### 1단계
 
+상태: 완료
+
 - 설계 문서 확정
-- 기존 직접 맛 점수 입력 UI 제거 또는 숨김
+- 기존 직접 맛 점수 입력 UI 제거
 - 평점, 후기, 좋았던 점/아쉬웠던 점 태그 UI 추가
 - 태그는 상수 기반으로 시작
+- 백엔드 `Feedback.positive_tags`, `Feedback.negative_tags` 추가
+- 기존 `selected_tags`와 호환 유지
 
 ### 2단계
+
+상태: 예정
 
 - `FeedbackCommandService` 추가
 - `Feedback.save()` side effect 제거
@@ -535,17 +544,23 @@ rating_weight = 1.0
 
 ### 3단계
 
+상태: 예정
+
 - `FeedbackAnalysis` 모델 추가
 - 태그 기반 규칙 분석 먼저 구현
 - 로컬 LLM 분석은 나중에 붙일 수 있게 인터페이스만 분리
 
 ### 4단계
 
+상태: 예정
+
 - 로컬 LLM 분석 연결
 - JSON schema 검증
 - 실패/재시도 처리
 
 ### 5단계
+
+상태: 예정
 
 - `TasteProfileLearningService` 추가
 - confidence 높은 분석만 프로필에 소폭 반영
