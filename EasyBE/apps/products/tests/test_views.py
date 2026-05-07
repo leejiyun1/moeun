@@ -96,11 +96,7 @@ class ProductSearchAPITest(BaseAPITestCase):
             "main_image_url",
             "brewery_name",
             "alcohol_type",
-            "is_gift_suitable",
-            "is_regional_specialty",
-            "is_limited_edition",
-            "is_premium",
-            "is_award_winning",
+            "tags",
             "is_tasting_available",
             "view_count",
             "like_count",
@@ -137,17 +133,13 @@ class ProductSearchAPITest(BaseAPITestCase):
         """카테고리 필터 테스트"""
         url = reverse("products:v1:products-search")
 
-        # 프리미엄 상품 설정
-        self.all_products[0].is_premium = True
-        self.all_products[0].save()
-
         response = self.client.get(url, {"premium": "true"})
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         results = response.data["results"]
         if results:
             for product in results:
-                self.assertTrue(product["is_premium"])
+                self.assertTrue(any(tag["slug"] == "premium" for tag in product["tags"]))
 
     def test_product_taste_profile_filters(self):
         """맛 프로필 필터 테스트"""
@@ -453,14 +445,14 @@ class AdminAPITest(BaseAPITestCase):
         url = reverse("products:v1:products-manage", kwargs={"pk": product.pk})
         response = self.client.patch(
             url,
-            {"price": 17000, "is_premium": False, "status": product.Status.OUT_OF_STOCK},
+            {"price": 17000, "tag_ids": [], "status": product.Status.OUT_OF_STOCK},
             format="json",
         )
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         product.refresh_from_db()
         self.assertEqual(product.price, 17000)
-        self.assertFalse(product.is_premium)
+        self.assertFalse(product.tags.exists())
         self.assertEqual(product.status, product.Status.OUT_OF_STOCK)
 
     def test_product_patch_rejects_invalid_discount(self):

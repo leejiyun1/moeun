@@ -20,13 +20,7 @@ class ProductBaseCreateSerializer(serializers.Serializer):
     description = serializers.CharField()
     description_image_url = serializers.URLField()
 
-    # 상품 특성
-    is_gift_suitable = serializers.BooleanField(default=False)
-    is_award_winning = serializers.BooleanField(default=False)
-    is_regional_specialty = serializers.BooleanField(default=False)
-    is_limited_edition = serializers.BooleanField(default=False)
-    is_premium = serializers.BooleanField(default=False)
-    is_organic = serializers.BooleanField(default=False)
+    tag_ids = serializers.ListField(child=serializers.IntegerField(min_value=1), required=False, allow_empty=True)
     is_tasting_available = serializers.BooleanField(default=False)
 
     # 이미지
@@ -47,6 +41,11 @@ class ProductBaseCreateSerializer(serializers.Serializer):
 
         return attrs
 
+    def validate_tag_ids(self, value):
+        if len(value) != len(set(value)):
+            raise serializers.ValidationError("상품 태그는 중복될 수 없습니다.")
+        return value
+
     def validate_images(self, value):
         """이미지 유효성 검사"""
         return validate_product_images(value)
@@ -61,11 +60,16 @@ class IndividualProductCreateSerializer(ProductBaseCreateSerializer):
         """개별 상품 생성."""
         drink_data = validated_data.pop("drink_info")
         images_data = validated_data.pop("images")
-        return ProductCommandService.create_single_product(
-            drink_data=drink_data,
-            product_data=validated_data,
-            images_data=images_data,
-        )
+        tag_ids = validated_data.pop("tag_ids", [])
+        try:
+            return ProductCommandService.create_single_product(
+                drink_data=drink_data,
+                product_data=validated_data,
+                images_data=images_data,
+                tag_ids=tag_ids,
+            )
+        except ValueError as exc:
+            raise serializers.ValidationError({"detail": str(exc)}) from exc
 
     def to_representation(self, instance):
         """응답 시리얼라이저"""
@@ -81,11 +85,16 @@ class PackageProductCreateSerializer(ProductBaseCreateSerializer):
         """패키지 상품 생성."""
         package_data = validated_data.pop("package_info")
         images_data = validated_data.pop("images")
-        return ProductCommandService.create_package_product(
-            package_data=package_data,
-            product_data=validated_data,
-            images_data=images_data,
-        )
+        tag_ids = validated_data.pop("tag_ids", [])
+        try:
+            return ProductCommandService.create_package_product(
+                package_data=package_data,
+                product_data=validated_data,
+                images_data=images_data,
+                tag_ids=tag_ids,
+            )
+        except ValueError as exc:
+            raise serializers.ValidationError({"detail": str(exc)}) from exc
 
     def to_representation(self, instance):
         """응답 시리얼라이저"""

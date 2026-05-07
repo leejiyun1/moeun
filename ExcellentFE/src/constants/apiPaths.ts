@@ -46,6 +46,8 @@ export const API_PATHS = {
     PRODUCT_PACKAGE_CREATE: '/products/package/create/',
     DRINKS_FOR_PACKAGE: '/drinks/for-package/',
     PACKAGE_POLICIES: '/package-policies/manage/',
+    PRODUCT_TAGS: '/product-tags/manage/',
+    PRODUCT_TAG_DETAIL: (id: number) => `/product-tags/${id}/manage/`,
     BREWERIES: '/breweries/',
   },
   SEARCHPRODUCTS: {

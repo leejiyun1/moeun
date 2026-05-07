@@ -23,6 +23,8 @@ from apps.products.views import (  # Brewery views; Drink views; Product views -
     ProductManageListView,
     ProductManageView,
     ProductSearchView,
+    ProductTagManageListView,
+    ProductTagManageView,
     RecommendedProductsView,
     RegionalProductsView,
 )
@@ -69,6 +71,8 @@ v1_patterns = [
     path("products/<uuid:pk>/manage/", ProductManageView.as_view(), name="products-manage"),
     path("products/individual/create/", IndividualProductCreateView.as_view(), name="products-individual-create"),
     path("products/package/create/", PackageProductCreateView.as_view(), name="products-package-create"),
+    path("product-tags/manage/", ProductTagManageListView.as_view(), name="product-tags-manage-list"),
+    path("product-tags/<int:pk>/manage/", ProductTagManageView.as_view(), name="product-tags-manage"),
     path("package-policies/manage/", PackagePolicyManageListView.as_view(), name="package-policies-manage-list"),
     path("package-policies/<int:pk>/manage/", PackagePolicyManageView.as_view(), name="package-policies-manage"),
 ]

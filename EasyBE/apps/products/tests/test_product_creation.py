@@ -73,7 +73,6 @@ class IndividualProductCreationAPITest(BaseProductCreationTestCase):
         self.assertEqual(product.price, 15000)
         self.assertEqual(product.original_price, 18000)
         self.assertEqual(product.discount, 3000)
-        self.assertTrue(product.is_premium)
         self.assertTrue(product.is_tasting_available)
 
         # 생성된 이미지 검증

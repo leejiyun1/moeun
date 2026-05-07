@@ -17,12 +17,7 @@ class ProductUpdateSerializer(serializers.Serializer):
     description = serializers.CharField(required=False)
     description_image_url = serializers.URLField(required=False)
 
-    is_gift_suitable = serializers.BooleanField(required=False)
-    is_award_winning = serializers.BooleanField(required=False)
-    is_regional_specialty = serializers.BooleanField(required=False)
-    is_limited_edition = serializers.BooleanField(required=False)
-    is_premium = serializers.BooleanField(required=False)
-    is_organic = serializers.BooleanField(required=False)
+    tag_ids = serializers.ListField(child=serializers.IntegerField(min_value=1), required=False, allow_empty=True)
     is_tasting_available = serializers.BooleanField(required=False)
     status = serializers.ChoiceField(choices=Product.Status.choices, required=False)
     images = ProductImageCreateSerializer(many=True, required=False)
@@ -44,6 +39,11 @@ class ProductUpdateSerializer(serializers.Serializer):
 
     def validate_images(self, value):
         return validate_product_images(value)
+
+    def validate_tag_ids(self, value):
+        if len(value) != len(set(value)):
+            raise serializers.ValidationError("상품 태그는 중복될 수 없습니다.")
+        return value
 
     def _validate_nested_payloads(self, attrs):
         if "drink_info" in attrs:

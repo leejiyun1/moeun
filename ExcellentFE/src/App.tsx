@@ -37,6 +37,7 @@ const AdminProductCreate = lazy(
 const AdminPackagePolicies = lazy(
   () => import('@/pages/admin/AdminPackagePolicies')
 )
+const AdminProductTags = lazy(() => import('@/pages/admin/AdminProductTags'))
 
 function App() {
   const navigate = useNavigate()
@@ -102,6 +103,14 @@ function App() {
               element={
                 <RequireAdmin>
                   <AdminPackagePolicies />
+                </RequireAdmin>
+              }
+            />
+            <Route
+              path="admin/product-tags"
+              element={
+                <RequireAdmin>
+                  <AdminProductTags />
                 </RequireAdmin>
               }
             />

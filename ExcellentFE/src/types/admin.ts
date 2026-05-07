@@ -1,4 +1,4 @@
-import type { ProductDetail } from '@/types/product'
+import type { ProductDetail, ProductTag, ProductTagGroup } from '@/types/product'
 
 export interface PaginatedResponse<T> {
   count: number
@@ -16,7 +16,6 @@ export type PackageAllowedItemScope =
   | 'PACKAGE_PRODUCTS'
   | 'ALLOWED_SET'
 export type PackageDiscountType = 'NONE' | 'FIXED_AMOUNT'
-
 export interface AdminProductListItem {
   id: string
   name: string
@@ -30,11 +29,7 @@ export interface AdminProductListItem {
   main_image_url: string | null
   brewery_name: string | null
   alcohol_type: string | null
-  is_gift_suitable: boolean
-  is_regional_specialty: boolean
-  is_limited_edition: boolean
-  is_premium: boolean
-  is_award_winning: boolean
+  tags: ProductTag[]
   is_tasting_available: boolean
   view_count: number
   like_count: number
@@ -133,12 +128,7 @@ export interface CreateIndividualProductPayload {
   discount: number | null
   description: string
   description_image_url: string
-  is_gift_suitable: boolean
-  is_award_winning: boolean
-  is_regional_specialty: boolean
-  is_limited_edition: boolean
-  is_premium: boolean
-  is_organic: boolean
+  tag_ids?: number[]
   is_tasting_available: boolean
   images: ProductImageCreatePayload[]
   drink_info: DrinkCreatePayload
@@ -156,12 +146,7 @@ export interface CreatePackageProductPayload {
   discount: number | null
   description: string
   description_image_url: string
-  is_gift_suitable: boolean
-  is_award_winning: boolean
-  is_regional_specialty: boolean
-  is_limited_edition: boolean
-  is_premium: boolean
-  is_organic: boolean
+  tag_ids?: number[]
   is_tasting_available: boolean
   images: ProductImageCreatePayload[]
   package_info: {
@@ -174,3 +159,12 @@ export interface CreatePackageProductPayload {
 
 export type CreateIndividualProductResponse = ProductDetail
 export type CreatePackageProductResponse = ProductDetail
+
+export interface CreateProductTagPayload {
+  name: string
+  slug: string
+  group: ProductTagGroup
+  description: string
+  is_active: boolean
+  sort_order: number
+}

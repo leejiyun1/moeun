@@ -1,3 +1,5 @@
+import type { ProductTag } from '@/types/product'
+
 export interface SearchFilters {
   keyword: string
   selectedFeatures: string[]
@@ -22,11 +24,7 @@ export interface Product {
   main_image_url: string
   brewery_name?: string | null
   alcohol_type?: string | null
-  is_gift_suitable: boolean
-  is_regional_specialty: boolean
-  is_limited_edition: boolean
-  is_premium: boolean
-  is_award_winning: boolean
+  tags: ProductTag[]
   is_tasting_available: boolean
   view_count: number
   like_count: number

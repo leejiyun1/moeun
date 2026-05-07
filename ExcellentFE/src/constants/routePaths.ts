@@ -27,6 +27,7 @@ export const ROUTE_PATHS = {
     PRODUCTS: '/admin/products',
     PRODUCT_NEW: '/admin/products/new',
     PACKAGE_POLICIES: '/admin/package-policies',
+    PRODUCT_TAGS: '/admin/product-tags',
   },
 
   NOT_FOUND: '*',

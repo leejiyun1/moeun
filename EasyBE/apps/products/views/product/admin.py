@@ -11,7 +11,11 @@ from rest_framework.generics import (
 )
 from rest_framework.response import Response
 
-from apps.products.selectors import PackagePolicySelector, ProductSelector
+from apps.products.selectors import (
+    PackagePolicySelector,
+    ProductSelector,
+    ProductTagSelector,
+)
 from apps.products.serializers.drink import DrinkForPackageSerializer
 from apps.products.serializers.package_policy import PackagePolicySerializer
 from apps.products.serializers.product.create import (
@@ -20,6 +24,7 @@ from apps.products.serializers.product.create import (
 )
 from apps.products.serializers.product.detail import ProductDetailSerializer
 from apps.products.serializers.product.list import ProductListSerializer
+from apps.products.serializers.product.tag import ProductTagManageSerializer
 from apps.products.serializers.product.update import ProductUpdateSerializer
 from apps.products.services import PackagePolicyCommandService, ProductCommandService
 from apps.users.permissions import IsAdminRole
@@ -153,6 +158,64 @@ class PackagePolicyManageView(RetrieveUpdateDestroyAPIView):
 
     def perform_destroy(self, instance):
         PackagePolicyCommandService.deactivate_policy(instance)
+
+
+class ProductTagManageListView(ListCreateAPIView):
+    """상품 태그 목록/생성 (관리자용)"""
+
+    serializer_class = ProductTagManageSerializer
+    permission_classes = [IsAdminRole]
+    pagination_class = SearchPagination
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
+    filterset_fields = ["group", "is_active"]
+    search_fields = ["name", "slug", "description"]
+    ordering_fields = ["sort_order", "name", "created_at", "updated_at"]
+    ordering = ["sort_order", "name"]
+
+    @extend_schema(
+        summary="상품 태그 목록", description="상품 운영 태그 목록을 조회합니다.", tags=["관리자 - 상품 태그"]
+    )
+    def get(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
+
+    @extend_schema(summary="상품 태그 생성", description="상품 운영 태그를 생성합니다.", tags=["관리자 - 상품 태그"])
+    def post(self, request, *args, **kwargs):
+        return super().create(request, *args, **kwargs)
+
+    def get_queryset(self):
+        return ProductTagSelector.management_queryset()
+
+
+class ProductTagManageView(RetrieveUpdateDestroyAPIView):
+    """상품 태그 조회/수정/비활성화 (관리자용)"""
+
+    serializer_class = ProductTagManageSerializer
+    permission_classes = [IsAdminRole]
+
+    @extend_schema(summary="상품 태그 조회", description="상품 운영 태그를 조회합니다.", tags=["관리자 - 상품 태그"])
+    def get(self, request, *args, **kwargs):
+        return super().retrieve(request, *args, **kwargs)
+
+    @extend_schema(exclude=True)
+    def put(self, request, *args, **kwargs):
+        return self.patch(request, *args, **kwargs)
+
+    @extend_schema(
+        summary="상품 태그 수정", description="상품 운영 태그를 부분 수정합니다.", tags=["관리자 - 상품 태그"]
+    )
+    def patch(self, request, *args, **kwargs):
+        return super().partial_update(request, *args, **kwargs)
+
+    @extend_schema(summary="상품 태그 비활성화", description="상품 태그를 비활성화합니다.", tags=["관리자 - 상품 태그"])
+    def delete(self, request, *args, **kwargs):
+        return super().destroy(request, *args, **kwargs)
+
+    def get_queryset(self):
+        return ProductTagSelector.management_queryset()
+
+    def perform_destroy(self, instance):
+        instance.is_active = False
+        instance.save(update_fields=["is_active", "updated_at"])
 
 
 class ProductManageView(RetrieveUpdateDestroyAPIView):

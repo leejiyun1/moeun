@@ -5,7 +5,7 @@ from django.db.models import BooleanField, Exists, OuterRef, QuerySet, Value
 from django.http import QueryDict
 from django.shortcuts import get_object_or_404
 
-from apps.products.models import Drink, PackagePolicy, Product, ProductLike
+from apps.products.models import Drink, PackagePolicy, Product, ProductLike, ProductTag
 
 
 class ProductSelector:
@@ -28,11 +28,11 @@ class ProductSelector:
     }
 
     CATEGORY_FILTER_MAPPING: Dict[str, str] = {
-        "gift_suitable": "is_gift_suitable",
-        "regional_specialty": "is_regional_specialty",
-        "limited_edition": "is_limited_edition",
-        "premium": "is_premium",
-        "award_winning": "is_award_winning",
+        "gift_suitable": "gift-suitable",
+        "regional_specialty": "regional-specialty",
+        "limited_edition": "limited-edition",
+        "premium": "premium",
+        "award_winning": "award-winning",
     }
 
     TASTE_RANGE = Decimal("0.5")
@@ -43,6 +43,7 @@ class ProductSelector:
     def base_queryset() -> QuerySet:
         return Product.objects.select_related("drink__brewery", "package", "package__policy").prefetch_related(
             "images",
+            "tags",
             "package__drinks__brewery",
             "package__items__drink__brewery",
         )
@@ -125,8 +126,8 @@ class ProductSelector:
     def apply_category_filters(queryset: QuerySet, query_params: QueryDict) -> QuerySet:
         for param, field in ProductSelector.CATEGORY_FILTER_MAPPING.items():
             if query_params.get(param) == "true":
-                queryset = queryset.filter(**{field: True})
-        return queryset
+                queryset = queryset.filter(tags__slug=field, tags__is_active=True)
+        return queryset.distinct()
 
     @staticmethod
     def get_section_products(section_type: str, limit: int = 8) -> QuerySet:
@@ -140,15 +141,31 @@ class ProductSelector:
             queryset = queryset.filter(drink__isnull=False).order_by("-view_count")
             limit = 3
         elif section_type == ProductSelector.SECTION_AWARD_WINNING:
-            queryset = queryset.filter(is_award_winning=True, package__isnull=False).order_by("-order_count")
+            queryset = queryset.filter(
+                tags__slug="award-winning", tags__is_active=True, package__isnull=False
+            ).order_by("-order_count")
         elif section_type == ProductSelector.SECTION_MAKGEOLLI:
             queryset = queryset.filter(package__isnull=False, package__name__icontains="막걸리").order_by("-created_at")
         elif section_type == ProductSelector.SECTION_REGIONAL:
-            queryset = queryset.filter(is_regional_specialty=True, package__isnull=False).order_by("-created_at")
+            queryset = queryset.filter(
+                tags__slug="regional-specialty", tags__is_active=True, package__isnull=False
+            ).order_by("-created_at")
         else:
             return queryset.none()
 
-        return queryset[:limit]
+        return queryset.distinct()[:limit]
+
+
+class ProductTagSelector:
+    """상품 태그 조회 전용 selector."""
+
+    @staticmethod
+    def management_queryset() -> QuerySet:
+        return ProductTag.objects.order_by("sort_order", "name")
+
+    @staticmethod
+    def active_queryset() -> QuerySet:
+        return ProductTagSelector.management_queryset().filter(is_active=True)
 
 
 class PackagePolicySelector:

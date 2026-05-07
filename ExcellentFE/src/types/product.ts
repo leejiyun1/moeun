@@ -49,6 +49,20 @@ export interface ProductImage {
   created_at: string
 }
 
+export type ProductTagGroup = 'DISPLAY' | 'RECOMMENDATION' | 'FEATURE'
+
+export interface ProductTag {
+  id: number
+  name: string
+  slug: string
+  group: ProductTagGroup
+  description: string
+  is_active: boolean
+  sort_order: number
+  created_at?: string
+  updated_at?: string
+}
+
 // 최종 상품 타입
 export interface ProductDetail {
   id: string
@@ -64,12 +78,7 @@ export interface ProductDetail {
   is_on_sale: boolean
   description: string
   description_image_url: string
-  is_gift_suitable: boolean
-  is_award_winning: boolean
-  is_regional_specialty: boolean
-  is_limited_edition: boolean
-  is_premium: boolean
-  is_organic: boolean
+  tags: ProductTag[]
   is_tasting_available: boolean
   view_count: number
   order_count: number
@@ -112,6 +121,7 @@ export interface Product {
   like_count?: number
   is_liked?: boolean
   review_count?: number
+  tags?: ProductTag[]
   status?: 'ACTIVE' | 'INACTIVE'
   created_at?: string
   updated_at?: string

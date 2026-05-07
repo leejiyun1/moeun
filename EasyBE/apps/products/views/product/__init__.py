@@ -13,6 +13,8 @@ from .admin import (
     PackageProductCreateView,
     ProductManageListView,
     ProductManageView,
+    ProductTagManageListView,
+    ProductTagManageView,
 )
 
 # 일반 사용자용 API
@@ -58,4 +60,6 @@ __all__ = [
     "DrinksForPackageView",
     "ProductManageView",
     "ProductManageListView",
+    "ProductTagManageListView",
+    "ProductTagManageView",
 ]

@@ -9,9 +9,11 @@ import type {
   CreatePackageProductPayload,
   CreatePackageProductResponse,
   CreatePackagePolicyPayload,
+  CreateProductTagPayload,
   PackagePolicy,
   PaginatedResponse,
 } from '@/types/admin'
+import type { ProductTag } from '@/types/product'
 import { axiosInstance } from '@/utils/axios'
 
 const compactParams = (params?: AdminProductQuery) => {
@@ -72,6 +74,32 @@ export const adminApi = {
   ): Promise<PackagePolicy> => {
     const response = await axiosInstance.post(
       API_PATHS.ADMIN.PACKAGE_POLICIES,
+      payload
+    )
+    return response.data
+  },
+
+  getProductTags: async (): Promise<PaginatedResponse<ProductTag>> => {
+    const response = await axiosInstance.get(API_PATHS.ADMIN.PRODUCT_TAGS)
+    return response.data
+  },
+
+  createProductTag: async (
+    payload: CreateProductTagPayload
+  ): Promise<ProductTag> => {
+    const response = await axiosInstance.post(
+      API_PATHS.ADMIN.PRODUCT_TAGS,
+      payload
+    )
+    return response.data
+  },
+
+  updateProductTag: async (
+    tagId: number,
+    payload: Partial<CreateProductTagPayload>
+  ): Promise<ProductTag> => {
+    const response = await axiosInstance.patch(
+      API_PATHS.ADMIN.PRODUCT_TAG_DETAIL(tagId),
       payload
     )
     return response.data

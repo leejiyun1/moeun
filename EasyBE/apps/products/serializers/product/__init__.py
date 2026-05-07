@@ -10,9 +10,12 @@ from .image import (
     ProductImageSerializer,
 )
 from .list import ProductListSerializer
+from .tag import ProductTagManageSerializer, ProductTagSerializer
 
 __all__ = [
     "ProductImageSerializer",
     "ProductImageCreateSerializer",
     "ProductListSerializer",
+    "ProductTagManageSerializer",
+    "ProductTagSerializer",
 ]

@@ -8,6 +8,7 @@ from apps.products.models import (
     Product,
     ProductImage,
     ProductLike,
+    ProductTag,
 )
 from apps.products.selectors import ProductSelector
 from apps.products.services import (
@@ -167,13 +168,11 @@ class ProductCommandServiceTest(BaseServiceTestCase):
             product,
             {
                 "price": 17000,
-                "is_premium": False,
                 "status": Product.Status.OUT_OF_STOCK,
             },
         )
 
         self.assertEqual(result.price, 17000)
-        self.assertFalse(result.is_premium)
         self.assertEqual(result.status, Product.Status.OUT_OF_STOCK)
         product.refresh_from_db()
         self.assertEqual(product.price, 17000)
@@ -359,10 +358,6 @@ class ProductSearchServiceTest(BaseServiceTestCase):
 
     def test_apply_category_filters(self):
         """카테고리 필터 적용 테스트"""
-        # 프리미엄 상품 설정
-        self.all_products[0].is_premium = True
-        self.all_products[0].save()
-
         queryset = Product.objects.filter(status="ACTIVE")
         query_params = QueryDict("premium=true")
 
@@ -370,15 +365,15 @@ class ProductSearchServiceTest(BaseServiceTestCase):
 
         # 프리미엄 상품만 반환되는지 확인
         for product in filtered_queryset:
-            self.assertTrue(product.is_premium)
+            self.assertTrue(product.tags.filter(slug="premium").exists())
 
     def test_get_search_queryset_with_multiple_filters(self):
         """여러 필터 동시 적용 테스트"""
         # 테스트 데이터 설정
         product = self.all_products[0]
-        product.is_premium = True
-        product.is_gift_suitable = True
-        product.save()
+        premium_tag = ProductTag.objects.get(slug="premium")
+        gift_tag = ProductTag.objects.get(slug="gift-suitable")
+        product.tags.add(premium_tag, gift_tag)
 
         query_params = QueryDict("premium=true&gift_suitable=true")
 
@@ -386,8 +381,8 @@ class ProductSearchServiceTest(BaseServiceTestCase):
 
         self.assertIn(product, queryset)
         for filtered_product in queryset:
-            self.assertTrue(filtered_product.is_premium)
-            self.assertTrue(filtered_product.is_gift_suitable)
+            self.assertTrue(filtered_product.tags.filter(slug="premium").exists())
+            self.assertTrue(filtered_product.tags.filter(slug="gift-suitable").exists())
 
     def test_validate_search_params_valid(self):
         """유효한 검색 파라미터 검증 테스트"""

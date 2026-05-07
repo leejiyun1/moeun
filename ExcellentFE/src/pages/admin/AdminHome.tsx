@@ -12,6 +12,11 @@ const adminCards = [
     description: '패키지 구성 수량, 중복 허용, 허용 범위, 할인을 관리합니다.',
     to: ROUTE_PATHS.ADMIN.PACKAGE_POLICIES,
   },
+  {
+    title: '상품 태그',
+    description: '상품 노출, 추천, 특성 분류에 쓰는 운영 태그를 관리합니다.',
+    to: ROUTE_PATHS.ADMIN.PRODUCT_TAGS,
+  },
 ]
 
 const AdminHome = () => {

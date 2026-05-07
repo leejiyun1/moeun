@@ -4,6 +4,7 @@ from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers
 
 from apps.products.models import Product
+from apps.products.serializers.product.tag import ProductTagSerializer
 
 
 class ProductListSerializer(serializers.ModelSerializer):
@@ -17,6 +18,7 @@ class ProductListSerializer(serializers.ModelSerializer):
     recommendation_score = serializers.SerializerMethodField()
     recommendation_reason = serializers.SerializerMethodField()
     is_liked = serializers.SerializerMethodField()
+    tags = ProductTagSerializer(many=True, read_only=True)
 
     # 할인 관련 계산 필드
     discount_rate = serializers.SerializerMethodField()
@@ -38,11 +40,7 @@ class ProductListSerializer(serializers.ModelSerializer):
             "main_image_url",
             "brewery_name",
             "alcohol_type",
-            "is_gift_suitable",
-            "is_regional_specialty",
-            "is_limited_edition",
-            "is_premium",
-            "is_award_winning",
+            "tags",
             "is_tasting_available",
             "view_count",
             "like_count",

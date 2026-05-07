@@ -2,7 +2,7 @@ import { adminApi } from '@/api/admin'
 import {
   ADMIN_QUERY_KEYS,
   ALCOHOL_TYPE_OPTIONS,
-  PRODUCT_FEATURE_OPTIONS,
+  PRODUCT_TAG_GROUP_LABELS,
 } from '@/constants/admin'
 import { ROUTE_PATHS } from '@/constants/routePaths'
 import type {
@@ -10,6 +10,7 @@ import type {
   CreatePackageProductPayload,
   ProductImageCreatePayload,
 } from '@/types/admin'
+import type { ProductTag } from '@/types/product'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { isAxiosError } from 'axios'
 import {
@@ -22,8 +23,6 @@ import { useNavigate } from 'react-router-dom'
 import AdminPageShell from './AdminPageShell'
 
 type ProductKind = 'individual' | 'package'
-type FeatureKey = (typeof PRODUCT_FEATURE_OPTIONS)[number]['key']
-type FeatureState = Record<FeatureKey, boolean>
 
 interface CommonProductFormState {
   price: string
@@ -65,11 +64,6 @@ type CommonTextField = Exclude<
   keyof CommonProductFormState,
   'isTastingAvailable'
 >
-
-const initialFeatures = PRODUCT_FEATURE_OPTIONS.reduce((acc, option) => {
-  acc[option.key] = false
-  return acc
-}, {} as FeatureState)
 
 const initialCommonForm: CommonProductFormState = {
   price: '',
@@ -135,7 +129,7 @@ const AdminProductCreate = () => {
     useState<IndividualFormState>(initialIndividualForm)
   const [packageForm, setPackageForm] =
     useState<PackageFormState>(initialPackageForm)
-  const [features, setFeatures] = useState<FeatureState>(initialFeatures)
+  const [selectedTagIds, setSelectedTagIds] = useState<number[]>([])
   const [errorMessage, setErrorMessage] = useState('')
 
   const { data: breweries, isLoading: isBreweriesLoading } = useQuery({
@@ -151,6 +145,11 @@ const AdminProductCreate = () => {
   const { data: policies } = useQuery({
     queryKey: [ADMIN_QUERY_KEYS.PACKAGE_POLICIES],
     queryFn: adminApi.getPackagePolicies,
+  })
+
+  const { data: tags } = useQuery({
+    queryKey: [ADMIN_QUERY_KEYS.PRODUCT_TAGS],
+    queryFn: adminApi.getProductTags,
   })
 
   const onCreateSuccess = async () => {
@@ -238,13 +237,17 @@ const AdminProductCreate = () => {
     }))
   }
 
-  const handleFeatureChange =
-    (field: FeatureKey) => (event: ChangeEvent<HTMLInputElement>) => {
-      setFeatures((current) => ({
-        ...current,
-        [field]: event.target.checked,
-      }))
-    }
+  const handleTagChange = (tagId: number, checked: boolean) => {
+    setSelectedTagIds((current) => {
+      const selected = new Set(current)
+      if (checked) {
+        selected.add(tagId)
+      } else {
+        selected.delete(tagId)
+      }
+      return Array.from(selected)
+    })
+  }
 
   const handleTastingChange = (event: ChangeEvent<HTMLInputElement>) => {
     setCommonForm((current) => ({
@@ -266,7 +269,7 @@ const AdminProductCreate = () => {
     discount: optionalNumericValue(commonForm.discount),
     description: commonForm.description.trim(),
     description_image_url: commonForm.descriptionImageUrl.trim(),
-    ...features,
+    tag_ids: selectedTagIds,
     is_tasting_available: commonForm.isTastingAvailable,
     images: buildImages(),
   })
@@ -366,9 +369,10 @@ const AdminProductCreate = () => {
         <CommonSaleSection form={commonForm} onChange={handleCommonFieldChange} />
         <CommonDescriptionSection
           form={commonForm}
-          features={features}
+          tags={tags?.results ?? []}
+          selectedTagIds={selectedTagIds}
           onFieldChange={handleCommonFieldChange}
-          onFeatureChange={handleFeatureChange}
+          onTagChange={handleTagChange}
           onTastingChange={handleTastingChange}
         />
 
@@ -738,21 +742,21 @@ const CommonSaleSection = ({ form, onChange }: CommonSaleSectionProps) => (
 
 interface CommonDescriptionSectionProps {
   form: CommonProductFormState
-  features: FeatureState
+  tags: ProductTag[]
+  selectedTagIds: number[]
   onFieldChange: (
     field: CommonTextField
   ) => (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void
-  onFeatureChange: (
-    field: FeatureKey
-  ) => (event: ChangeEvent<HTMLInputElement>) => void
+  onTagChange: (tagId: number, checked: boolean) => void
   onTastingChange: (event: ChangeEvent<HTMLInputElement>) => void
 }
 
 const CommonDescriptionSection = ({
   form,
-  features,
+  tags,
+  selectedTagIds,
   onFieldChange,
-  onFeatureChange,
+  onTagChange,
   onTastingChange,
 }: CommonDescriptionSectionProps) => (
   <section className="rounded-[20px] border border-[#d9d9d9] bg-white p-6">
@@ -767,20 +771,42 @@ const CommonDescriptionSection = ({
       />
     </Field>
 
-    <div className="mt-5 flex flex-wrap gap-3">
-      {PRODUCT_FEATURE_OPTIONS.map((option) => (
-        <label
-          key={option.key}
-          className="flex cursor-pointer items-center gap-2 rounded-full border border-[#d9d9d9] bg-[#f8f8f8] px-4 py-2 text-sm font-bold"
-        >
-          <input
-            type="checkbox"
-            checked={features[option.key]}
-            onChange={onFeatureChange(option.key)}
-          />
-          {option.label}
-        </label>
-      ))}
+    <div className="mt-5">
+      <div className="mb-3 flex items-center justify-between">
+        <strong className="text-sm text-[#555555]">운영 태그</strong>
+        <span className="text-xs font-bold text-[#999999]">
+          태그 관리 화면에서 추가/비활성화할 수 있습니다.
+        </span>
+      </div>
+      {tags.length === 0 ? (
+        <p className="rounded-[14px] bg-[#f8f8f8] p-4 text-sm text-[#666666]">
+          아직 등록된 태그가 없습니다. 태그가 없으면 상품은 태그 없이
+          등록됩니다.
+        </p>
+      ) : (
+        <div className="flex flex-wrap gap-3">
+          {tags
+            .filter((tag) => tag.is_active)
+            .map((tag) => (
+              <label
+                key={tag.id}
+                className="flex cursor-pointer items-center gap-2 rounded-full border border-[#d9d9d9] bg-[#f8f8f8] px-4 py-2 text-sm font-bold"
+              >
+                <input
+                  type="checkbox"
+                  checked={selectedTagIds.includes(tag.id)}
+                  onChange={(event) =>
+                    onTagChange(tag.id, event.target.checked)
+                  }
+                />
+                <span>{tag.name}</span>
+                <span className="text-xs text-[#999999]">
+                  {PRODUCT_TAG_GROUP_LABELS[tag.group]}
+                </span>
+              </label>
+            ))}
+        </div>
+      )}
     </div>
 
     <label className="mt-5 flex items-start gap-3 rounded-[14px] bg-[#fff4f2] p-4 text-sm font-bold leading-6 text-[#8a3a32]">

@@ -15,6 +15,8 @@ from .package_policy import (
 from .product import (
     ProductImageSerializer,
     ProductListSerializer,
+    ProductTagManageSerializer,
+    ProductTagSerializer,
 )
 
 __all__ = [
@@ -30,4 +32,6 @@ __all__ = [
     # Product (UI용 + 관리자용)
     "ProductImageSerializer",
     "ProductListSerializer",
+    "ProductTagManageSerializer",
+    "ProductTagSerializer",
 ]

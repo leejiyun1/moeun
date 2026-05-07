@@ -27,6 +27,8 @@ from .product import (  # 일반 사용자용 API; 메인페이지 섹션들; �
     ProductManageListView,
     ProductManageView,
     ProductSearchView,
+    ProductTagManageListView,
+    ProductTagManageView,
     RecommendedProductsView,
     RegionalProductsView,
 )
@@ -60,4 +62,6 @@ __all__ = [
     "DrinksForPackageView",
     "ProductManageView",
     "ProductManageListView",
+    "ProductTagManageListView",
+    "ProductTagManageView",
 ]

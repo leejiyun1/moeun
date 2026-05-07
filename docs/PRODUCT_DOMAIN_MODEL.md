@@ -131,7 +131,6 @@ Product
 
 - 가격: `price`, `original_price`, `discount`
 - 설명: `description`, `description_image_url`
-- 상품 특성: `is_gift_suitable`, `is_award_winning`, `is_regional_specialty`, `is_limited_edition`, `is_premium`, `is_organic`
 - 시음 설정: `is_tasting_available`
 - 통계: `view_count`, `order_count`, `like_count`, `review_count`
 - 상태: `ACTIVE`, `INACTIVE`, `OUT_OF_STOCK`
@@ -147,6 +146,41 @@ Product.product_type
 ```
 
 이 방식은 현재 스키마 변경량을 줄이는 장점이 있다. 다만 판매명과 원본명이 달라져야 하는 운영 요구가 생기면 `Product.name`을 실제 필드로 승격하는 것이 맞다.
+
+### ProductTag
+
+운영자가 직접 만들고 바꿀 수 있는 상품 분류 태그다.
+
+기존 상품 boolean 필드는 제거한다.
+
+```text
+ProductTag
+├── name
+├── slug
+├── group
+├── description
+├── is_active
+└── sort_order
+
+ProductTagging
+├── product
+└── tag
+```
+
+태그는 상품의 실제 판매 상태가 아니라 노출/추천/특성 분류다.
+
+예:
+
+- `award-winning`: 수상작
+- `regional-specialty`: 지역 특산주
+- `premium`: 프리미엄
+- `gift-suitable`: 선물 적합
+- `limited-edition`: 한정판
+- `organic`: 유기농
+
+태그가 늘어나도 `Product` 필드나 마이그레이션을 추가하지 않는다.
+
+`is_tasting_available`은 태그가 아니라 시음 판매 정책이므로 `Product` 필드로 유지한다.
 
 ### ProductImage
 

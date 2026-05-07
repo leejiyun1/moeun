@@ -4,6 +4,7 @@ from apps.products.models import Drink, Package, PackageItem, PackagePolicy, Pro
 
 from ..brewery import BrewerySimpleSerializer
 from .image import ProductImageSerializer
+from .tag import ProductTagSerializer
 
 
 class DrinkTasteProfileSerializer(serializers.Serializer):
@@ -134,6 +135,7 @@ class ProductDetailSerializer(serializers.ModelSerializer):
     drink = ProductDrinkSerializer(read_only=True)
     package = ProductPackageSerializer(read_only=True)
     images = ProductImageSerializer(many=True, read_only=True)
+    tags = ProductTagSerializer(many=True, read_only=True)
 
     # 할인 정보
     discount_rate = serializers.SerializerMethodField()
@@ -157,12 +159,7 @@ class ProductDetailSerializer(serializers.ModelSerializer):
             "is_on_sale",
             "description",
             "description_image_url",
-            "is_gift_suitable",
-            "is_award_winning",
-            "is_regional_specialty",
-            "is_limited_edition",
-            "is_premium",
-            "is_organic",
+            "tags",
             "is_tasting_available",
             "view_count",
             "order_count",

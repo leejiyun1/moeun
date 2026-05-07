@@ -142,12 +142,13 @@ class ProductRecommendationService:
 
     @staticmethod
     def _operation_score(product: Product) -> float:
+        product_tag_slugs = {tag.slug for tag in product.tags.all() if tag.is_active}
         enabled_flags = sum(
             [
-                product.is_premium,
-                product.is_award_winning,
-                product.is_regional_specialty,
-                product.is_gift_suitable,
+                "premium" in product_tag_slugs,
+                "award-winning" in product_tag_slugs,
+                "regional-specialty" in product_tag_slugs,
+                "gift-suitable" in product_tag_slugs,
                 product.is_tasting_available,
             ]
         )

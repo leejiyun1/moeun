@@ -10,6 +10,7 @@ from apps.products.models import (
     PackagePolicy,
     Product,
     ProductImage,
+    ProductTag,
 )
 
 
@@ -23,10 +24,12 @@ class ProductCommandService:
         drink_data: dict[str, Any],
         product_data: dict[str, Any],
         images_data: list[dict[str, Any]],
+        tag_ids: list[int] | None = None,
     ) -> Product:
         drink = ProductCommandService._create_drink(drink_data)
         product = Product.objects.create(drink=drink, **dict(product_data))
         ProductCommandService._create_product_images(product, images_data)
+        ProductCommandService._set_product_tags(product, tag_ids or [])
         return product
 
     @staticmethod
@@ -36,10 +39,12 @@ class ProductCommandService:
         package_data: dict[str, Any],
         product_data: dict[str, Any],
         images_data: list[dict[str, Any]],
+        tag_ids: list[int] | None = None,
     ) -> Product:
         package = ProductCommandService._create_package(package_data)
         product = Product.objects.create(package=package, **dict(product_data))
         ProductCommandService._create_product_images(product, images_data)
+        ProductCommandService._set_product_tags(product, tag_ids or [])
         return product
 
     @staticmethod
@@ -56,8 +61,9 @@ class ProductCommandService:
         images_data = product_data.pop("images", None)
         drink_data = product_data.pop("drink_info", None)
         package_data = product_data.pop("package_info", None)
+        tag_ids = product_data.pop("tag_ids", None)
 
-        if not product_data and images_data is None and drink_data is None and package_data is None:
+        if not product_data and images_data is None and drink_data is None and package_data is None and tag_ids is None:
             return product
 
         if product_data:
@@ -71,6 +77,9 @@ class ProductCommandService:
         if images_data is not None:
             ProductCommandService._replace_product_images(product, images_data)
 
+        if tag_ids is not None:
+            ProductCommandService._set_product_tags(product, tag_ids)
+
         if drink_data is not None and product.drink_id:
             ProductCommandService._update_drink(product.drink, drink_data)
 
@@ -78,6 +87,13 @@ class ProductCommandService:
             ProductCommandService._update_package(product.package, package_data)
 
         return product
+
+    @staticmethod
+    def _set_product_tags(product: Product, tag_ids: list[int]) -> None:
+        tags = ProductTag.objects.filter(id__in=tag_ids, is_active=True)
+        if tags.count() != len(set(tag_ids)):
+            raise ValueError("존재하지 않거나 비활성 상태인 상품 태그가 포함되어 있습니다.")
+        product.tags.set(tags)
 
     @staticmethod
     def _create_drink(drink_data: dict[str, Any]) -> Drink:

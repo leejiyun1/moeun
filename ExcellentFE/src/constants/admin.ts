@@ -10,6 +10,7 @@ export const ADMIN_QUERY_KEYS = {
   BREWERIES: 'admin-breweries',
   DRINKS_FOR_PACKAGE: 'admin-drinks-for-package',
   PACKAGE_POLICIES: 'admin-package-policies',
+  PRODUCT_TAGS: 'admin-product-tags',
 } as const
 
 export const ADMIN_PRODUCT_STATUS_OPTIONS: {
@@ -72,11 +73,8 @@ export const ALCOHOL_TYPE_OPTIONS = [
   { value: 'FRUIT_WINE', label: '과실주' },
 ] as const
 
-export const PRODUCT_FEATURE_OPTIONS = [
-  { key: 'is_gift_suitable', label: '선물 적합' },
-  { key: 'is_award_winning', label: '수상작' },
-  { key: 'is_regional_specialty', label: '지역 특산주' },
-  { key: 'is_limited_edition', label: '리미티드' },
-  { key: 'is_premium', label: '프리미엄' },
-  { key: 'is_organic', label: '유기농' },
-] as const
+export const PRODUCT_TAG_GROUP_LABELS = {
+  DISPLAY: '노출',
+  RECOMMENDATION: '추천',
+  FEATURE: '특성',
+} as const

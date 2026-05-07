@@ -125,6 +125,7 @@ const AdminProducts = () => {
                   <th className="px-5 py-4">구분</th>
                   <th className="px-5 py-4">가격</th>
                   <th className="px-5 py-4">할인</th>
+                  <th className="px-5 py-4">태그</th>
                   <th className="px-5 py-4">시음</th>
                   <th className="px-5 py-4">상태</th>
                   <th className="px-5 py-4">조회/좋아요</th>
@@ -152,6 +153,22 @@ const AdminProducts = () => {
                       {product.is_on_sale
                         ? `${priceFormatter.format(product.discount ?? 0)}원`
                         : '없음'}
+                    </td>
+                    <td className="px-5 py-4">
+                      {product.tags.length > 0 ? (
+                        <div className="flex max-w-[220px] flex-wrap gap-1.5">
+                          {product.tags.map((tag) => (
+                            <span
+                              key={tag.id}
+                              className="rounded-full bg-[#f8f8f8] px-2.5 py-1 text-xs font-bold text-[#666666]"
+                            >
+                              {tag.name}
+                            </span>
+                          ))}
+                        </div>
+                      ) : (
+                        <span className="text-[#aaaaaa]">없음</span>
+                      )}
                     </td>
                     <td className="px-5 py-4">
                       {product.is_tasting_available ? '가능' : '불가'}

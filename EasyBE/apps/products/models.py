@@ -233,6 +233,36 @@ class PackageItem(models.Model):
         return f"{self.package.name} - {self.drink.name} x{self.quantity}"
 
 
+class ProductTag(models.Model):
+    """운영자가 관리하는 상품 태그."""
+
+    class Group(models.TextChoices):
+        DISPLAY = "DISPLAY", "노출"
+        RECOMMENDATION = "RECOMMENDATION", "추천"
+        FEATURE = "FEATURE", "특성"
+
+    name = models.CharField(max_length=50, unique=True, help_text="태그명")
+    slug = models.SlugField(max_length=80, unique=True, help_text="태그 식별자")
+    group = models.CharField(max_length=20, choices=Group.choices, default=Group.FEATURE, help_text="태그 그룹")
+    description = models.TextField(blank=True, help_text="태그 설명")
+    is_active = models.BooleanField(default=True, help_text="활성 여부")
+    sort_order = models.PositiveIntegerField(default=0, help_text="정렬 순서")
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = "product_tags"
+        ordering = ["sort_order", "name"]
+        indexes = [
+            models.Index(fields=["slug"]),
+            models.Index(fields=["group", "is_active"]),
+            models.Index(fields=["sort_order"]),
+        ]
+
+    def __str__(self):
+        return self.name
+
+
 class Product(models.Model):
     """상품 (개별 술 또는 패키지)"""
 
@@ -260,13 +290,7 @@ class Product(models.Model):
     description = models.TextField(help_text="상품 설명")
     description_image_url = models.URLField(max_length=255, help_text="상품 설명 이미지 URL")
 
-    # 상품 특성
-    is_gift_suitable = models.BooleanField(default=False, help_text="선물 적합")
-    is_award_winning = models.BooleanField(default=False, help_text="수상작")
-    is_regional_specialty = models.BooleanField(default=False, help_text="지역 특산주")
-    is_limited_edition = models.BooleanField(default=False, help_text="리미티드 에디션")
-    is_premium = models.BooleanField(default=False, help_text="프리미엄")
-    is_organic = models.BooleanField(default=False, help_text="유기농")
+    tags = models.ManyToManyField(ProductTag, through="ProductTagging", related_name="products", blank=True)
     is_tasting_available = models.BooleanField(default=False, help_text="시음 가능 여부")
 
     # 통계
@@ -378,6 +402,25 @@ class ProductImage(models.Model):
 
     def __str__(self):
         return f"{self.product.name} - {'메인' if self.is_main else '서브'} 이미지"
+
+
+class ProductTagging(models.Model):
+    """상품과 태그 연결."""
+
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name="taggings")
+    tag = models.ForeignKey(ProductTag, on_delete=models.CASCADE, related_name="taggings")
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = "product_taggings"
+        unique_together = ("product", "tag")
+        indexes = [
+            models.Index(fields=["product"]),
+            models.Index(fields=["tag"]),
+        ]
+
+    def __str__(self):
+        return f"{self.product.name} - {self.tag.name}"
 
 
 class ProductLike(models.Model):

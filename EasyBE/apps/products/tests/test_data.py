@@ -109,26 +109,28 @@ PACKAGE_DATA = [
     {"name": "프리미엄 컬렉션", "type": "CURATED", "drink_indices": [1, 2, 3]},
 ]
 
-# 공통 상품 특성 템플릿
-PRODUCT_FEATURES = {
+# 공통 상품 태그 템플릿
+PRODUCT_TAG_DATA = [
+    {"name": "선물 적합", "slug": "gift-suitable", "group": "DISPLAY", "sort_order": 10},
+    {"name": "프리미엄", "slug": "premium", "group": "RECOMMENDATION", "sort_order": 20},
+    {"name": "지역 특산주", "slug": "regional-specialty", "group": "DISPLAY", "sort_order": 30},
+    {"name": "수상작", "slug": "award-winning", "group": "RECOMMENDATION", "sort_order": 40},
+    {"name": "리미티드", "slug": "limited-edition", "group": "DISPLAY", "sort_order": 50},
+    {"name": "유기농", "slug": "organic", "group": "FEATURE", "sort_order": 60},
+]
+
+PRODUCT_TAG_SLUGS = {
     "premium_gift": {
-        "is_gift_suitable": True,
-        "is_premium": True,
-        "is_regional_specialty": True,
+        "tag_slugs": ["gift-suitable", "premium", "regional-specialty"],
     },
     "award_winning": {
-        "is_gift_suitable": True,
-        "is_premium": True,
-        "is_award_winning": True,
+        "tag_slugs": ["gift-suitable", "premium", "award-winning"],
     },
     "limited_premium": {
-        "is_premium": True,
-        "is_limited_edition": True,
-        "is_regional_specialty": True,
+        "tag_slugs": ["premium", "limited-edition", "regional-specialty"],
     },
     "organic_gift": {
-        "is_gift_suitable": True,
-        "is_organic": True,
+        "tag_slugs": ["gift-suitable", "organic"],
     },
 }
 
@@ -141,21 +143,21 @@ INDIVIDUAL_PRODUCT_DATA = [
         "discount": 3000,
         "description": "100% 우리쌀로 빚은 부드럽고 달콤한 프리미엄 막걸리입니다.",
         "description_image_url": "https://cdn.example.com/products/makgeolli1-desc.jpg",
-        **PRODUCT_FEATURES["premium_gift"],
+        **PRODUCT_TAG_SLUGS["premium_gift"],
     },
     {
         "drink_index": 1,
         "price": 35000,
         "description": "지하 암반수로 빚은 깔끔하고 향긋한 전통 청주입니다.",
         "description_image_url": "https://cdn.example.com/products/cheongju1-desc.jpg",
-        **PRODUCT_FEATURES["award_winning"],
+        **PRODUCT_TAG_SLUGS["award_winning"],
     },
     {
         "drink_index": 2,
         "price": 45000,
         "description": "100년 전통 한옥에서 천천히 증류한 프리미엄 소주입니다.",
         "description_image_url": "https://cdn.example.com/products/soju1-desc.jpg",
-        **PRODUCT_FEATURES["limited_premium"],
+        **PRODUCT_TAG_SLUGS["limited_premium"],
     },
     {
         "drink_index": 3,
@@ -164,7 +166,7 @@ INDIVIDUAL_PRODUCT_DATA = [
         "discount": 4000,
         "description": "국내산 복분자로 만든 달콤하고 상큼한 과실주입니다.",
         "description_image_url": "https://cdn.example.com/products/bokbunja-desc.jpg",
-        **PRODUCT_FEATURES["organic_gift"],
+        **PRODUCT_TAG_SLUGS["organic_gift"],
     },
 ]
 
@@ -177,8 +179,7 @@ PACKAGE_PRODUCT_DATA = [
         "discount": 8000,
         "description": "전통주 입문자를 위한 큐레이티드 세트입니다.",
         "description_image_url": "https://cdn.example.com/products/starter-set-desc.jpg",
-        "is_gift_suitable": True,
-        "is_premium": False,
+        "tag_slugs": ["gift-suitable"],
     },
     {
         "package_index": 1,
@@ -187,9 +188,7 @@ PACKAGE_PRODUCT_DATA = [
         "discount": 13000,
         "description": "엄선된 프리미엄 전통주 컬렉션입니다.",
         "description_image_url": "https://cdn.example.com/products/premium-collection-desc.jpg",
-        "is_gift_suitable": True,
-        "is_premium": True,
-        "is_award_winning": True,
+        "tag_slugs": ["gift-suitable", "premium", "award-winning"],
     },
 ]
 
@@ -276,7 +275,6 @@ def get_individual_product_creation_data(brewery_id):
         "discount": 3000,
         "description": "부드럽고 달콤한 프리미엄 막걸리입니다.",
         "description_image_url": "https://cdn.example.com/desc.jpg",
-        **PRODUCT_FEATURES["premium_gift"],
         "is_tasting_available": True,
         "images": [
             {"image_url": "https://cdn.example.com/main.jpg", "is_main": True},
@@ -298,8 +296,6 @@ def get_package_product_creation_data(drink_ids):
         "discount": 15000,
         "description": "엄선된 3종의 전통주를 담은 프리미엄 세트입니다.",
         "description_image_url": "https://cdn.example.com/package-desc.jpg",
-        "is_gift_suitable": True,
-        "is_premium": True,
         "is_tasting_available": True,
         "images": [{"image_url": "https://cdn.example.com/package-main.jpg", "is_main": True}],
     }

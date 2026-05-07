@@ -10,6 +10,7 @@ from apps.products.models import (
     Product,
     ProductImage,
     ProductLike,
+    ProductTag,
 )
 
 from .test_data import (
@@ -19,6 +20,7 @@ from .test_data import (
     PACKAGE_DATA,
     PACKAGE_PRODUCT_DATA,
     PRODUCT_IMAGE_DATA,
+    PRODUCT_TAG_DATA,
 )
 
 User = get_user_model()
@@ -85,15 +87,26 @@ class TestDataCreator:
         return packages
 
     @staticmethod
+    def create_product_tags():
+        """테스트용 상품 태그 생성"""
+        tags = {}
+        for data in PRODUCT_TAG_DATA:
+            tag, _ = ProductTag.objects.get_or_create(slug=data["slug"], defaults=data)
+            tags[tag.slug] = tag
+        return tags
+
+    @staticmethod
     def create_individual_products(drinks=None):
         """테스트용 개별 술 상품들 생성"""
         if drinks is None:
             drinks = TestDataCreator.create_drinks()
 
         products = []
+        tags = TestDataCreator.create_product_tags()
         for data in INDIVIDUAL_PRODUCT_DATA:
             product_data = data.copy()
             drink_index = product_data.pop("drink_index")
+            tag_slugs = product_data.pop("tag_slugs", [])
             product_data["drink"] = drinks[drink_index]
 
             # 기존 상품이 있는지 확인 (OneToOne 관계)
@@ -104,6 +117,8 @@ class TestDataCreator:
                 product = Product.objects.create(**product_data)
                 products.append(product)
 
+            products[-1].tags.set([tags[slug] for slug in tag_slugs])
+
         return products
 
     @staticmethod
@@ -113,9 +128,11 @@ class TestDataCreator:
             packages = TestDataCreator.create_packages()
 
         products = []
+        tags = TestDataCreator.create_product_tags()
         for data in PACKAGE_PRODUCT_DATA:
             product_data = data.copy()
             package_index = product_data.pop("package_index")
+            tag_slugs = product_data.pop("tag_slugs", [])
             product_data["package"] = packages[package_index]
 
             # 기존 상품이 있는지 확인 (OneToOne 관계)
@@ -125,6 +142,8 @@ class TestDataCreator:
             else:
                 product = Product.objects.create(**product_data)
                 products.append(product)
+
+            products[-1].tags.set([tags[slug] for slug in tag_slugs])
 
         return products
 
@@ -165,6 +184,7 @@ class TestDataCreator:
         breweries = TestDataCreator.create_breweries()
         drinks = TestDataCreator.create_drinks(breweries)
         packages = TestDataCreator.create_packages(drinks)
+        tags = TestDataCreator.create_product_tags()
 
         # 상품 데이터 생성
         individual_products = TestDataCreator.create_individual_products(drinks)
@@ -187,6 +207,7 @@ class TestDataCreator:
             "package_products": package_products,
             "all_products": all_products,
             "images": images,
+            "tags": tags,
         }
 
     @staticmethod
@@ -195,6 +216,7 @@ class TestDataCreator:
         ProductLike.objects.all().delete()
         ProductImage.objects.all().delete()
         Product.objects.all().delete()
+        ProductTag.objects.all().delete()
         PackageItem.objects.all().delete()
         Package.objects.all().delete()
         Drink.objects.all().delete()
