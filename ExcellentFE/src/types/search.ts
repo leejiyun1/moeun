@@ -30,6 +30,7 @@ export interface Product {
   is_tasting_available: boolean
   view_count: number
   like_count: number
+  is_liked?: boolean
   status: string
   created_at: string
 }

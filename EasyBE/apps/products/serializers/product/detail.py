@@ -139,6 +139,7 @@ class ProductDetailSerializer(serializers.ModelSerializer):
     discount_rate = serializers.SerializerMethodField()
     final_price = serializers.SerializerMethodField()
     is_on_sale = serializers.SerializerMethodField()
+    is_liked = serializers.SerializerMethodField()
 
     class Meta:
         model = Product
@@ -166,6 +167,7 @@ class ProductDetailSerializer(serializers.ModelSerializer):
             "view_count",
             "order_count",
             "like_count",
+            "is_liked",
             "review_count",
             "status",
             "images",
@@ -181,3 +183,6 @@ class ProductDetailSerializer(serializers.ModelSerializer):
 
     def get_is_on_sale(self, obj) -> bool:
         return obj.is_on_sale()
+
+    def get_is_liked(self, obj) -> bool:
+        return bool(getattr(obj, "is_liked", False))

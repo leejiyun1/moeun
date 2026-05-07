@@ -1,7 +1,7 @@
 import type { CardBaseProps } from '@/types/cardProps'
 import HeartButton from '@/components/common/HeartButton.tsx'
-import { useState } from 'react'
 import { Link } from 'react-router-dom'
+import { useProductLike } from '@/hooks/product/useProductLike'
 
 const CardBase = ({
   id,
@@ -11,15 +11,15 @@ const CardBase = ({
   title,
   subtitle,
   price,
+  isLiked: initialLiked,
 }: CardBaseProps) => {
-  const [isLiked, setIsLiked] = useState(false)
-
   const detailPath =
     id && productType
       ? productType === 'PACKAGE'
         ? `/package/${id}`
         : `/product/${id}`
       : null
+  const { isLiked, toggleLike } = useProductLike(id, initialLiked)
 
   return (
     <div className="flex w-[300px] flex-col">
@@ -41,7 +41,7 @@ const CardBase = ({
         )}
         <HeartButton
           isLiked={isLiked}
-          onClick={() => setIsLiked((prev) => !prev)}
+          onClick={toggleLike}
           className="absolute right-2 bottom-2"
         />
       </div>

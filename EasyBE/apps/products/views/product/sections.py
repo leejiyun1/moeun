@@ -24,7 +24,10 @@ class BaseSectionView(BaseProductListView):
         return Response({"title": self.section_title, "products": serializer.data})
 
     def get_queryset(self):
-        return ProductSelector.get_section_products(self.section_type, limit=self.section_limit)
+        return ProductSelector.with_user_like_status(
+            ProductSelector.get_section_products(self.section_type, limit=self.section_limit),
+            self.request.user,
+        )
 
 
 # ============================================================================

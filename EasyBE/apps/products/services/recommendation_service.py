@@ -34,7 +34,7 @@ class ProductRecommendationService:
     @classmethod
     def get_recommendations(cls, user: Optional[User], limit: int = 8) -> RecommendationResult:
         profile = cls._get_profile(user)
-        candidates = list(cls._candidate_queryset())
+        candidates = list(ProductSelector.with_user_like_status(cls._candidate_queryset(), user))
 
         if profile:
             products = cls._rank_personalized(candidates, profile)[:limit]

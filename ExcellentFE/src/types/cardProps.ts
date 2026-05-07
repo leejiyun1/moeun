@@ -7,6 +7,7 @@ export interface CardBaseProps {
   title?: string
   subtitle?: string
   price?: number
+  isLiked?: boolean
 }
 
 // 리뷰 카드 데이터 타입
@@ -21,6 +22,7 @@ export interface ReviewCardProps {
   defaultRating?: number
   date?: string
   modalTitle: string
+  isLiked?: boolean
 }
 
 // 테스트 페이지 추천 카드 데이터  타입

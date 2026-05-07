@@ -74,6 +74,7 @@ export interface ProductDetail {
   view_count: number
   order_count: number
   like_count: number
+  is_liked: boolean
   review_count: number
   status: 'ACTIVE' | 'INACTIVE'
   images: ProductImage[]
@@ -109,6 +110,7 @@ export interface Product {
   view_count?: number
   order_count?: number
   like_count?: number
+  is_liked?: boolean
   review_count?: number
   status?: 'ACTIVE' | 'INACTIVE'
   created_at?: string

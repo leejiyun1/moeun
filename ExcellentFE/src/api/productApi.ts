@@ -16,6 +16,11 @@ export interface UpdateCartPayload {
   pickup_date?: string | null
 }
 
+export interface ProductLikeResponse {
+  is_liked: boolean
+  like_count: number
+}
+
 export const mainProductApi = {
   MonthProducts: async () => {
     const response = await axiosInstance.get(API_PATHS.PRODUCTS.MONTH)
@@ -68,5 +73,12 @@ export const cartApi = {
 
 export const getProductDetail = async (id: string): Promise<ProductDetail> => {
   const response = await axiosInstance.get(API_PATHS.PRODUCTS.DETAIL(id))
+  return response.data
+}
+
+export const toggleProductLike = async (
+  id: string | number
+): Promise<ProductLikeResponse> => {
+  const response = await axiosInstance.post(API_PATHS.PRODUCTS.LIKE(id))
   return response.data
 }

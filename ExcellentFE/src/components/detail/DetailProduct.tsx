@@ -27,6 +27,7 @@ const DetailProduct = ({
   return (
     <div className="grid grid-cols-2 gap-8">
       <DetailCard
+        id={data.id}
         className="h-50 w-50 sm:h-100 sm:w-100 md:h-100 md:w-100 lg:h-140 lg:w-140"
         imgSrc={
           Array.isArray(data.images)
@@ -34,6 +35,7 @@ const DetailProduct = ({
             : (data.images as unknown as string)
         }
         imgAlt={data.name}
+        isLiked={data.is_liked}
       />
 
       <div className="space-y-4">

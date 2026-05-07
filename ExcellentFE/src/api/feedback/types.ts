@@ -16,6 +16,7 @@ export interface Feedback {
   masked_username: string
   has_image?: boolean
   view_count?: number
+  is_liked?: boolean
   created_at: string
   updated_at?: string
 }

@@ -28,12 +28,14 @@
 - 파이썬 `__pycache__`, `.pyc`, `.DS_Store` 같은 실행/OS 산출물.
 - 참조되지 않던 `ExcellentFE/src/components/ui/sliderUi.tsx`.
 - 실제 추천 API와 맞지 않던 오래된 `ExcellentFE/src/mocks/handlers/recommendation` mock.
+- 실제 API 경로와 맞지 않아 동작하지 않던 프론트 MSW mock 전체.
+- import 그래프에서 끊긴 미사용 프론트 컴포넌트, barrel, 유틸, 기본 Vite 산출물.
+- 화면 안에서만 토글되던 하트 버튼 임시 상태. 상품 좋아요 API와 연결했다.
 - 구현 없이 `INSTALLED_APPS`에만 등록되어 있던 빈 Django 앱 `EasyBE/apps/adminpanel`.
 - 테스트 코드처럼 보이던 취향 테스트 UI 경로 `ExcellentFE/src/components/test`를 `ExcellentFE/src/components/taste-test`로 변경.
 
 검토 후 유지한 항목:
 
-- `ExcellentFE/src/mocks`: 개발 환경 MSW 용도로 사용 중이다. 다만 실제 API와 어긋나는 handler는 추가로 생기면 제거한다.
 - `ExcellentFE/src/foundations`: 입력/버튼/z-index 기준값으로 현재 참조 중이다.
 - `EasyBE/apps/taste_test/services`의 하위 호환 코드: 현재 테스트와 기존 import 경로가 의존하므로 별도 리팩터링 단위에서 제거한다.
 
@@ -198,7 +200,30 @@
 
 ## P2. 프론트/문서 정리
 
-### 7. 프론트 추천 UX 반영
+### 7. UI/API 연결 점검
+
+반영 완료:
+
+- 상품 카드, 검색 결과 카드, 상세 대표 이미지의 하트 버튼을 백엔드 상품 좋아요 API에 연결했다.
+- 상품 목록/상세 응답에 로그인 사용자의 `is_liked` 상태를 포함한다.
+- 검색 결과 카드의 중첩 링크 구조를 제거하고 공통 카드 링크 동작으로 통일했다.
+- 실제 API와 맞지 않던 MSW mock과 미사용 UI/유틸 파일을 제거했다.
+
+남은 연결 후보:
+
+- 상품 상세의 `상품 후기` 영역은 아직 정적 placeholder다. 상품별 후기 조회 API를 별도로 설계해야 한다.
+- 관리자 상품 목록에는 수정/상태 변경/삭제 UI가 없지만, 백엔드 관리 API는 준비되어 있다.
+- 관리자 패키지 정책 목록에는 수정/삭제 UI가 없지만, 백엔드 관리 API는 준비되어 있다.
+- 양조장 생성/수정 API는 있으나 별도 관리자 화면은 없다.
+- 내 후기 수정/삭제 API는 있으나 마이페이지 UI에는 아직 없다.
+
+판단 기준:
+
+- 화면에 버튼이 있으면 서버 상태와 연결되어야 한다.
+- 서버 API만 있고 운영자가 실제로 써야 하는 기능은 관리자 진입점을 추가한다.
+- 아직 정책이 확정되지 않은 기능은 화면에 과장해서 노출하지 않는다.
+
+### 8. 프론트 추천 UX 반영
 
 현재 상태:
 

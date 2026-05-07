@@ -48,6 +48,7 @@ const Home = () => {
       title: product.name,
       subtitle: product.brewery_name,
       price: product.price,
+      isLiked: product.is_liked,
     }))
   }
 

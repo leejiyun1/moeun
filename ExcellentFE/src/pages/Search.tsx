@@ -45,6 +45,7 @@ const Search = () => {
     is_tasting_available: item.is_tasting_available,
     view_count: item.view_count,
     like_count: item.like_count,
+    is_liked: item.is_liked,
     status: item.status,
     created_at: item.created_at,
   }))

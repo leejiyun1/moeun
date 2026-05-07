@@ -7,6 +7,7 @@ import Modal from '@/components/common/Modal'
 import Button from '@/components/common/Button'
 import { Link } from 'react-router-dom'
 import defaultImg from '@/assets/images/backgrounds/login.jpg'
+import { useProductLike } from '@/hooks/product/useProductLike'
 
 const ReviewCard = ({
   product_id,
@@ -18,9 +19,10 @@ const ReviewCard = ({
   defaultRating,
   date,
   modalTitle,
+  isLiked: initialLiked,
 }: ReviewCardProps) => {
-  const [isLiked, setIsLiked] = useState(false)
   const [isModalOpen, setIsModalOpen] = useState(false)
+  const { isLiked, toggleLike } = useProductLike(product_id, initialLiked)
 
   return (
     <div
@@ -42,7 +44,7 @@ const ReviewCard = ({
         >
           <HeartButton
             isLiked={isLiked}
-            onClick={() => setIsLiked((prev) => !prev)}
+            onClick={toggleLike}
           />
         </div>
       </div>

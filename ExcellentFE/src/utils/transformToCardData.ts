@@ -11,5 +11,6 @@ export const transformToCardData = (products: Product[]): CardBaseProps[] => {
     title: product.name,
     subtitle: product.brewery_name,
     price: product.price,
+    isLiked: product.is_liked,
   }))
 }

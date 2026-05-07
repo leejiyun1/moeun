@@ -16,6 +16,7 @@ class ProductListSerializer(serializers.ModelSerializer):
     alcohol_type = serializers.SerializerMethodField()
     recommendation_score = serializers.SerializerMethodField()
     recommendation_reason = serializers.SerializerMethodField()
+    is_liked = serializers.SerializerMethodField()
 
     # 할인 관련 계산 필드
     discount_rate = serializers.SerializerMethodField()
@@ -45,6 +46,7 @@ class ProductListSerializer(serializers.ModelSerializer):
             "is_tasting_available",
             "view_count",
             "like_count",
+            "is_liked",
             "status",
             "created_at",
             "recommendation_score",
@@ -88,6 +90,10 @@ class ProductListSerializer(serializers.ModelSerializer):
     @extend_schema_field(serializers.CharField(allow_null=True))
     def get_recommendation_reason(self, obj) -> Optional[str]:
         return getattr(obj, "recommendation_reason", None)
+
+    @extend_schema_field(serializers.BooleanField)
+    def get_is_liked(self, obj) -> bool:
+        return bool(getattr(obj, "is_liked", False))
 
     @extend_schema_field(serializers.FloatField)
     def get_discount_rate(self, obj) -> float:

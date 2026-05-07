@@ -30,6 +30,7 @@ export const API_PATHS = {
   },
   PRODUCTS: {
     DETAIL: (id: string | number) => `/products/${id}/`,
+    LIKE: (id: string | number) => `/products/${id}/like/`,
     MONTH: '/products/monthly/',
     POPULAR: '/products/popular/',
     FEATURED: '/products/featured/',

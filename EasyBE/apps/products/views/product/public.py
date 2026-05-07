@@ -35,7 +35,10 @@ class BaseProductListView(ListAPIView):
 
     def get_queryset(self):
         """각 뷰에서 오버라이드"""
-        return self.get_base_queryset()
+        return ProductSelector.with_user_like_status(
+            self.get_base_queryset(),
+            self.request.user,
+        )
 
 
 # ============================================================================
@@ -63,7 +66,10 @@ class ProductSearchView(BaseProductListView):
         return super().list(request, *args, **kwargs)
 
     def get_queryset(self):
-        return ProductSearchService.get_search_queryset(self.request.query_params)
+        return ProductSelector.with_user_like_status(
+            ProductSearchService.get_search_queryset(self.request.query_params),
+            self.request.user,
+        )
 
 
 class ProductDetailView(RetrieveAPIView):
@@ -82,6 +88,9 @@ class ProductDetailView(RetrieveAPIView):
     def get(self, request, *args, **kwargs):
         product_id = kwargs.get("pk")
         product = ProductService.get_product_detail(product_id)
+        product.is_liked = (
+            LikeService.check_user_liked_product(request.user, product_id) if request.user.is_authenticated else False
+        )
 
         serializer = self.get_serializer(product)
         return Response(serializer.data)

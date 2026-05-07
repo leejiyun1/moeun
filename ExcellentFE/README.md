@@ -134,7 +134,6 @@ refactor: package 컴포넌트 분리 (#이슈넘버)
 ├─ constants     # 상수 정의 (API 경로, 디자인 색상 등)
 ├─ foundations   # 기본 스타일/설정 (버튼, 입력, zIndex)
 ├─ hooks         # 커스텀 훅
-├─ mocks         # 테스트용 목 데이터
 ├─ pages         # 라우팅 페이지 컴포넌트
 ├─ stores        # 상태 관리
 ├─ types         # 타입 정의

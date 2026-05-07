@@ -35,6 +35,7 @@ export const Feedback = () => {
       userId: item.masked_username ?? undefined,
       date: item.created_at ?? undefined,
       defaultRating: item.rating ?? 0,
+      isLiked: item.is_liked,
     })) ?? []
 
   const renderBestReviewCard = (item: BestReviewCardProps | CardBaseProps) => {

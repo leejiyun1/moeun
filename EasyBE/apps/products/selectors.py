@@ -1,11 +1,11 @@
 from decimal import Decimal, InvalidOperation
 from typing import Dict
 
-from django.db.models import QuerySet
+from django.db.models import BooleanField, Exists, OuterRef, QuerySet, Value
 from django.http import QueryDict
 from django.shortcuts import get_object_or_404
 
-from apps.products.models import Drink, PackagePolicy, Product
+from apps.products.models import Drink, PackagePolicy, Product, ProductLike
 
 
 class ProductSelector:
@@ -50,6 +50,21 @@ class ProductSelector:
     @staticmethod
     def active_queryset() -> QuerySet:
         return ProductSelector.base_queryset().filter(status=Product.Status.ACTIVE)
+
+    @staticmethod
+    def with_user_like_status(queryset: QuerySet, user) -> QuerySet:
+        """사용자의 상품 좋아요 여부를 queryset에 주입한다."""
+        if not getattr(user, "is_authenticated", False):
+            return queryset.annotate(is_liked=Value(False, output_field=BooleanField()))
+
+        return queryset.annotate(
+            is_liked=Exists(
+                ProductLike.objects.filter(
+                    user=user,
+                    product_id=OuterRef("pk"),
+                )
+            )
+        )
 
     @staticmethod
     def management_queryset() -> QuerySet:
