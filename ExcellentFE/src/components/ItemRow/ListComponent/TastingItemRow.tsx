@@ -11,7 +11,6 @@ interface TastingItemRowProps {
   carbonation?: string
   aroma?: string
   bitterness?: string
-  confidence?: string
 }
 
 const TastingItemRow = ({
@@ -25,7 +24,6 @@ const TastingItemRow = ({
   carbonation,
   aroma,
   bitterness,
-  confidence,
 }: TastingItemRowProps) => {
   const { fullTasteDisplay } = useTasteDisplay({
     sweetness,
@@ -34,7 +32,6 @@ const TastingItemRow = ({
     carbonation,
     aroma,
     bitterness,
-    confidence,
   })
 
   return (

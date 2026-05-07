@@ -71,13 +71,11 @@ class FeedbackModelTest(TestCase):
             sweetness=Decimal("3.0"),
             acidity=Decimal("2.5"),
             body=Decimal("4.0"),
-            confidence=80,
             comment="정말 맛있는 소주입니다!",
             selected_tags=["달콤한", "부드러운"],
         )
         self.assertEqual(feedback.rating, 5)
         self.assertEqual(feedback.sweetness, Decimal("3.0"))
-        self.assertEqual(feedback.confidence, 80)
         self.assertEqual(len(feedback.selected_tags), 2)
         self.assertIn("달콤한", feedback.selected_tags)
 
@@ -305,7 +303,6 @@ class FeedbackAPITest(APITestCase):
             "sweetness": "3.5",
             "acidity": "2.0",
             "body": "4.0",
-            "confidence": 80,
             "comment": "정말 맛있습니다!",
             "selected_tags": ["달콤한", "부드러운"],
         }

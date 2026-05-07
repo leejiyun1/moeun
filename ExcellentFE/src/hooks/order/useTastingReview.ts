@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import useSubmitFeedback from '@/hooks/order/useSubmitFeedback'
-import type { TastingReview, TastingSubmitData } from '@/types/feedback'
+import type { TastingReview } from '@/types/feedback'
 import type { FeedbackRequest } from '@/api/feedback/types'
 
 const INITIAL_REVIEW_STATE: TastingReview = {
@@ -61,7 +61,7 @@ const useTastingReview = (orderItemId?: number, onClose?: () => void) => {
     return review.rating > 0 && comment.trim().length > 0
   }
 
-  const createSubmitData = (): TastingSubmitData => {
+  const createSubmitData = (): FeedbackRequest => {
     return {
       order_item_id: Number(orderItemId ?? 0),
       overall_rating: review.rating,
@@ -103,7 +103,7 @@ const useTastingReview = (orderItemId?: number, onClose?: () => void) => {
     }
 
     const submitData = createSubmitData()
-    mutation.mutate(submitData as FeedbackRequest)
+    mutation.mutate(submitData)
     resetForm()
     closeModal()
     return true

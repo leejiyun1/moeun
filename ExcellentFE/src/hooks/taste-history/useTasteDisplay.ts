@@ -5,29 +5,24 @@ export const useTasteDisplay = (tasteData: {
   carbonation?: string
   aroma?: string
   bitterness?: string
-  confidence?: string
 }) => {
   const tasteInfo = {
-    단맛: tasteData.sweetness + '점',
-    신맛: tasteData.acidity + '점',
-    바디감: tasteData.body + '점',
-    탄산감: tasteData.carbonation + '점',
-    향: tasteData.aroma + '점',
-    쓴맛: tasteData.bitterness + '점',
+    단맛: tasteData.sweetness,
+    산미: tasteData.acidity,
+    바디감: tasteData.body,
+    탄산감: tasteData.carbonation,
+    향: tasteData.aroma,
+    쓴맛: tasteData.bitterness,
   }
 
   const tasteInfoArray = Object.entries(tasteInfo)
     .filter(([_, value]) => value)
-    .map(([key, value]) => `${key} ${value}`)
+    .map(([key, value]) => `${key} 적합도 ${value}점`)
 
   const tasteDisplay = tasteInfoArray.join(', ')
-  const confidenceDisplay = tasteData.confidence
-    ? ` (신뢰도 ${tasteData.confidence}%)`
-    : ''
 
   return {
     tasteDisplay,
-    confidenceDisplay,
-    fullTasteDisplay: tasteDisplay + confidenceDisplay,
+    fullTasteDisplay: tasteDisplay,
   }
 }

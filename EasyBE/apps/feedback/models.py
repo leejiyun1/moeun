@@ -153,11 +153,11 @@ class Feedback(models.Model):
         help_text="향이 내 입맛에 맞은 정도 (0.0-5.0)",
     )
 
-    # 신뢰도
+    # 내부 학습 가중치. 사용자가 직접 입력하지 않는다.
     confidence = models.PositiveIntegerField(
         default=50,
         validators=[MinValueValidator(0), MaxValueValidator(100)],
-        help_text="신뢰도 (0-100%) - 사용자가 자신의 입맛 정확도를 설정",
+        help_text="내부 학습 신뢰도 기본값 (0-100%)",
     )
 
     # 텍스트 피드백

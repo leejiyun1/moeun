@@ -89,8 +89,6 @@ export interface ItemRowType {
   carbonation?: string
   aroma?: string
   bitterness?: string
-  confidence?: number
-  selected_tags?: string[]
   created_at?: string
   updated_at?: string
   masked_username?: string

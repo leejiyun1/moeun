@@ -28,7 +28,6 @@ class FeedbackSerializer(serializers.ModelSerializer):
             "carbonation",
             "bitterness",
             "aroma",
-            "confidence",
             "comment",
             "selected_tags",
             "image",  # 업로드용

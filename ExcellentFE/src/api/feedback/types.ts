@@ -23,9 +23,7 @@ export interface Feedback {
   carbonation?: string
   bitterness?: string
   aroma?: string
-  confidence?: number
   comment: string
-  selected_tags?: string[] | null
   image_url?: string
   product_name: string
   masked_username: string
