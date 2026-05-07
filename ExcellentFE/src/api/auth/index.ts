@@ -3,8 +3,8 @@ import {
   type RefreshTokenResponse,
   type AdminLoginRequest,
   type AdminLoginResponse,
+  type DemoAdultVerificationRequest,
   type SocialLoginRequest,
-  type SocialLoginTempToken,
   type SocialLoginUser,
   type SocialProvider,
 } from '@/types/auth'
@@ -17,7 +17,10 @@ export const authApi = {
   adminLogin: async (
     payload: AdminLoginRequest
   ): Promise<AdminLoginResponse> => {
-    const { data } = await axiosInstance.post(API_PATHS.AUTH.ADMIN_LOGIN, payload)
+    const { data } = await axiosInstance.post(
+      API_PATHS.AUTH.ADMIN_LOGIN,
+      payload
+    )
     return data
   },
 
@@ -29,7 +32,7 @@ export const authApi = {
   socialLogin: async (
     provider: SocialProvider,
     payload: SocialLoginRequest
-  ): Promise<SocialLoginTempToken | SocialLoginUser> => {
+  ): Promise<SocialLoginUser> => {
     const { data } = await axiosInstance.post(
       API_PATHS.AUTH.LOGIN(provider),
       payload
@@ -47,28 +50,10 @@ export const authApi = {
     return data
   },
 
-  adultAuthToken: async (code: string) => {
-    const { data } = await axios.post(
-      API_PATHS.AUTH.ADULT_AUTH_TOKEN,
-      { code },
-      HEADERS
-    )
-    return data
-  },
-
-  adultAuthUser: async (accessToken: string) => {
-    const { data } = await axios.post(
-      API_PATHS.AUTH.ADULT_AUTH_USER,
-      { access_token: accessToken },
-      HEADERS
-    )
-    return data
-  },
-
-  adultAuthComplete: async (tempToken: string): Promise<SocialLoginUser> => {
+  demoAdultVerification: async (payload: DemoAdultVerificationRequest) => {
     const { data } = await axiosInstance.post(
-      API_PATHS.AUTH.ADULT_AUTH_COMPLETE,
-      { temp_token: tempToken }
+      API_PATHS.AUTH.ADULT_AUTH_DEMO,
+      payload
     )
     return data
   },

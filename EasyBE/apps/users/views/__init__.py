@@ -1,6 +1,6 @@
 # apps/users/views/__init__.py
 from .admin_login_view import AdminLoginView
-from .adult_verification_view import CompleteAdultVerificationView
+from .adult_verification_view import DemoAdultVerificationView
 from .google_view import GoogleLoginView
 from .kakao_view import KakaoLoginView
 from .naver_view import NaverLoginView
@@ -14,7 +14,7 @@ __all__ = [
     "GoogleLoginView",
     "OAuthStateView",
     "TasteProfileView",
-    "CompleteAdultVerificationView",
+    "DemoAdultVerificationView",
     "AdminLoginView",
     "UserProfileView",
     "UserDeleteView",

@@ -3,7 +3,7 @@
 from django.urls import include, path
 from rest_framework_simplejwt.views import TokenRefreshView
 
-from apps.users.views.adult_verification_view import CompleteAdultVerificationView
+from apps.users.views.adult_verification_view import DemoAdultVerificationView
 from apps.users.views.user_restore_code_view import (
     SendRecoveryCodeAPIView,
     VerifyRecoveryCodeAPIView,
@@ -31,9 +31,7 @@ v1_patterns = [
     path("auth/login/google", GoogleLoginView.as_view(), name="google_login"),
     path("auth/state", OAuthStateView.as_view(), name="save_oauth_state"),
     # 성인 인증
-    path(
-        "auth/adult-verification/complete", CompleteAdultVerificationView.as_view(), name="complete_adult_verification"
-    ),
+    path("auth/adult-verification/demo/", DemoAdultVerificationView.as_view(), name="demo_adult_verification"),
     # JWT 토큰 관련
     path("auth/admin/login/", AdminLoginView.as_view(), name="admin_login"),
     path("auth/token/refresh", TokenRefreshView.as_view(), name="token_refresh"),

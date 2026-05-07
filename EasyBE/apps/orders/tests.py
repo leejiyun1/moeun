@@ -19,6 +19,7 @@ class OrderFromCartAPITest(APITestCase):
     def setUp(self):
         # Given: 기본 데이터 설정
         self.user = User.objects.create_user(nickname="testuser")
+        self.user.verify_adult()
         self.client.force_authenticate(user=self.user)
 
         self.brewery = Brewery.objects.create(name="Test Brewery")
@@ -189,6 +190,21 @@ class OrderFromCartAPITest(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertIn("상품의 픽업 정보가 없습니다.", response.data["detail"])
         self.assertEqual(Order.objects.count(), 0)  # Order should not be created
+
+    def test_create_order_from_cart_requires_adult_verification(self):
+        """성인 인증을 완료하지 않은 사용자는 주문 생성 불가."""
+        self.user.is_adult = False
+        self.user.adult_verified_at = None
+        self.user.save(update_fields=["is_adult", "adult_verified_at"])
+        CartItem.objects.create(
+            user=self.user, product=self.product1, quantity=1, pickup_store=self.store1, pickup_date=date.today()
+        )
+
+        response = self.client.post(self.create_order_url)
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(response.data["code"], "ADULT_VERIFICATION_REQUIRED")
+        self.assertEqual(Order.objects.count(), 0)
 
     def test_unauthenticated_user_cannot_create_order_from_cart(self):
         """인증되지 않은 사용자의 주문 생성 실패 테스트"""

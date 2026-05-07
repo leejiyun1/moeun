@@ -40,40 +40,23 @@ class GoogleLoginView(APIView):
             google_id = str(google_user_data["id"])
             email = google_user_data.get("email")
 
-            # 4. 사용자 인증 및 성인 인증 상태 확인
+            # 4. 사용자 인증. 성인 인증은 주문/시음 신청 직전에 확인한다.
             user, auth_status = SocialAuthService.authenticate_social_user(
                 provider="GOOGLE", provider_id=google_id, user_info={"email": email}
             )
 
-            # 5. 성인 인증 여부에 따른 분기 처리
-            if user is not None and auth_status in ["existing_verified", "linked_verified"]:
-                # 성인 인증 완료 → 바로 로그인
-                tokens = JWTService.create_tokens_for_user(user)
-
-                return Response(
-                    {
-                        "success": True,
-                        "access": tokens["access_token"],
-                        "refresh": tokens["refresh_token"],
-                        "user_info": UserSerializer(user).data,
-                        "auth_type": auth_status,
-                    },
-                    status=status.HTTP_200_OK,
-                )
-
-            else:
-                # 성인 인증 필요 → 임시 토큰 발급
-                temp_token = SocialAuthService.create_adult_verification_token(provider="GOOGLE", provider_id=google_id)
-
-                return Response(
-                    {
-                        "success": True,
-                        "status": "adult_verification_required",
-                        "temp_token": temp_token,
-                        "message": "성인 인증이 필요합니다.",
-                    },
-                    status=status.HTTP_200_OK,
-                )
+            # 5. 로그인은 완료하고, 주류 주문/시음 신청 직전에 성인 인증을 요구한다.
+            tokens = JWTService.create_tokens_for_user(user)
+            return Response(
+                {
+                    "success": True,
+                    "access": tokens["access_token"],
+                    "refresh": tokens["refresh_token"],
+                    "user_info": UserSerializer(user).data,
+                    "auth_type": auth_status,
+                },
+                status=status.HTTP_200_OK,
+            )
 
         except Exception as e:
             return Response(

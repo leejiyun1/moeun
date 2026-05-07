@@ -15,7 +15,6 @@ const queryClient = new QueryClient()
 
 const Login = lazy(() => import('@/pages/auth/Login'))
 const SocialCallback = lazy(() => import('@/pages/auth/SocialCallback'))
-const AdultCallback = lazy(() => import('@/pages/auth/AdultCallback'))
 const AdultAuthManual = lazy(() => import('@/pages/auth/AdultAuthManual'))
 const Cart = lazy(() => import('@/pages/Cart'))
 const Home = lazy(() => import('@/pages/Index'))
@@ -59,14 +58,10 @@ function App() {
       <Suspense fallback={null}>
         <Routes>
           <Route path="/login" element={<Login />} />
+          <Route path="/auth/:provider/callback" element={<SocialCallback />} />
           <Route
-            path="/auth/:provider/callback"
-            element={<SocialCallback />}
-          />
-          <Route path="/auth/adult-manual" element={<AdultAuthManual />} />
-          <Route
-            path="/auth/adult-verification/callback"
-            element={<AdultCallback />}
+            path="/auth/adult-verification"
+            element={<AdultAuthManual />}
           />
           <Route path="admin/login" element={<AdminLogin />} />
 

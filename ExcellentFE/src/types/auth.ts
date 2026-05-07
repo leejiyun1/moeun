@@ -6,13 +6,6 @@ export interface SocialLoginRequest {
   state?: string
 }
 
-export interface SocialLoginTempToken {
-  success: boolean
-  status: string
-  temp_token: string
-  message: string
-}
-
 export interface SocialLoginUser {
   success: boolean
   access: string
@@ -21,6 +14,8 @@ export interface SocialLoginUser {
     nickname: string
     email: string | null
     role: string
+    is_adult: boolean
+    adult_verified_at: string | null
     created_at: string
   }
   auth_type: string
@@ -31,6 +26,10 @@ export interface AdminLoginRequest {
   password: string
 }
 
+export interface DemoAdultVerificationRequest {
+  birth_date: string
+}
+
 export interface AdminLoginResponse {
   success: boolean
   access: string
@@ -39,6 +38,8 @@ export interface AdminLoginResponse {
     nickname: string
     email: string | null
     role: string
+    is_adult: boolean
+    adult_verified_at: string | null
     created_at: string
     notification_agreed: boolean
   }

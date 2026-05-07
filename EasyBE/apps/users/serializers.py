@@ -37,7 +37,15 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ["nickname", "email", "role", "created_at", "notification_agreed"]
+        fields = [
+            "nickname",
+            "email",
+            "role",
+            "is_adult",
+            "adult_verified_at",
+            "created_at",
+            "notification_agreed",
+        ]
 
 
 class AdminLoginSerializer(serializers.Serializer):
@@ -45,6 +53,12 @@ class AdminLoginSerializer(serializers.Serializer):
 
     identifier = serializers.CharField()
     password = serializers.CharField(write_only=True, trim_whitespace=False)
+
+
+class DemoAdultVerificationSerializer(serializers.Serializer):
+    """데모 성인인증 요청."""
+
+    birth_date = serializers.DateField(help_text="생년월일. YYYY-MM-DD 형식")
 
 
 class UserUpdateSerializer(serializers.ModelSerializer):

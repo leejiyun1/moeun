@@ -26,7 +26,6 @@ export const useAuthStore = create<AuthState>((set) => ({
     } catch (error) {
       tokenStorage.removeAccessToken()
       tokenStorage.removeRefreshToken()
-      tokenStorage.removeTempToken()
       set({ isLoggedIn: false, isAuthInitialized: true, user: null })
       showError(getAxiosErrorMessage(error, ERROR_MESSAGE.LOGIN_FAILED))
     }

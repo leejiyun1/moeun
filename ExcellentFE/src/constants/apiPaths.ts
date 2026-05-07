@@ -8,11 +8,7 @@ export const API_PATHS = {
     ADMIN_LOGIN: '/auth/admin/login/',
     STATE: '/auth/state',
     TOKEN_REFRESH: '/auth/token/refresh',
-    ADULT_AUTH_TOKEN:
-      'https://u4txshromiloou5smkm6a22yqe0pzprn.lambda-url.us-east-1.on.aws/',
-    ADULT_AUTH_USER:
-      'https://bxomhhgxsmplfc33no2mkcijvi0bbgjv.lambda-url.us-east-1.on.aws/',
-    ADULT_AUTH_COMPLETE: 'auth/adult-verification/complete',
+    ADULT_AUTH_DEMO: '/auth/adult-verification/demo/',
   },
   USER: {
     PROFILE: '/user/profile/',

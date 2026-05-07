@@ -33,10 +33,19 @@ class InvalidCartSelectionError(OrderCreationError):
     pass
 
 
+class AdultVerificationRequiredError(OrderCreationError):
+    """성인 인증이 필요한 주문일 때 발생하는 예외"""
+
+    pass
+
+
 class OrderService:
     @staticmethod
     @transaction.atomic
     def create_order_from_cart(user, cart_item_ids=None, package_draft_ids=None):
+        if not user.is_adult:
+            raise AdultVerificationRequiredError("주문 전 성인 인증이 필요합니다.")
+
         cart_items = CartItem.objects.filter(user=user).select_related("product", "pickup_store")
         package_drafts = (
             PackageDraft.objects.filter(user=user)

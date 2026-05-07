@@ -5,7 +5,6 @@ import { SOCIAL_LOGIN } from '@/constants/socialLoginUrl'
 import { useAuthStore } from '@/stores/authStore'
 import {
   type SocialLoginRequest,
-  type SocialLoginTempToken,
   type SocialLoginUser,
   type SocialProvider,
 } from '@/types/auth'
@@ -50,13 +49,7 @@ export const useSocialLogin = (provider: SocialProvider) => {
     mutationFn: (payload: SocialLoginRequest) =>
       authApi.socialLogin(provider, payload),
 
-    onSuccess: (data: SocialLoginTempToken | SocialLoginUser) => {
-      if ('temp_token' in data) {
-        tokenStorage.setTempToken(data.temp_token)
-        if (tokenStorage.getTempToken())
-          navigate(ROUTE_PATHS.ADULT_AUTH_MANUAL, { replace: true })
-      }
-
+    onSuccess: (data: SocialLoginUser) => {
       if ('access' in data && 'refresh' in data) {
         tokenStorage.setAccessToken(data.access)
         tokenStorage.setRefreshToken(data.refresh)
@@ -68,7 +61,6 @@ export const useSocialLogin = (provider: SocialProvider) => {
     },
 
     onError: (error) => {
-      tokenStorage.removeTempToken()
       showError(getAxiosErrorMessage(error) ?? ERROR_MESSAGE.LOGIN_FAILED)
     },
   })

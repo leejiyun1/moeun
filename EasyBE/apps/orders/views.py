@@ -8,6 +8,7 @@ from rest_framework.response import Response
 from apps.orders.models import Order, OrderItem
 from apps.orders.serializers import FlatOrderItemSerializer, OrderSerializer
 from apps.orders.services import (
+    AdultVerificationRequiredError,
     CartIsEmptyError,
     InvalidCartSelectionError,
     MissingPickupInfoError,
@@ -46,6 +47,9 @@ class OrderViewSet(viewsets.ModelViewSet):
             )
             serializer = self.get_serializer(order)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+        except AdultVerificationRequiredError as e:
+            return Response({"code": "ADULT_VERIFICATION_REQUIRED", "detail": str(e)}, status=status.HTTP_403_FORBIDDEN)
 
         except (CartIsEmptyError, MissingPickupInfoError, InvalidCartSelectionError) as e:
             return Response({"detail": str(e)}, status=status.HTTP_400_BAD_REQUEST)

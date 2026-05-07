@@ -1,5 +1,6 @@
 # apps/users/tests/test_api.py
 
+from datetime import date
 from decimal import Decimal
 
 from django.contrib.auth import get_user_model
@@ -125,5 +126,39 @@ class AdminLoginAPITest(TestCase):
             {"identifier": "admin@test.com", "password": "wrong-password"},
             format="json",
         )
+
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+
+class DemoAdultVerificationAPITest(TestCase):
+    def setUp(self):
+        self.client = APIClient()
+        self.user = User.objects.create_user(nickname="adult-demo", email="adult-demo@test.com")
+        self.url = reverse("users:v1:demo_adult_verification")
+
+    def test_demo_adult_verification_success(self):
+        self.client.force_authenticate(user=self.user)
+        birth_date = date(date.today().year - 19, 1, 1)
+
+        response = self.client.post(self.url, {"birth_date": birth_date.isoformat()}, format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.user.refresh_from_db()
+        self.assertTrue(self.user.is_adult)
+        self.assertIsNotNone(self.user.adult_verified_at)
+        self.assertTrue(response.data["user_info"]["is_adult"])
+
+    def test_demo_adult_verification_rejects_minor(self):
+        self.client.force_authenticate(user=self.user)
+        birth_date = date(date.today().year - 18, 1, 1)
+
+        response = self.client.post(self.url, {"birth_date": birth_date.isoformat()}, format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.user.refresh_from_db()
+        self.assertFalse(self.user.is_adult)
+
+    def test_demo_adult_verification_requires_login(self):
+        response = self.client.post(self.url, {"birth_date": "2000-01-01"}, format="json")
 
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)

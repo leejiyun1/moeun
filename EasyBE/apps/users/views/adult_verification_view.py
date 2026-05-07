@@ -1,44 +1,34 @@
-# apps/users/views/adult_verification_view.py
 from rest_framework import status
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework_simplejwt.tokens import RefreshToken
 
-from apps.users.serializers import UserSerializer
-from apps.users.utils.social_auth import SocialAuthService
-from core.utils.temp_token import TempTokenManager
+from apps.users.serializers import DemoAdultVerificationSerializer, UserSerializer
 
 
-class CompleteAdultVerificationView(APIView):
-    """성인 인증 완료 처리"""
+class DemoAdultVerificationView(APIView):
+    """데모 성인 인증 처리.
+
+    외부 본인인증 provider 연동 전까지 개발/포트폴리오 환경에서만 사용한다.
+    """
+
+    permission_classes = [IsAuthenticated]
+    serializer_class = DemoAdultVerificationSerializer
 
     def post(self, request):
-        # 1. 요청 데이터 검증
-        temp_token = request.data.get("temp_token")
-        if not temp_token:
-            return Response({"error": "임시 토큰이 필요합니다."}, status=400)
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
 
-        # 2. 토큰 검증
-        token_data = TempTokenManager.verify_adult_verification_token(temp_token)
-        if not token_data["valid"]:
-            return Response({"error": token_data["error"]}, status=400)
+        birth_date = serializer.validated_data["birth_date"]
+        if not self._is_legal_adult(birth_date):
+            return Response({"detail": "만 19세 이상만 신청할 수 있습니다."}, status=status.HTTP_400_BAD_REQUEST)
 
-        # 3. 성인 인증 완료 처리
-        user = SocialAuthService.complete_adult_verification(
-            provider=token_data["provider"],
-            provider_id=token_data["social_id"],
-            user_info={"nickname": token_data["nickname"]},
-        )
+        request.user.verify_adult()
+        return Response({"success": True, "user_info": UserSerializer(request.user).data}, status=status.HTTP_200_OK)
 
-        # 4. JWT 토큰 발급
-        refresh = RefreshToken.for_user(user)
+    @staticmethod
+    def _is_legal_adult(birth_date):
+        from django.utils import timezone
 
-        # 5. 응답 반환
-        return Response(
-            {
-                "success": True,
-                "access": str(refresh.access_token),
-                "refresh": str(refresh),
-                "user_info": UserSerializer(user).data,
-            }
-        )
+        today = timezone.localdate()
+        return today.year - birth_date.year >= 19

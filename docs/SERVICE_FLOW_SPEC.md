@@ -711,6 +711,7 @@ FE 호출:
 - 선택한 `CartItem` id 목록을 보낸다.
 - 선택한 `PackageDraft` id 목록을 보낸다.
 - 픽업 정보 누락을 1차 차단한다.
+- 백엔드가 `ADULT_VERIFICATION_REQUIRED`를 반환하면 성인인증 화면으로 이동한다.
 - 주문 성공 후 장바구니/주문내역 이동 기준을 정한다.
 
 ### BE 책임
@@ -726,6 +727,7 @@ FE 호출:
 
 - 요청 사용자의 장바구니 항목만 주문 가능하게 한다.
 - 선택 항목만 주문한다.
+- 사용자가 성인 인증을 완료했는지 확인한다.
 - 픽업 정보가 없으면 실패시킨다.
 - 일반 상품은 `OrderItem`으로 snapshot한다.
 - 커스텀 패키지는 `OrderCustomPackage`와 `OrderCustomPackageItem`으로 snapshot한다.
@@ -733,6 +735,11 @@ FE 호출:
 ### 상태 변화
 
 ```text
+성인 미인증이면:
+Order 생성 없음
+HTTP 403 ADULT_VERIFICATION_REQUIRED 반환
+
+성인 인증 완료 후:
 Order 생성
 OrderItem 생성
 OrderCustomPackage 생성
@@ -745,12 +752,116 @@ PackageDraft.status = ORDERED
 - 주문 생성 후 상품 가격 변경이 과거 주문 금액에 영향을 주면 안 된다.
 - 다른 사용자의 cart item id를 주문할 수 있으면 안 된다.
 - package draft를 주문 후에도 DRAFT로 남기면 안 된다.
+- 프론트 성인인증 화면만 믿고 주문을 통과시키면 안 된다.
 
 ### 검증 기준
 
+- 성인 미인증 사용자는 주문 생성이 실패하고 성인인증 화면으로 이동한다.
+- 데모 성인인증 완료 후 주문을 다시 시도할 수 있다.
 - 선택한 일반 상품만 주문된다.
 - 선택한 커스텀 패키지만 주문된다.
 - 주문 snapshot에 상품명, 가격, 수량, 정책명, 픽업 정보가 보존된다.
+
+## Flow 7-1. 사용자가 데모 성인인증을 완료한다
+
+### 목표
+
+주문/시음 신청 직전에 성인 여부를 확인한다.
+
+현재는 외부 provider 계약 전 단계이므로 데모 인증을 사용한다. 데모 인증은 실서비스 성인인증으로 사용하지 않는다.
+
+### 진입점
+
+```text
+GET /auth/adult-verification
+```
+
+주문 생성 실패 시 이동:
+
+```text
+POST /api/v1/orders/create_from_cart/
+-> 403 ADULT_VERIFICATION_REQUIRED
+-> /auth/adult-verification?redirect=/cart
+```
+
+### FE 책임
+
+관련 파일:
+
+- `ExcellentFE/src/pages/auth/AdultAuthManual.tsx`
+- `ExcellentFE/src/hooks/auth/useAdultAuth.ts`
+- `ExcellentFE/src/hooks/cart/useUserPostOrder.ts`
+- `ExcellentFE/src/api/auth/index.ts`
+- `ExcellentFE/src/constants/routePaths.ts`
+
+책임:
+
+- 데모 생년월일 입력 화면 제공
+- 데모 인증 API 호출
+- 인증 성공 후 사용자 프로필 재조회
+- 원래 흐름으로 돌아갈 redirect 처리
+
+### API 계약
+
+```text
+POST /api/v1/auth/adult-verification/demo/
+```
+
+요청:
+
+```json
+{
+  "birth_date": "2000-01-01"
+}
+```
+
+응답:
+
+```json
+{
+  "success": true,
+  "user_info": {
+    "is_adult": true,
+    "adult_verified_at": "..."
+  }
+}
+```
+
+### BE 책임
+
+관련 파일:
+
+- `EasyBE/apps/users/views/adult_verification_view.py`
+- `EasyBE/apps/users/serializers.py`
+- `EasyBE/apps/users/models.py`
+
+책임:
+
+- 로그인 사용자만 데모 인증 허용
+- 생년월일 기준 성인 여부 계산
+- 성인이면 `User.verify_adult()` 호출
+- 사용자 정보 응답
+
+### 상태 변화
+
+```text
+User.is_adult = true
+User.adult_verified_at = now()
+```
+
+### 금지사항
+
+- 데모 인증을 운영 환경에서 사용하지 않는다.
+- 프론트가 계산한 나이만 믿지 않는다.
+- 로그인 직후 성인인증을 강제하지 않는다.
+- 소셜 로그인 생년월일을 성인인증 완료로 처리하지 않는다.
+
+### 검증 기준
+
+- 미로그인 사용자는 데모 성인인증 API 호출 불가
+- 미성년 생년월일은 실패
+- 성인 생년월일은 `is_adult=true` 처리
+- 인증 완료 후 주문을 다시 시도할 수 있다.
 
 ## Flow 8. 사용자가 리뷰를 남긴다
 
