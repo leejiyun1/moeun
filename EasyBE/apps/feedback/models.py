@@ -25,31 +25,8 @@ LEGACY_TASTE_TAGS = [
     ("산미", "산미"),
 ]
 
-REVIEW_TAG_DEFINITIONS = [
-    {"label": "달달함", "sentiment": "positive", "taste_axis": "sweetness"},
-    {"label": "상큼함", "sentiment": "positive", "taste_axis": "acidity"},
-    {"label": "묵직함", "sentiment": "positive", "taste_axis": "body"},
-    {"label": "톡 쏘는 느낌", "sentiment": "positive", "taste_axis": "carbonation"},
-    {"label": "쌉쌀함", "sentiment": "positive", "taste_axis": "bitterness"},
-    {"label": "향긋함", "sentiment": "positive", "taste_axis": "aroma"},
-    {"label": "너무 달다", "sentiment": "negative", "taste_axis": "sweetness"},
-    {"label": "너무 시다", "sentiment": "negative", "taste_axis": "acidity"},
-    {"label": "너무 묵직하다", "sentiment": "negative", "taste_axis": "body"},
-    {"label": "탄산이 부담스럽다", "sentiment": "negative", "taste_axis": "carbonation"},
-    {"label": "너무 쓰다", "sentiment": "negative", "taste_axis": "bitterness"},
-    {"label": "향이 강하다", "sentiment": "negative", "taste_axis": "aroma"},
-]
-
-POSITIVE_REVIEW_TAGS = [tag["label"] for tag in REVIEW_TAG_DEFINITIONS if tag["sentiment"] == "positive"]
-NEGATIVE_REVIEW_TAGS = [tag["label"] for tag in REVIEW_TAG_DEFINITIONS if tag["sentiment"] == "negative"]
-VALID_REVIEW_TAGS = {tag["label"] for tag in REVIEW_TAG_DEFINITIONS}
-VALID_LEGACY_TAGS = {tag[0] for tag in LEGACY_TASTE_TAGS}
-VALID_FEEDBACK_TAGS = VALID_REVIEW_TAGS | VALID_LEGACY_TAGS
-
-# 외부 import 호환용 이름.
-TASTE_TAG_CHOICES = LEGACY_TASTE_TAGS + [
-    (tag["label"], tag["label"]) for tag in REVIEW_TAG_DEFINITIONS if tag["label"] not in VALID_LEGACY_TAGS
-]
+TASTE_TAG_CHOICES = LEGACY_TASTE_TAGS
+VALID_FEEDBACK_TAGS = {tag[0] for tag in LEGACY_TASTE_TAGS}
 
 
 class FeedbackQuerySet(models.QuerySet):
@@ -60,9 +37,14 @@ class FeedbackQuerySet(models.QuerySet):
         return self.filter(rating__gte=4)
 
     def with_taste_profile(self):
-        """취향 평가가 있는 리뷰들"""
+        """입맛 적합도 입력이 있는 리뷰들"""
         return self.filter(
-            models.Q(sweetness__isnull=False) | models.Q(acidity__isnull=False) | models.Q(body__isnull=False)
+            models.Q(sweetness__isnull=False)
+            | models.Q(acidity__isnull=False)
+            | models.Q(body__isnull=False)
+            | models.Q(carbonation__isnull=False)
+            | models.Q(bitterness__isnull=False)
+            | models.Q(aroma__isnull=False)
         )
 
     def recent(self, days=7):
@@ -121,14 +103,14 @@ class Feedback(models.Model):
         validators=[MinValueValidator(1), MaxValueValidator(5)], help_text="종합 평점 (1-5점)"
     )
 
-    # 세부 취향 평가 (0.0-5.0)
+    # 세부 입맛 적합도 (0.0-5.0)
     sweetness = models.DecimalField(
         max_digits=3,
         decimal_places=1,
         null=True,
         blank=True,
         validators=[MinValueValidator(Decimal("0.0")), MaxValueValidator(Decimal("5.0"))],
-        help_text="단맛 평가 (0.0-5.0)",
+        help_text="단맛이 내 입맛에 맞은 정도 (0.0-5.0)",
     )
     acidity = models.DecimalField(
         max_digits=3,
@@ -136,7 +118,7 @@ class Feedback(models.Model):
         null=True,
         blank=True,
         validators=[MinValueValidator(Decimal("0.0")), MaxValueValidator(Decimal("5.0"))],
-        help_text="산미 평가 (0.0-5.0)",
+        help_text="산미가 내 입맛에 맞은 정도 (0.0-5.0)",
     )
     body = models.DecimalField(
         max_digits=3,
@@ -144,7 +126,7 @@ class Feedback(models.Model):
         null=True,
         blank=True,
         validators=[MinValueValidator(Decimal("0.0")), MaxValueValidator(Decimal("5.0"))],
-        help_text="바디감 평가 (0.0-5.0)",
+        help_text="바디감이 내 입맛에 맞은 정도 (0.0-5.0)",
     )
     carbonation = models.DecimalField(
         max_digits=3,
@@ -152,7 +134,7 @@ class Feedback(models.Model):
         null=True,
         blank=True,
         validators=[MinValueValidator(Decimal("0.0")), MaxValueValidator(Decimal("5.0"))],
-        help_text="탄산감 평가 (0.0-5.0)",
+        help_text="탄산감이 내 입맛에 맞은 정도 (0.0-5.0)",
     )
     bitterness = models.DecimalField(
         max_digits=3,
@@ -160,7 +142,7 @@ class Feedback(models.Model):
         null=True,
         blank=True,
         validators=[MinValueValidator(Decimal("0.0")), MaxValueValidator(Decimal("5.0"))],
-        help_text="쓴맛 평가 (0.0-5.0)",
+        help_text="쓴맛이 내 입맛에 맞은 정도 (0.0-5.0)",
     )
     aroma = models.DecimalField(
         max_digits=3,
@@ -168,7 +150,7 @@ class Feedback(models.Model):
         null=True,
         blank=True,
         validators=[MinValueValidator(Decimal("0.0")), MaxValueValidator(Decimal("5.0"))],
-        help_text="풍미 평가 (0.0-5.0)",
+        help_text="향이 내 입맛에 맞은 정도 (0.0-5.0)",
     )
 
     # 신뢰도
@@ -188,8 +170,6 @@ class Feedback(models.Model):
     selected_tags = models.JSONField(
         null=True, blank=True, help_text="선택한 맛/느낌 태그들 (예: ['과일향', '달콤한', '부드러운'])"
     )
-    positive_tags = models.JSONField(default=list, blank=True, help_text="좋았던 점 태그 목록")
-    negative_tags = models.JSONField(default=list, blank=True, help_text="아쉬웠던 점 태그 목록")
 
     # 조회 관련
     view_count = models.PositiveIntegerField(default=0, help_text="피드백 조회수")
@@ -250,20 +230,6 @@ class Feedback(models.Model):
                 from django.core.exceptions import ValidationError
 
                 raise ValidationError(f"허용되지 않은 태그: {invalid_tags}")
-
-        if self.positive_tags:
-            invalid_tags = [tag for tag in self.positive_tags if tag not in POSITIVE_REVIEW_TAGS]
-            if invalid_tags:
-                from django.core.exceptions import ValidationError
-
-                raise ValidationError(f"허용되지 않은 좋았던 점 태그: {invalid_tags}")
-
-        if self.negative_tags:
-            invalid_tags = [tag for tag in self.negative_tags if tag not in NEGATIVE_REVIEW_TAGS]
-            if invalid_tags:
-                from django.core.exceptions import ValidationError
-
-                raise ValidationError(f"허용되지 않은 아쉬웠던 점 태그: {invalid_tags}")
 
     def delete_image(self):
         """이미지 삭제 (S3/NCP에서)"""

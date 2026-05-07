@@ -29,6 +29,22 @@ class PreferTasteProfileModelTest(TestCase):
         # 서비스 메서드가 올바른 인수로 호출되었는지 확인
         mock_update.assert_called_once_with(self.profile, mock_feedback)
 
+    def test_review_without_taste_fit_score_does_not_increment_review_count(self):
+        """입맛 적합도 입력이 없는 리뷰는 프로필 학습 카운트에 포함하지 않는다."""
+        mock_feedback = Mock(
+            sweetness=None,
+            acidity=None,
+            body=None,
+            carbonation=None,
+            bitterness=None,
+            aroma=None,
+        )
+
+        TasteAnalysisService.update_taste_profile_from_feedback(self.profile, mock_feedback)
+
+        self.profile.refresh_from_db()
+        self.assertEqual(self.profile.total_reviews_count, 0)
+
     def test_get_taste_scores_dict(self):
         """get_taste_scores_dict 메서드 테스트"""
         self.profile.sweetness_level = Decimal("4.5")

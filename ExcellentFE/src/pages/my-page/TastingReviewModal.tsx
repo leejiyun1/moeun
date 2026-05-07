@@ -1,8 +1,9 @@
 import Button from '@/components/common/Button'
 import Modal from '@/components/common/Modal'
+import ReviewRatingSection from '@/components/common/review-modal/ReviewRatingSection'
 import ReviewSummaryForm from '@/components/common/review-modal/ReviewSummaryForm'
+import TasteFitSlider from '@/components/common/review-modal/TasteFitSlider'
 import useTastingReview from '@/hooks/order/useTastingReview'
-import ReviewStarTag from '@/components/common/review-modal/ReviewStarTag'
 import { useAuthStore } from '@/stores/authStore'
 
 interface TastingReviewModalProps {
@@ -19,10 +20,7 @@ const TastingReviewModal = ({
   const {
     review,
     updateReview,
-    positiveTags,
-    negativeTags,
-    handleTogglePositiveTag,
-    handleToggleNegativeTag,
+    clearTasteFitScore,
     comment,
     setComment,
     handleFileChange,
@@ -49,13 +47,14 @@ const TastingReviewModal = ({
         <p>나의 맛의 지문 정확도를 높여보세요!</p>
       </div>
       <div className="w-full">
-        <ReviewStarTag
+        <ReviewRatingSection
           review={review}
           updateReview={updateReview}
-          positiveTags={positiveTags}
-          negativeTags={negativeTags}
-          handleTogglePositiveTag={handleTogglePositiveTag}
-          handleToggleNegativeTag={handleToggleNegativeTag}
+        />
+        <TasteFitSlider
+          review={review}
+          updateReview={updateReview}
+          clearTasteFitScore={clearTasteFitScore}
         />
         <ReviewSummaryForm
           comment={comment}

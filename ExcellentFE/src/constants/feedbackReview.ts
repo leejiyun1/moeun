@@ -1,19 +1,18 @@
-export const POSITIVE_FEEDBACK_TAGS = [
-  { label: '#달달함', value: '달달함' },
-  { label: '#상큼함', value: '상큼함' },
-  { label: '#묵직함', value: '묵직함' },
-  { label: '#톡 쏘는 느낌', value: '톡 쏘는 느낌' },
-  { label: '#쌉쌀함', value: '쌉쌀함' },
-  { label: '#향긋함', value: '향긋함' },
+export const TASTE_FIT_SLIDERS = [
+  { key: 'sweetness' as const, label: '단맛', variant: 'sweetness' as const },
+  { key: 'acidity' as const, label: '산미', variant: 'acidity' as const },
+  { key: 'body' as const, label: '바디감', variant: 'body' as const },
+  {
+    key: 'carbonation' as const,
+    label: '탄산감',
+    variant: 'carbonation' as const,
+  },
+  { key: 'bitterness' as const, label: '쓴맛', variant: 'bitter' as const },
+  { key: 'aroma' as const, label: '향', variant: 'aroma' as const },
 ] as const
 
-export const NEGATIVE_FEEDBACK_TAGS = [
-  { label: '#너무 달다', value: '너무 달다' },
-  { label: '#너무 시다', value: '너무 시다' },
-  { label: '#너무 묵직하다', value: '너무 묵직하다' },
-  { label: '#탄산이 부담스럽다', value: '탄산이 부담스럽다' },
-  { label: '#너무 쓰다', value: '너무 쓰다' },
-  { label: '#향이 강하다', value: '향이 강하다' },
-] as const
-
-export const MAX_SELECTED_TAGS = 3
+export const TASTE_FIT_SCORE_LABELS = {
+  min: '안 맞음',
+  max: '잘 맞음',
+  unset: '선택 안 함',
+} as const

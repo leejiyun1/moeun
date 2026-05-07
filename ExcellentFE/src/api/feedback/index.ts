@@ -21,17 +21,21 @@ const createFormDataFromFeedback = (data: FeedbackRequest): FormData => {
     })
   }
 
-  if (data.positive_tags?.length) {
-    data.positive_tags.forEach((tag) => {
-      formData.append('positive_tags', tag)
-    })
-  }
+  const tasteFitFields = [
+    'sweetness',
+    'acidity',
+    'body',
+    'carbonation',
+    'bitterness',
+    'aroma',
+  ] as const
 
-  if (data.negative_tags?.length) {
-    data.negative_tags.forEach((tag) => {
-      formData.append('negative_tags', tag)
-    })
-  }
+  tasteFitFields.forEach((field) => {
+    const value = data[field]
+    if (value !== undefined) {
+      formData.set(field, String(value))
+    }
+  })
 
   return formData
 }

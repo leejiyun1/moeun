@@ -81,29 +81,6 @@ class FeedbackModelTest(TestCase):
         self.assertEqual(len(feedback.selected_tags), 2)
         self.assertIn("달콤한", feedback.selected_tags)
 
-    def test_feedback_positive_negative_tags_validation(self):
-        feedback = Feedback(
-            user=self.user,
-            order_item=self.order_item,
-            rating=5,
-            positive_tags=["달달함", "향긋함"],
-            negative_tags=["너무 쓰다"],
-        )
-        try:
-            feedback.clean()
-        except ValidationError:
-            self.fail("valid positive/negative tags should not raise ValidationError")
-
-    def test_feedback_invalid_sentiment_tag_validation(self):
-        feedback = Feedback(
-            user=self.user,
-            order_item=self.order_item,
-            rating=5,
-            positive_tags=["너무 달다"],
-        )
-        with self.assertRaises(ValidationError):
-            feedback.clean()
-
     def test_feedback_str_method(self):
         feedback = Feedback.objects.create(
             user=self.user, order_item=self.order_item, rating=4, comment="좋은 술입니다."
@@ -265,8 +242,20 @@ class FeedbackQuerySetTest(TestCase):
             pickup_store=self.store,
         )
         without_taste = Feedback.objects.create(user=self.user, order_item=order_item2, rating=4)
+        order_item3 = OrderItem.objects.create(
+            order=self.order,
+            product=self.product,
+            quantity=1,
+            price=Decimal("15000"),
+            pickup_day=date.today(),
+            pickup_store=self.store,
+        )
+        with_aroma_only = Feedback.objects.create(
+            user=self.user, order_item=order_item3, rating=4, aroma=Decimal("4.5")
+        )
         taste_profile_feedbacks = Feedback.objects.with_taste_profile()
         self.assertIn(with_taste, taste_profile_feedbacks)
+        self.assertIn(with_aroma_only, taste_profile_feedbacks)
         self.assertNotIn(without_taste, taste_profile_feedbacks)
 
 
@@ -328,22 +317,21 @@ class FeedbackAPITest(APITestCase):
         self.assertEqual(feedback.user, self.user)
         self.assertEqual(feedback.rating, 5)
 
-    def test_create_feedback_with_positive_negative_tags(self):
+    def test_create_feedback_with_taste_fit_scores(self):
         self.client.force_authenticate(user=self.user)
         data = {
             "order_item": self.order_item.id,
             "rating": 5,
             "comment": "달달하고 향이 좋아서 편했습니다.",
-            "positive_tags": ["달달함", "향긋함"],
-            "negative_tags": ["너무 쓰다"],
+            "sweetness": "5.0",
+            "aroma": "4.5",
         }
         url = reverse("feedback:v1:feedbacks-list")
         response = self.client.post(url, data, format="json")
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         feedback = Feedback.objects.get()
-        self.assertEqual(feedback.positive_tags, ["달달함", "향긋함"])
-        self.assertEqual(feedback.negative_tags, ["너무 쓰다"])
-        self.assertEqual(feedback.selected_tags, ["달달함", "향긋함", "너무 쓰다"])
+        self.assertEqual(feedback.sweetness, Decimal("5.0"))
+        self.assertEqual(feedback.aroma, Decimal("4.5"))
 
     def test_create_feedback_invalid_image_format(self):
         """잘못된 이미지 형식 테스트"""

@@ -2,20 +2,7 @@
 
 from rest_framework import serializers
 
-from .models import (
-    NEGATIVE_REVIEW_TAGS,
-    POSITIVE_REVIEW_TAGS,
-    TASTE_TAG_CHOICES,
-    Feedback,
-)
-
-
-def _normalize_tag_list(value):
-    if value in (None, ""):
-        return []
-    if isinstance(value, str):
-        return [value]
-    return list(value)
+from .models import TASTE_TAG_CHOICES, Feedback
 
 
 class FeedbackSerializer(serializers.ModelSerializer):
@@ -28,8 +15,6 @@ class FeedbackSerializer(serializers.ModelSerializer):
     product_id = serializers.UUIDField(source="product.id", read_only=True)
     masked_username = serializers.CharField(read_only=True)
     has_image = serializers.BooleanField(read_only=True)
-    positive_tags = serializers.ListField(child=serializers.CharField(), required=False)
-    negative_tags = serializers.ListField(child=serializers.CharField(), required=False)
 
     class Meta:
         model = Feedback
@@ -46,8 +31,6 @@ class FeedbackSerializer(serializers.ModelSerializer):
             "confidence",
             "comment",
             "selected_tags",
-            "positive_tags",
-            "negative_tags",
             "image",  # 업로드용
             "image_url",  # 응답용
             "product_name",
@@ -61,19 +44,17 @@ class FeedbackSerializer(serializers.ModelSerializer):
         read_only_fields = ["id", "view_count", "created_at", "updated_at"]
 
     def to_internal_value(self, data):
-        """multipart form-data에서도 태그 배열을 안정적으로 받는다."""
+        """multipart form-data에서도 기존 태그 배열을 안정적으로 받는다."""
         if hasattr(data, "getlist"):
             data = data.copy()
-            for field in ["selected_tags", "positive_tags", "negative_tags"]:
-                values = data.getlist(field)
-                indexed_values = []
-                prefix = f"{field}["
-                for key in data.keys():
-                    if key.startswith(prefix):
-                        indexed_values.extend(data.getlist(key))
-                merged_values = values + indexed_values
-                if merged_values:
-                    data.setlist(field, merged_values)
+            values = data.getlist("selected_tags")
+            indexed_values = []
+            for key in data.keys():
+                if key.startswith("selected_tags["):
+                    indexed_values.extend(data.getlist(key))
+            merged_values = values + indexed_values
+            if merged_values:
+                data.setlist("selected_tags", merged_values)
         return super().to_internal_value(data)
 
     def validate_order_item(self, value):
@@ -97,24 +78,6 @@ class FeedbackSerializer(serializers.ModelSerializer):
             if invalid_tags:
                 raise serializers.ValidationError(f"허용되지 않은 태그: {invalid_tags}. " f"유효한 태그: {valid_tags}")
         return value
-
-    def validate_positive_tags(self, value):
-        tags = _normalize_tag_list(value)
-        invalid_tags = [tag for tag in tags if tag not in POSITIVE_REVIEW_TAGS]
-        if invalid_tags:
-            raise serializers.ValidationError(
-                f"허용되지 않은 좋았던 점 태그: {invalid_tags}. 유효한 태그: {POSITIVE_REVIEW_TAGS}"
-            )
-        return tags
-
-    def validate_negative_tags(self, value):
-        tags = _normalize_tag_list(value)
-        invalid_tags = [tag for tag in tags if tag not in NEGATIVE_REVIEW_TAGS]
-        if invalid_tags:
-            raise serializers.ValidationError(
-                f"허용되지 않은 아쉬웠던 점 태그: {invalid_tags}. 유효한 태그: {NEGATIVE_REVIEW_TAGS}"
-            )
-        return tags
 
     def validate_image(self, value):
         """이미지 파일 유효성 검사 - 더 유연한 방식"""
@@ -150,11 +113,6 @@ class FeedbackSerializer(serializers.ModelSerializer):
         """피드백 생성 및 이미지 업로드"""
         # 이미지 파일 추출
         image_file = validated_data.pop("image", None)
-        positive_tags = validated_data.get("positive_tags") or []
-        negative_tags = validated_data.get("negative_tags") or []
-
-        if (positive_tags or negative_tags) and not validated_data.get("selected_tags"):
-            validated_data["selected_tags"] = positive_tags + negative_tags
 
         # 피드백 생성
         feedback = Feedback.objects.create(**validated_data)
@@ -174,13 +132,6 @@ class FeedbackSerializer(serializers.ModelSerializer):
     def update(self, instance, validated_data):
         """피드백 수정 및 이미지 업데이트"""
         image_file = validated_data.pop("image", None)
-        positive_tags = validated_data.get("positive_tags")
-        negative_tags = validated_data.get("negative_tags")
-
-        if positive_tags is not None or negative_tags is not None:
-            next_positive_tags = positive_tags if positive_tags is not None else instance.positive_tags
-            next_negative_tags = negative_tags if negative_tags is not None else instance.negative_tags
-            validated_data["selected_tags"] = next_positive_tags + next_negative_tags
 
         # 새 이미지가 있으면 기존 이미지 삭제 후 업로드
         if image_file:
@@ -240,8 +191,6 @@ class FeedbackListSerializer(serializers.ModelSerializer):
             "rating",
             "comment",
             "selected_tags",
-            "positive_tags",
-            "negative_tags",
             "image_url",
             "product_name",
             "product_id",  # 추가

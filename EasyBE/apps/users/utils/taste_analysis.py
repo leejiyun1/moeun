@@ -118,6 +118,19 @@ class TasteAnalysisService:
         """
         피드백을 바탕으로 진화하는 취향 점수 업데이트
         """
+        taste_fields = {
+            "sweetness_level": "sweetness",
+            "acidity_level": "acidity",
+            "body_level": "body",
+            "carbonation_level": "carbonation",
+            "bitterness_level": "bitterness",
+            "aroma_level": "aroma",
+        }
+
+        has_taste_fit_signal = any(getattr(feedback, field) is not None for field in taste_fields.values())
+        if not has_taste_fit_signal:
+            return
+
         from apps.taste_test.services import TasteTestData
 
         # 1. 기본 데이터 수집
@@ -137,15 +150,6 @@ class TasteAnalysisService:
         learning_rate = TasteAnalysisService._calculate_adaptive_learning_rate(feedback, profile.total_reviews_count)
 
         # 4. 각 맛 특성별 업데이트
-        taste_fields = {
-            "sweetness_level": "sweetness",
-            "acidity_level": "acidity",
-            "body_level": "body",
-            "carbonation_level": "carbonation",
-            "bitterness_level": "bitterness",
-            "aroma_level": "aroma",
-        }
-
         for profile_field, feedback_field in taste_fields.items():
             user_feedback = getattr(feedback, feedback_field)
             if user_feedback is None:

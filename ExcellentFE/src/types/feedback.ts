@@ -2,13 +2,23 @@ import type { TasteScoreMap } from '@/types/tasteTypes'
 
 export interface TastingReview {
   rating: number
+  sweetness?: number
+  acidity?: number
+  body?: number
+  carbonation?: number
+  bitterness?: number
+  aroma?: number
 }
 
 export interface TastingSubmitData {
   order_item_id: number
   overall_rating: number
-  positive_tags: string[]
-  negative_tags: string[]
+  sweetness?: number
+  acidity?: number
+  body?: number
+  carbonation?: number
+  bitterness?: number
+  aroma?: number
   comment?: string
   files?: File[] | null
 }
