@@ -41,7 +41,7 @@
 - 상품 이미지 파일 업로드
 - 양조장/술 원본 데이터 등록 화면
 - 커스텀 패키지 draft 운영 확인 화면
-- 주문/픽업 운영 화면
+- 주문/수령 운영 화면
 - 후기 검수 화면
 
 ## 1차 목표
@@ -117,9 +117,10 @@
 /admin/products/:id
 /admin/package-policies/:id
 /admin/orders
-/admin/pickups
 /admin/feedbacks
 ```
+
+주문/배송/픽업 운영 라우트는 실제 운영 방식이 확정된 뒤 추가한다.
 
 ## 기능 기준
 

@@ -229,6 +229,12 @@ PackagePolicy
 - `pickup_date`
 - `is_tasting_selected`
 
+주의:
+
+- `pickup_store`, `pickup_date`는 현재 구현 기준의 주문 전 정보다.
+- 실제 운영 방식이 픽업, 배송, 문의형 신청 중 무엇으로 갈지 확정되기 전까지 이 필드를 더 강한 운영 정책으로 확장하지 않는다.
+- 운영 방식 확정 후 필요하면 `fulfillment` 구조로 일반화한다.
+
 상태:
 
 - `DRAFT`: 작성 중
@@ -278,7 +284,7 @@ Order
 - 구성품 합산가
 - 할인 금액
 - 최종 가격
-- 픽업 매장/날짜
+- 현재 구현 기준의 픽업 매장/날짜
 - 시음 선택 여부
 
 `OrderCustomPackageItem`은 주문 당시 상품명, 단가, 수량을 보존한다.
