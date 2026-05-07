@@ -27,6 +27,7 @@ export const API_PATHS = {
     RECENT: '/feedbacks/recent/',
     POPULAR: '/feedbacks/popular/',
     PERSONALIZED: '/feedbacks/personalized/',
+    PRODUCT: (productId: string | number) => `/feedbacks/product/${productId}/`,
   },
   PRODUCTS: {
     DETAIL: (id: string | number) => `/products/${id}/`,

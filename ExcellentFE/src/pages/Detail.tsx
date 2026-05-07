@@ -61,7 +61,7 @@ const Detail = () => {
         </div>
       </div>
 
-      <DetailFeedback />
+      <DetailFeedback productId={data.id} reviewCount={data.review_count} />
     </div>
   )
 }

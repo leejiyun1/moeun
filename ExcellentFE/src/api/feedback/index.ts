@@ -60,4 +60,13 @@ export const feedbackApi = {
     const res = await axiosInstance.get<FeedbackResponse>(url)
     return res.data
   },
+
+  fetchProductFeedbacks: async (
+    productId: string | number
+  ): Promise<FeedbackResponse> => {
+    const response = await axiosInstance.get<FeedbackResponse>(
+      API_PATHS.FEEDBACK.PRODUCT(productId)
+    )
+    return response.data
+  },
 }

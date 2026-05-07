@@ -56,7 +56,7 @@ export const Feedback = () => {
       imgSrc: item.image_url || undefined,
       imgAlt: item.product_name ?? '모은 주류',
       userId: item.masked_username,
-      review: item.comment,
+      review: item.comment ?? undefined,
       defaultRating: item.rating,
       date: item.created_at,
       modalTitle,

@@ -919,8 +919,11 @@ DELETE /api/v1/feedbacks/{id}/
 GET    /api/v1/feedbacks/recent/
 GET    /api/v1/feedbacks/popular/
 GET    /api/v1/feedbacks/personalized/
+GET    /api/v1/feedbacks/product/{product_id}/
 GET    /api/v1/user/feedbacks/
 ```
+
+상품 상세 화면은 `GET /api/v1/feedbacks/product/{product_id}/`로 해당 상품에 연결된 후기만 조회한다.
 
 ### 목표 리뷰 입력
 

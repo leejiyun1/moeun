@@ -343,6 +343,46 @@ class FeedbackAPITest(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), 1)
 
+    def test_list_product_feedbacks(self):
+        feedback = Feedback.objects.create(
+            user=self.user,
+            order_item=self.order_item,
+            rating=5,
+            comment="상품 상세에 노출될 후기입니다.",
+        )
+
+        other_drink = Drink.objects.create(
+            name="다른 소주",
+            brewery=self.brewery,
+            ingredients="쌀, 물",
+            alcohol_type=Drink.AlcoholType.SOJU,
+            abv=Decimal("17.5"),
+            volume_ml=500,
+        )
+        other_product = Product.objects.create(
+            drink=other_drink,
+            price=12000,
+            description="다른 상품 설명",
+            description_image_url="http://example.com/other.jpg",
+        )
+        other_order_item = OrderItem.objects.create(
+            order=self.order,
+            product=other_product,
+            quantity=1,
+            price=Decimal("12000"),
+            pickup_day=date.today(),
+            pickup_store=self.store,
+        )
+        Feedback.objects.create(user=self.user, order_item=other_order_item, rating=4)
+
+        url = reverse("feedback:v1:feedbacks-product", kwargs={"product_id": self.product.id})
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 1)
+        self.assertEqual(response.data[0]["id"], feedback.id)
+        self.assertEqual(response.data[0]["product_id"], str(self.product.id))
+
     def test_list_my_feedbacks(self):
         self.client.force_authenticate(user=self.user)
         feedback = Feedback.objects.create(user=self.user, order_item=self.order_item, rating=4)

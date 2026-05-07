@@ -10,7 +10,7 @@ export interface Feedback {
   product_id?: string
   order_item: number | string
   rating: number
-  comment: string
+  comment?: string | null
   image_url?: string
   product_name: string
   masked_username: string

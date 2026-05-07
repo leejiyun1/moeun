@@ -28,6 +28,11 @@ v1_patterns = [
         FeedbackViewSet.as_view({"get": "personalized_reviews"}),
         name="feedbacks-personalized",
     ),
+    path(
+        "feedbacks/product/<uuid:product_id>/",
+        FeedbackViewSet.as_view({"get": "product_reviews"}),
+        name="feedbacks-product",
+    ),
     # 사용자별 피드백
     path("user/feedbacks/", FeedbackViewSet.as_view({"get": "my_reviews"}), name="feedbacks-my"),
 ]

@@ -36,13 +36,13 @@ class FeedbackViewSet(viewsets.ModelViewSet):
 
     def get_serializer_class(self):
         """액션별 시리얼라이저 선택"""
-        if self.action == "list":
+        if self.action in ["list", "product_reviews"]:
             return FeedbackListSerializer
         return FeedbackSerializer
 
     def get_permissions(self):
         """액션별 권한 설정"""
-        if self.action in ["retrieve", "recent_reviews", "popular_reviews", "personalized_reviews"]:
+        if self.action in ["retrieve", "recent_reviews", "popular_reviews", "personalized_reviews", "product_reviews"]:
             return [AllowAny()]
         return [IsAuthenticated()]
 
@@ -134,6 +134,18 @@ class FeedbackViewSet(viewsets.ModelViewSet):
         queryset = Feedback.objects.select_related("user", "order_item__product").personalized_for_user(request.user)[
             :8
         ]
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
+
+    @extend_schema(summary="상품별 후기", description="특정 상품에 작성된 피드백 목록", tags=["상품상세"])
+    @action(detail=False, methods=["get"], permission_classes=[AllowAny])
+    def product_reviews(self, request, product_id=None):
+        """상품 상세 화면용 후기 목록"""
+        queryset = (
+            Feedback.objects.select_related("user", "order_item__product")
+            .filter(order_item__product_id=product_id)
+            .order_by("-created_at")
+        )
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
 
