@@ -1,3 +1,7 @@
+import base64
+
+import requests
+from django.conf import settings
 from django.db import transaction
 
 from apps.cart.models import CartItem, PackageDraft
@@ -55,6 +59,7 @@ class OrderService:
         package_draft_ids=None,
         fulfillment_method=Order.FulfillmentMethod.PICKUP,
         is_test_order=True,
+        payment_provider=Payment.Provider.TOSS_TEST,
     ):
         if not user.is_adult:
             raise AdultVerificationRequiredError("주문 전 성인 인증이 필요합니다.")
@@ -105,7 +110,7 @@ class OrderService:
 
         OrderItem.objects.bulk_create(order_items_to_create)
         OrderService._create_custom_package_snapshots(order, package_drafts)
-        OrderService._create_ready_payment(order)
+        OrderService._create_ready_payment(order, payment_provider)
 
         # 3. 장바구니 비우기
         cart_items.delete()
@@ -144,6 +149,59 @@ class OrderService:
             },
         )
         order.mark_paid()
+        return order
+
+    @staticmethod
+    def confirm_toss_payment(user, payment_key, order_id, amount):
+        if not settings.TOSS_PAYMENTS_SECRET_KEY:
+            raise PaymentError("토스페이먼츠 시크릿 키가 설정되어 있지 않습니다.")
+
+        with transaction.atomic():
+            payment = Payment.objects.select_for_update().filter(merchant_uid=order_id, order__user=user).first()
+            if payment is None:
+                raise PaymentError("결제 정보를 찾을 수 없습니다.")
+
+            order = Order.objects.select_for_update().get(id=payment.order_id)
+            if payment.provider != Payment.Provider.TOSS_TEST or not payment.is_test_payment:
+                raise PaymentError("토스페이먼츠 테스트 결제만 승인할 수 있습니다.")
+            if order.payment_status == Order.PaymentStatus.PAID:
+                return order
+            if int(amount) != order.total_price:
+                payment.mark_failed({"reason": "AMOUNT_MISMATCH", "requested_amount": amount})
+                order.payment_status = Order.PaymentStatus.FAILED
+                order.save(update_fields=["payment_status", "updated_at"])
+                amount_error = "결제 금액이 주문 금액과 일치하지 않습니다."
+            else:
+                amount_error = None
+
+        if amount_error:
+            raise PaymentError(amount_error)
+
+        response = OrderService._request_toss_confirm(
+            payment_key=payment_key,
+            order_id=order_id,
+            amount=order.total_price,
+        )
+        with transaction.atomic():
+            payment = Payment.objects.select_for_update().filter(merchant_uid=order_id, order__user=user).first()
+            order = Order.objects.select_for_update().get(id=payment.order_id)
+            if order.payment_status == Order.PaymentStatus.PAID:
+                return order
+
+            if not response.ok:
+                raw_response = OrderService._safe_response_json(response)
+                payment.mark_failed(raw_response)
+                order.payment_status = Order.PaymentStatus.FAILED
+                order.save(update_fields=["payment_status", "updated_at"])
+                toss_error = raw_response.get("message", "토스페이먼츠 결제 승인에 실패했습니다.")
+            else:
+                raw_response = response.json()
+                payment.mark_paid(payment_key=payment_key, raw_response=raw_response)
+                order.mark_paid()
+                toss_error = None
+
+        if toss_error:
+            raise PaymentError(toss_error)
         return order
 
     @staticmethod
@@ -210,12 +268,36 @@ class OrderService:
         OrderCustomPackageItem.objects.bulk_create(custom_package_items_to_create)
 
     @staticmethod
-    def _create_ready_payment(order):
+    def _create_ready_payment(order, payment_provider):
         return Payment.objects.create(
             order=order,
-            provider=Payment.Provider.TEST,
-            merchant_uid=f"{order.order_number}-TEST",
+            provider=payment_provider,
+            merchant_uid=order.order_number,
             amount=order.total_price,
             status=Payment.Status.READY,
             is_test_payment=order.is_test_order,
         )
+
+    @staticmethod
+    def _request_toss_confirm(payment_key, order_id, amount):
+        auth_token = base64.b64encode(f"{settings.TOSS_PAYMENTS_SECRET_KEY}:".encode()).decode()
+        return requests.post(
+            settings.TOSS_PAYMENTS_CONFIRM_URL,
+            headers={
+                "Authorization": f"Basic {auth_token}",
+                "Content-Type": "application/json",
+            },
+            json={
+                "paymentKey": payment_key,
+                "orderId": order_id,
+                "amount": amount,
+            },
+            timeout=10,
+        )
+
+    @staticmethod
+    def _safe_response_json(response):
+        try:
+            return response.json()
+        except ValueError:
+            return {"message": response.text or "토스페이먼츠 응답을 해석할 수 없습니다."}

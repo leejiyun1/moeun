@@ -18,6 +18,11 @@ urlpatterns = [
         OrderViewSet.as_view({"post": "confirm_test_payment"}),
         name="order-test-payment-confirm",
     ),
+    path(
+        "toss-payment/confirm/",
+        OrderViewSet.as_view({"post": "confirm_toss_payment"}),
+        name="order-toss-payment-confirm",
+    ),
     path("", OrderViewSet.as_view({"get": "list"}), name="order-list"),
     path("<int:pk>/", OrderViewSet.as_view({"get": "retrieve"}), name="order-detail"),
 ]

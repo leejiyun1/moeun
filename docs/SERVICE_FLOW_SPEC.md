@@ -468,7 +468,7 @@ CartItem 생성 또는 quantity 증가
 운영 기준:
 
 - 주문 기능은 구현한다.
-- 결제는 실제 PG 승인 대신 테스트 결제 승인으로 제한한다.
+- 결제는 토스페이먼츠 테스트 결제창과 테스트 승인 API로 제한한다.
 - 주문 데이터는 `is_test_order=true`로 구분한다.
 - 실제 PG로 전환할 수 있도록 결제 정보는 `Payment` 모델로 분리한다.
 - 픽업/배송 정책이 확정되기 전까지 기존 픽업 필드는 유지하되, 주문에는 `fulfillment_method`를 둔다.
@@ -515,6 +515,7 @@ DELETE /api/v1/cart/{id}/
 GET    /api/v1/stores/
 POST   /api/v1/orders/create_from_cart/
 POST   /api/v1/orders/{order_id}/test-payment/confirm/
+POST   /api/v1/orders/toss-payment/confirm/
 ```
 
 주문 생성 payload:
@@ -532,6 +533,16 @@ POST   /api/v1/orders/{order_id}/test-payment/confirm/
 ```json
 {
   "payment_key": "test_payment_..."
+}
+```
+
+토스 테스트 결제 승인 payload:
+
+```json
+{
+  "paymentKey": "토스 successUrl에서 받은 값",
+  "orderId": "Payment.merchant_uid",
+  "amount": 30000
 }
 ```
 
@@ -555,7 +566,8 @@ POST   /api/v1/orders/{order_id}/test-payment/confirm/
 - 주문 생성 전 필수 정보 검증
 - 선택 항목만 주문으로 변환
 - 주문 생성 시 테스트 결제 대기 상태의 `Payment` 생성
-- 테스트 결제 승인 시 `Payment.status=PAID`, `Order.payment_status=PAID`, `Order.status=CONFIRMED`로 전환
+- 토스 테스트 결제 승인 시 서버에서 주문 금액을 검증한 뒤 토스 승인 API를 호출한다.
+- 승인 성공 시 `Payment.status=PAID`, `Order.payment_status=PAID`, `Order.status=CONFIRMED`로 전환한다.
 
 ### 상태 변화
 
@@ -592,6 +604,8 @@ Order.status 변경
 - 선택하지 않은 장바구니 항목을 주문에 포함하지 않는다.
 - 테스트 결제 모드에서 실제 PG 결제 완료처럼 표현하지 않는다.
 - 결제 상태를 `Order.status` 하나에 섞지 않는다.
+- 토스 시크릿 키를 프론트 코드나 커밋 대상 파일에 넣지 않는다.
+- successUrl의 amount만 믿지 않고 서버 주문 금액과 비교한다.
 
 ### 검증 기준
 

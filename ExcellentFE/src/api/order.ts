@@ -21,4 +21,15 @@ export const orderApi = {
     )
     return response.data as ServerOrder
   },
+  CONFIRM_TOSS_PAYMENT: async (payload: {
+    paymentKey: string
+    orderId: string
+    amount: number
+  }) => {
+    const response = await axiosInstance.post(
+      API_PATHS.ORDER.CONFIRM_TOSS_PAYMENT,
+      payload
+    )
+    return response.data as ServerOrder
+  },
 }

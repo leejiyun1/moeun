@@ -350,7 +350,22 @@ Payment
 └── raw_response
 ```
 
-현재 1차 구현은 `provider=TEST`만 사용한다. 추후 PortOne, Toss Payments 같은 PG를 붙일 때도 `Order` 생성 로직은 유지하고 `Payment` 승인 로직만 교체한다.
+현재 구현은 `provider=TOSS_TEST`를 사용해 토스페이먼츠 테스트 결제창을 연동한다.
+
+토스페이먼츠 테스트 결제 흐름:
+
+```text
+Order 생성
+-> Payment 생성(provider=TOSS_TEST, status=READY)
+-> FE 토스 결제창 요청
+-> successUrl로 paymentKey/orderId/amount 반환
+-> BE가 주문 금액 검증
+-> BE가 토스 결제 승인 API 호출
+-> Payment.status=PAID
+-> Order.payment_status=PAID
+```
+
+시크릿 키는 백엔드 환경 변수 `TOSS_PAYMENTS_SECRET_KEY`에만 둔다. 프론트에는 `VITE_TOSS_PAYMENTS_CLIENT_KEY`만 노출한다.
 
 주문 상태와 결제 상태는 분리한다.
 

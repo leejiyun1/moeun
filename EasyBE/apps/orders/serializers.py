@@ -145,6 +145,12 @@ class TestPaymentConfirmSerializer(serializers.Serializer):
     payment_key = serializers.CharField(max_length=120)
 
 
+class TossPaymentConfirmSerializer(serializers.Serializer):
+    paymentKey = serializers.CharField(max_length=200)
+    orderId = serializers.CharField(max_length=64)
+    amount = serializers.IntegerField(min_value=1)
+
+
 class FlatOrderItemSerializer(serializers.ModelSerializer):
     product = SimpleProductSerializer(read_only=True)
     pickup_store = StoreSerializer(read_only=True)

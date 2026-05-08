@@ -114,6 +114,7 @@ class Payment(models.Model):
 
     class Provider(models.TextChoices):
         TEST = "TEST", "테스트 결제"
+        TOSS_TEST = "TOSS_TEST", "토스페이먼츠 테스트 결제"
 
     class Status(models.TextChoices):
         READY = "READY", "결제 대기"
@@ -153,6 +154,11 @@ class Payment(models.Model):
         self.approved_at = timezone.now()
         self.raw_response = raw_response or {}
         self.save(update_fields=["payment_key", "status", "approved_at", "raw_response", "updated_at"])
+
+    def mark_failed(self, raw_response: dict | None = None):
+        self.status = self.Status.FAILED
+        self.raw_response = raw_response or {}
+        self.save(update_fields=["status", "raw_response", "updated_at"])
 
 
 class OrderItem(models.Model):

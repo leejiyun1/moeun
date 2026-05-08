@@ -11,6 +11,8 @@ export const ROUTE_PATHS = {
   LOGIN: '/login',
   SOCIAL_CALLBACK: (provider: string) => `/auth/${provider}/callback`,
   ADULT_VERIFICATION: '/auth/adult-verification',
+  TOSS_PAYMENT_SUCCESS: '/payment/toss/success',
+  TOSS_PAYMENT_FAIL: '/payment/toss/fail',
 
   // 마이페이지
   MYPAGE: {

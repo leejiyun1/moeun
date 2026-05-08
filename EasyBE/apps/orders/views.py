@@ -10,6 +10,7 @@ from apps.orders.serializers import (
     FlatOrderItemSerializer,
     OrderSerializer,
     TestPaymentConfirmSerializer,
+    TossPaymentConfirmSerializer,
 )
 from apps.orders.services import (
     AdultVerificationRequiredError,
@@ -79,6 +80,23 @@ class OrderViewSet(viewsets.ModelViewSet):
                 user=request.user,
                 order_id=pk,
                 payment_key=serializer.validated_data["payment_key"],
+            )
+        except PaymentError as e:
+            return Response({"detail": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+        return Response(self.get_serializer(order).data, status=status.HTTP_200_OK)
+
+    @action(detail=False, methods=["post"], url_path="toss-payment/confirm")
+    def confirm_toss_payment(self, request):
+        serializer = TossPaymentConfirmSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        try:
+            order = OrderService.confirm_toss_payment(
+                user=request.user,
+                payment_key=serializer.validated_data["paymentKey"],
+                order_id=serializer.validated_data["orderId"],
+                amount=serializer.validated_data["amount"],
             )
         except PaymentError as e:
             return Response({"detail": str(e)}, status=status.HTTP_400_BAD_REQUEST)

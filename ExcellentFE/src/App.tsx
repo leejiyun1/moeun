@@ -39,6 +39,10 @@ const AdminPackagePolicies = lazy(
 )
 const AdminProductTags = lazy(() => import('@/pages/admin/AdminProductTags'))
 const AdminOrders = lazy(() => import('@/pages/admin/AdminOrders'))
+const TossPaymentSuccess = lazy(
+  () => import('@/pages/payment/TossPaymentSuccess')
+)
+const TossPaymentFail = lazy(() => import('@/pages/payment/TossPaymentFail'))
 
 function App() {
   const navigate = useNavigate()
@@ -65,6 +69,8 @@ function App() {
             path="/auth/adult-verification"
             element={<AdultAuthManual />}
           />
+          <Route path="/payment/toss/success" element={<TossPaymentSuccess />} />
+          <Route path="/payment/toss/fail" element={<TossPaymentFail />} />
           <Route path="admin/login" element={<AdminLogin />} />
 
           <Route element={<Layout />}>

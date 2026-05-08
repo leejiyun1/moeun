@@ -180,6 +180,10 @@ GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID")
 GOOGLE_CLIENT_SECRET = os.getenv("GOOGLE_CLIENT_SECRET")
 GOOGLE_REDIRECT_URI = os.getenv("GOOGLE_REDIRECT_URI")
 
+# Toss Payments test/live keys. Secret key must stay server-side only.
+TOSS_PAYMENTS_SECRET_KEY = os.getenv("TOSS_PAYMENTS_SECRET_KEY", "")
+TOSS_PAYMENTS_CONFIRM_URL = os.getenv("TOSS_PAYMENTS_CONFIRM_URL", "https://api.tosspayments.com/v1/payments/confirm")
+
 # REST Framework 설정
 REST_FRAMEWORK = {
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",

@@ -4,6 +4,7 @@ import { orderApi } from '@/api/order'
 import { showSuccess, showError } from '@/utils/feedbackUtils'
 import { ROUTE_PATHS } from '@/constants/routePaths'
 import axios from 'axios'
+import { requestTossTestPayment } from '@/utils/tossPayments'
 
 const useUserPostOrder = () => {
   const navigate = useNavigate()
@@ -12,13 +13,13 @@ const useUserPostOrder = () => {
   const postOrderMutation = useMutation({
     mutationFn: async (itemIds: number[]) => {
       const order = await orderApi.CREATE_FROM_CART(itemIds)
-      return orderApi.CONFIRM_TEST_PAYMENT(order.id)
+      await requestTossTestPayment(order)
+      return order
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['UserCart'] })
       queryClient.invalidateQueries({ queryKey: ['orders'] })
-      showSuccess('테스트 결제가 완료되었습니다.')
-      navigate('/mypage/order-history')
+      showSuccess('토스 테스트 결제창으로 이동합니다.')
     },
     onError: (error) => {
       if (

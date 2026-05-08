@@ -1,7 +1,9 @@
 from datetime import date
 from decimal import Decimal
+from unittest.mock import Mock, patch
 
 from django.contrib.auth import get_user_model
+from django.test import override_settings
 from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
@@ -117,6 +119,76 @@ class OrderFromCartAPITest(APITestCase):
         self.assertEqual(order.payment_status, Order.PaymentStatus.PAID)
         self.assertEqual(order.payment.status, Payment.Status.PAID)
         self.assertEqual(order.payment.payment_key, "test_payment_001")
+
+    @override_settings(TOSS_PAYMENTS_SECRET_KEY="test_sk_local")
+    @patch("apps.orders.services.requests.post")
+    def test_confirm_toss_payment_success(self, mock_post):
+        """토스 테스트 결제 승인 API 응답이 성공이면 결제 완료 처리한다."""
+        mock_response = Mock(ok=True)
+        mock_response.json.return_value = {
+            "paymentKey": "toss_payment_001",
+            "orderId": "ORD_TEST",
+            "totalAmount": 10000,
+            "status": "DONE",
+        }
+        mock_post.return_value = mock_response
+        CartItem.objects.create(
+            user=self.user,
+            product=self.product1,
+            quantity=1,
+            pickup_store=self.store1,
+            pickup_date=date.today(),
+        )
+        create_response = self.client.post(self.create_order_url)
+        order = Order.objects.get(id=create_response.data["id"])
+
+        response = self.client.post(
+            "/api/v1/orders/toss-payment/confirm/",
+            {
+                "paymentKey": "toss_payment_001",
+                "orderId": order.payment.merchant_uid,
+                "amount": order.total_price,
+            },
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        order.refresh_from_db()
+        order.payment.refresh_from_db()
+        self.assertEqual(order.status, Order.Status.CONFIRMED)
+        self.assertEqual(order.payment_status, Order.PaymentStatus.PAID)
+        self.assertEqual(order.payment.status, Payment.Status.PAID)
+        self.assertEqual(order.payment.provider, Payment.Provider.TOSS_TEST)
+        mock_post.assert_called_once()
+
+    @override_settings(TOSS_PAYMENTS_SECRET_KEY="test_sk_local")
+    def test_confirm_toss_payment_rejects_amount_mismatch(self):
+        """토스 승인 전 서버 주문 금액과 리다이렉트 금액을 비교한다."""
+        CartItem.objects.create(
+            user=self.user,
+            product=self.product1,
+            quantity=1,
+            pickup_store=self.store1,
+            pickup_date=date.today(),
+        )
+        create_response = self.client.post(self.create_order_url)
+        order = Order.objects.get(id=create_response.data["id"])
+
+        response = self.client.post(
+            "/api/v1/orders/toss-payment/confirm/",
+            {
+                "paymentKey": "toss_payment_001",
+                "orderId": order.payment.merchant_uid,
+                "amount": order.total_price - 1,
+            },
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        order.refresh_from_db()
+        order.payment.refresh_from_db()
+        self.assertEqual(order.payment_status, Order.PaymentStatus.FAILED)
+        self.assertEqual(order.payment.status, Payment.Status.FAILED)
 
     def test_create_order_from_cart_uses_selected_item_ids(self):
         """선택한 장바구니 항목만 주문으로 생성한다."""

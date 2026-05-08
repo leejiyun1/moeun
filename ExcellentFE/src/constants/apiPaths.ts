@@ -59,6 +59,7 @@ export const API_PATHS = {
     CREATE_FROM_CART: '/orders/create_from_cart/',
     CONFIRM_TEST_PAYMENT: (id: number) =>
       `/orders/${id}/test-payment/confirm/`,
+    CONFIRM_TOSS_PAYMENT: '/orders/toss-payment/confirm/',
   },
   STORES: {
     LIST: '/stores/',
