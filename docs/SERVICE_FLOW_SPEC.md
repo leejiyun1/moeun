@@ -463,7 +463,15 @@ CartItem 생성 또는 quantity 증가
 
 사용자가 담아둔 상품에 대해 주문 생성에 필요한 정보를 입력하고 주문 가능한 상태로 만든다.
 
-현재 구현은 `픽업 매장/날짜` 기준이다. 다만 실제 운영 방식이 픽업에서 주문 판매, 배송, 문의형 신청 중 무엇으로 갈지 아직 확정되지 않았으므로 새 기능을 픽업 전용 구조로 더 확장하지 않는다.
+현재 구현은 `픽업 매장/날짜` 기준이다. 주문 화면은 완성형 쇼핑몰 흐름으로 확장하되, 실제 판매 면허와 판매 주체가 확정되기 전까지 결제는 테스트 결제 모드로만 처리한다.
+
+운영 기준:
+
+- 주문 기능은 구현한다.
+- 결제는 실제 PG 승인 대신 테스트 결제 승인으로 제한한다.
+- 주문 데이터는 `is_test_order=true`로 구분한다.
+- 실제 PG로 전환할 수 있도록 결제 정보는 `Payment` 모델로 분리한다.
+- 픽업/배송 정책이 확정되기 전까지 기존 픽업 필드는 유지하되, 주문에는 `fulfillment_method`를 둔다.
 
 ### 진입점
 
@@ -506,6 +514,7 @@ PATCH  /api/v1/cart/{id}/
 DELETE /api/v1/cart/{id}/
 GET    /api/v1/stores/
 POST   /api/v1/orders/create_from_cart/
+POST   /api/v1/orders/{order_id}/test-payment/confirm/
 ```
 
 주문 생성 payload:
@@ -513,7 +522,16 @@ POST   /api/v1/orders/create_from_cart/
 ```json
 {
   "item_ids": [1, 2],
-  "package_draft_ids": [10]
+  "package_draft_ids": [10],
+  "fulfillment_method": "PICKUP"
+}
+```
+
+테스트 결제 승인 payload:
+
+```json
+{
+  "payment_key": "test_payment_..."
 }
 ```
 
@@ -536,6 +554,8 @@ POST   /api/v1/orders/create_from_cart/
 - 현재 구현 기준으로 픽업 매장/날짜 수정
 - 주문 생성 전 필수 정보 검증
 - 선택 항목만 주문으로 변환
+- 주문 생성 시 테스트 결제 대기 상태의 `Payment` 생성
+- 테스트 결제 승인 시 `Payment.status=PAID`, `Order.payment_status=PAID`, `Order.status=CONFIRMED`로 전환
 
 ### 상태 변화
 
@@ -552,7 +572,16 @@ CartItem.quantity 변경
 ```text
 Order 생성
 OrderItem 생성
+Payment 생성
 선택된 CartItem 삭제 또는 주문 처리
+```
+
+테스트 결제 승인:
+
+```text
+Payment 승인
+Order.payment_status 변경
+Order.status 변경
 ```
 
 ### 금지사항
@@ -561,6 +590,8 @@ OrderItem 생성
 - 프론트에서 임시 날짜를 자동 주입하지 않는다.
 - 백엔드에서 pickup 정보 누락을 프론트만 믿고 통과시키지 않는다.
 - 선택하지 않은 장바구니 항목을 주문에 포함하지 않는다.
+- 테스트 결제 모드에서 실제 PG 결제 완료처럼 표현하지 않는다.
+- 결제 상태를 `Order.status` 하나에 섞지 않는다.
 
 ### 검증 기준
 
@@ -568,6 +599,8 @@ OrderItem 생성
 - 장바구니 항목별 픽업 매장/날짜가 수정된다.
 - 선택 항목에 픽업 정보가 없으면 주문이 막힌다.
 - 선택한 항목만 주문으로 생성된다.
+- 주문 생성 직후 결제 상태는 `READY`다.
+- 테스트 결제 승인 후 결제 상태는 `PAID`다.
 
 ### 정리 후보
 

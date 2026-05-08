@@ -8,11 +8,24 @@ class Order(models.Model):
     """주문"""
 
     class Status(models.TextChoices):
+        PENDING_PAYMENT = "PENDING_PAYMENT", "결제 대기"
         PENDING = "PENDING", "주문 완료"
         CONFIRMED = "CONFIRMED", "주문 확인"
         READY = "READY", "픽업 준비 완료"
         COMPLETED = "COMPLETED", "픽업 완료"
         CANCELLED = "CANCELLED", "주문 취소"
+
+    class PaymentStatus(models.TextChoices):
+        READY = "READY", "결제 대기"
+        PAID = "PAID", "결제 완료"
+        FAILED = "FAILED", "결제 실패"
+        CANCELLED = "CANCELLED", "결제 취소"
+        REFUNDED = "REFUNDED", "환불 완료"
+
+    class FulfillmentMethod(models.TextChoices):
+        PICKUP = "PICKUP", "매장 수령"
+        DELIVERY = "DELIVERY", "배송"
+        UNDECIDED = "UNDECIDED", "미정"
 
     id = models.BigAutoField(primary_key=True)
     order_number = models.CharField(max_length=20, unique=True, help_text="사용자에게 보여줄 주문 번호")
@@ -21,8 +34,15 @@ class Order(models.Model):
     # 주문 금액
     total_price = models.PositiveIntegerField(help_text="총 주문 금액")
 
-    # 주문 상태
-    status = models.CharField(max_length=20, choices=Status.choices, default=Status.PENDING)
+    # 주문/결제/수령 상태
+    status = models.CharField(max_length=20, choices=Status.choices, default=Status.PENDING_PAYMENT)
+    payment_status = models.CharField(max_length=20, choices=PaymentStatus.choices, default=PaymentStatus.READY)
+    fulfillment_method = models.CharField(
+        max_length=20,
+        choices=FulfillmentMethod.choices,
+        default=FulfillmentMethod.PICKUP,
+    )
+    is_test_order = models.BooleanField(default=True, help_text="테스트 결제 주문 여부")
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -33,6 +53,9 @@ class Order(models.Model):
             models.Index(fields=["user"]),
             models.Index(fields=["order_number"]),
             models.Index(fields=["status"]),
+            models.Index(fields=["payment_status"]),
+            models.Index(fields=["fulfillment_method"]),
+            models.Index(fields=["is_test_order"]),
             models.Index(fields=["-created_at"]),
         ]
 
@@ -56,7 +79,7 @@ class Order(models.Model):
 
     def can_cancel(self):
         """취소 가능한지 확인"""
-        return self.status in [self.Status.PENDING, self.Status.CONFIRMED]
+        return self.status in [self.Status.PENDING_PAYMENT, self.Status.PENDING, self.Status.CONFIRMED]
 
     def cancel(self):
         """주문 취소"""
@@ -78,6 +101,58 @@ class Order(models.Model):
         if self.status == self.Status.READY:
             self.status = self.Status.COMPLETED
             self.save(update_fields=["status", "updated_at"])
+
+    def mark_paid(self):
+        """결제 완료 처리"""
+        self.payment_status = self.PaymentStatus.PAID
+        self.status = self.Status.CONFIRMED
+        self.save(update_fields=["payment_status", "status", "updated_at"])
+
+
+class Payment(models.Model):
+    """주문 결제 내역."""
+
+    class Provider(models.TextChoices):
+        TEST = "TEST", "테스트 결제"
+
+    class Status(models.TextChoices):
+        READY = "READY", "결제 대기"
+        PAID = "PAID", "결제 완료"
+        FAILED = "FAILED", "결제 실패"
+        CANCELLED = "CANCELLED", "결제 취소"
+        REFUNDED = "REFUNDED", "환불 완료"
+
+    order = models.OneToOneField(Order, on_delete=models.CASCADE, related_name="payment")
+    provider = models.CharField(max_length=20, choices=Provider.choices, default=Provider.TEST)
+    payment_key = models.CharField(max_length=120, blank=True, help_text="PG 결제 식별자")
+    merchant_uid = models.CharField(max_length=80, unique=True, help_text="내부 결제 주문번호")
+    amount = models.PositiveIntegerField(help_text="결제 금액")
+    status = models.CharField(max_length=20, choices=Status.choices, default=Status.READY)
+    is_test_payment = models.BooleanField(default=True, help_text="테스트 결제 여부")
+    approved_at = models.DateTimeField(null=True, blank=True)
+    raw_response = models.JSONField(default=dict, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = "payments"
+        indexes = [
+            models.Index(fields=["order"]),
+            models.Index(fields=["merchant_uid"]),
+            models.Index(fields=["status"]),
+            models.Index(fields=["is_test_payment"]),
+            models.Index(fields=["-created_at"]),
+        ]
+
+    def __str__(self):
+        return f"{self.order.order_number} - {self.provider} {self.status}"
+
+    def mark_paid(self, payment_key: str, raw_response: dict | None = None):
+        self.payment_key = payment_key
+        self.status = self.Status.PAID
+        self.approved_at = timezone.now()
+        self.raw_response = raw_response or {}
+        self.save(update_fields=["payment_key", "status", "approved_at", "raw_response", "updated_at"])
 
 
 class OrderItem(models.Model):

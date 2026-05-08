@@ -47,6 +47,21 @@ export interface ServerOrder {
   user: string
   total_price: number
   status: string
+  payment_status: string
+  fulfillment_method: string
+  is_test_order: boolean
+  payment: {
+    id: number
+    provider: string
+    payment_key: string
+    merchant_uid: string
+    amount: number
+    status: string
+    is_test_payment: boolean
+    approved_at: string | null
+    created_at: string
+    updated_at: string
+  } | null
   order_date: string
   pickup_day: string
   pickup_store: OrderPickupStore

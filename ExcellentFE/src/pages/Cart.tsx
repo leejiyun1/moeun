@@ -91,7 +91,7 @@ const Cart = () => {
             }}
             disabled={postOrderMutation.isPending || updatePickupMutation.isPending}
           >
-            {postOrderMutation.isPending ? '결제 처리 중...' : '결제하기'}
+            {postOrderMutation.isPending ? '테스트 결제 처리 중...' : '테스트 결제하기'}
           </Button>
         </>
       )}

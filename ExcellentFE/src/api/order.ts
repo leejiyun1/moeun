@@ -10,8 +10,15 @@ export const orderApi = {
   CREATE_FROM_CART: async (itemIds: number[]) => {
     const response = await axiosInstance.post(
       API_PATHS.ORDER.CREATE_FROM_CART,
-      { item_ids: itemIds }
+      { item_ids: itemIds, fulfillment_method: 'PICKUP' }
     )
-    return response.data
+    return response.data as ServerOrder
+  },
+  CONFIRM_TEST_PAYMENT: async (orderId: number) => {
+    const response = await axiosInstance.post(
+      API_PATHS.ORDER.CONFIRM_TEST_PAYMENT(orderId),
+      { payment_key: `test_payment_${orderId}_${Date.now()}` }
+    )
+    return response.data as ServerOrder
   },
 }

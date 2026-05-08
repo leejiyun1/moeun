@@ -294,12 +294,22 @@ PackagePolicy
 
 주문 생성 후에는 장바구니 상태가 아니라 주문 당시 상태를 보존해야 한다.
 
+현재 주문은 실제 판매 운영 전 단계이므로 테스트 결제 모드로 동작한다.
+
+기준:
+
+- 화면과 데이터 구조는 실제 주문/결제로 전환 가능하게 만든다.
+- 운영 면허와 판매 주체가 확정되기 전까지 실제 결제 승인으로 처리하지 않는다.
+- 주문 데이터에는 테스트 주문 여부를 명시한다.
+- 결제 정보는 `Order`에 직접 넣지 않고 `Payment`로 분리한다.
+
 일반 상품:
 
 ```text
 Order
 -> OrderItem
 -> Product
+-> Payment
 ```
 
 커스텀 패키지:
@@ -322,6 +332,45 @@ Order
 - 시음 선택 여부
 
 `OrderCustomPackageItem`은 주문 당시 상품명, 단가, 수량을 보존한다.
+
+### Payment
+
+주문 결제 상태를 관리하는 모델이다.
+
+```text
+Payment
+├── order
+├── provider
+├── payment_key
+├── merchant_uid
+├── amount
+├── status
+├── is_test_payment
+├── approved_at
+└── raw_response
+```
+
+현재 1차 구현은 `provider=TEST`만 사용한다. 추후 PortOne, Toss Payments 같은 PG를 붙일 때도 `Order` 생성 로직은 유지하고 `Payment` 승인 로직만 교체한다.
+
+주문 상태와 결제 상태는 분리한다.
+
+```text
+Order.status
+-> 주문/수령 처리 상태
+
+Order.payment_status
+-> 결제 처리 상태
+```
+
+테스트 결제 승인 전 주문은 `PENDING_PAYMENT`로 생성된다. 테스트 결제가 승인되면 `payment_status=PAID`, `Order.status=CONFIRMED`로 전환한다.
+
+주문 수령 방식은 `fulfillment_method`로 관리한다.
+
+- `PICKUP`: 매장 수령
+- `DELIVERY`: 배송
+- `UNDECIDED`: 운영 방식 미정 또는 데모
+
+현재 기존 장바구니 UI는 픽업 기준이므로 1차 주문 생성은 `PICKUP`을 기본값으로 사용한다.
 
 ## 시음 설계
 

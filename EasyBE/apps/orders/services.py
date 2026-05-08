@@ -6,6 +6,7 @@ from apps.orders.models import (
     OrderCustomPackage,
     OrderCustomPackageItem,
     OrderItem,
+    Payment,
 )
 
 
@@ -39,12 +40,27 @@ class AdultVerificationRequiredError(OrderCreationError):
     pass
 
 
+class PaymentError(OrderCreationError):
+    """결제 처리 중 발생하는 예외"""
+
+    pass
+
+
 class OrderService:
     @staticmethod
     @transaction.atomic
-    def create_order_from_cart(user, cart_item_ids=None, package_draft_ids=None):
+    def create_order_from_cart(
+        user,
+        cart_item_ids=None,
+        package_draft_ids=None,
+        fulfillment_method=Order.FulfillmentMethod.PICKUP,
+        is_test_order=True,
+    ):
         if not user.is_adult:
             raise AdultVerificationRequiredError("주문 전 성인 인증이 필요합니다.")
+
+        if fulfillment_method not in Order.FulfillmentMethod.values:
+            raise OrderCreationError("지원하지 않는 수령 방식입니다.")
 
         cart_items = CartItem.objects.filter(user=user).select_related("product", "pickup_store")
         package_drafts = (
@@ -64,7 +80,12 @@ class OrderService:
         total_price = sum(item.total_price for item in cart_items) + sum(draft.final_price for draft in package_drafts)
 
         # 1. 주문 생성
-        order = Order.objects.create(user=user, total_price=total_price)
+        order = Order.objects.create(
+            user=user,
+            total_price=total_price,
+            fulfillment_method=fulfillment_method,
+            is_test_order=is_test_order,
+        )
 
         # 2. 주문 항목 생성
         order_items_to_create = []
@@ -84,11 +105,45 @@ class OrderService:
 
         OrderItem.objects.bulk_create(order_items_to_create)
         OrderService._create_custom_package_snapshots(order, package_drafts)
+        OrderService._create_ready_payment(order)
 
         # 3. 장바구니 비우기
         cart_items.delete()
         package_drafts.update(status=PackageDraft.Status.ORDERED)
 
+        return order
+
+    @staticmethod
+    @transaction.atomic
+    def confirm_test_payment(user, order_id, payment_key):
+        if not payment_key:
+            raise PaymentError("테스트 결제 키가 필요합니다.")
+
+        order = Order.objects.select_for_update().filter(id=order_id, user=user).first()
+        if order is None:
+            raise PaymentError("주문을 찾을 수 없습니다.")
+        if not order.is_test_order:
+            raise PaymentError("테스트 주문만 테스트 결제로 승인할 수 있습니다.")
+        if order.payment_status == Order.PaymentStatus.PAID:
+            return order
+        if order.status == Order.Status.CANCELLED:
+            raise PaymentError("취소된 주문은 결제 승인할 수 없습니다.")
+
+        payment = Payment.objects.select_for_update().filter(order=order).first()
+        if payment is None:
+            raise PaymentError("결제 정보를 찾을 수 없습니다.")
+        if payment.amount != order.total_price:
+            raise PaymentError("결제 금액이 주문 금액과 일치하지 않습니다.")
+
+        payment.mark_paid(
+            payment_key=payment_key,
+            raw_response={
+                "provider": Payment.Provider.TEST,
+                "payment_key": payment_key,
+                "amount": payment.amount,
+            },
+        )
+        order.mark_paid()
         return order
 
     @staticmethod
@@ -153,3 +208,14 @@ class OrderService:
                 )
 
         OrderCustomPackageItem.objects.bulk_create(custom_package_items_to_create)
+
+    @staticmethod
+    def _create_ready_payment(order):
+        return Payment.objects.create(
+            order=order,
+            provider=Payment.Provider.TEST,
+            merchant_uid=f"{order.order_number}-TEST",
+            amount=order.total_price,
+            status=Payment.Status.READY,
+            is_test_payment=order.is_test_order,
+        )

@@ -14,6 +14,7 @@ import type {
   PaginatedResponse,
 } from '@/types/admin'
 import type { ProductTag } from '@/types/product'
+import type { ServerOrder } from '@/types/orderType'
 import { axiosInstance } from '@/utils/axios'
 
 const compactParams = (params?: AdminProductQuery) => {
@@ -81,6 +82,11 @@ export const adminApi = {
 
   getProductTags: async (): Promise<PaginatedResponse<ProductTag>> => {
     const response = await axiosInstance.get(API_PATHS.ADMIN.PRODUCT_TAGS)
+    return response.data
+  },
+
+  getOrders: async (): Promise<PaginatedResponse<ServerOrder>> => {
+    const response = await axiosInstance.get(API_PATHS.ORDER.ADMIN_LIST)
     return response.data
   },
 

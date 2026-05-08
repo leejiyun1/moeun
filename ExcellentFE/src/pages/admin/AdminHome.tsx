@@ -17,6 +17,11 @@ const adminCards = [
     description: '상품 노출, 추천, 특성 분류에 쓰는 운영 태그를 관리합니다.',
     to: ROUTE_PATHS.ADMIN.PRODUCT_TAGS,
   },
+  {
+    title: '주문 관리',
+    description: '테스트 주문과 결제 상태를 확인합니다.',
+    to: ROUTE_PATHS.ADMIN.ORDERS,
+  },
 ]
 
 const AdminHome = () => {

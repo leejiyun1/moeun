@@ -5,6 +5,7 @@ from apps.orders.models import (
     OrderCustomPackage,
     OrderCustomPackageItem,
     OrderItem,
+    Payment,
 )
 from apps.products.models import Product  # Product 모델 직접 임포트
 from apps.stores.serializers import StoreSerializer
@@ -94,6 +95,7 @@ class OrderSerializer(serializers.ModelSerializer):
     items = OrderItemSerializer(many=True, read_only=True)
     custom_packages = OrderCustomPackageSerializer(many=True, read_only=True)
     user = serializers.StringRelatedField()
+    payment = serializers.SerializerMethodField()
 
     class Meta:
         model = Order
@@ -103,12 +105,44 @@ class OrderSerializer(serializers.ModelSerializer):
             "user",
             "total_price",
             "status",
+            "payment_status",
+            "fulfillment_method",
+            "is_test_order",
+            "payment",
             "created_at",
             "updated_at",
             "items",
             "custom_packages",
         ]
         read_only_fields = fields
+
+    def get_payment(self, obj):
+        payment = getattr(obj, "payment", None)
+        if payment is None:
+            return None
+        return PaymentSerializer(payment).data
+
+
+class PaymentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Payment
+        fields = [
+            "id",
+            "provider",
+            "payment_key",
+            "merchant_uid",
+            "amount",
+            "status",
+            "is_test_payment",
+            "approved_at",
+            "created_at",
+            "updated_at",
+        ]
+        read_only_fields = fields
+
+
+class TestPaymentConfirmSerializer(serializers.Serializer):
+    payment_key = serializers.CharField(max_length=120)
 
 
 class FlatOrderItemSerializer(serializers.ModelSerializer):

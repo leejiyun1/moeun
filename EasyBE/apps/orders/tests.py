@@ -8,7 +8,7 @@ from rest_framework.test import APITestCase
 
 from apps.cart.models import CartItem
 from apps.cart.services import CartPackageDraftService
-from apps.orders.models import Order, OrderCustomPackage
+from apps.orders.models import Order, OrderCustomPackage, Payment
 from apps.products.models import Brewery, Drink, PackagePolicy, Product
 from apps.stores.models import Store
 
@@ -82,9 +82,41 @@ class OrderFromCartAPITest(APITestCase):
         order = Order.objects.first()
         self.assertEqual(order.total_price, 40000)  # (10000 * 2) + (20000 * 1)
         self.assertEqual(order.items.count(), 2)
+        self.assertTrue(order.is_test_order)
+        self.assertEqual(order.status, Order.Status.PENDING_PAYMENT)
+        self.assertEqual(order.payment_status, Order.PaymentStatus.READY)
+        self.assertEqual(order.fulfillment_method, Order.FulfillmentMethod.PICKUP)
+        self.assertEqual(order.payment.amount, 40000)
+        self.assertEqual(order.payment.status, Payment.Status.READY)
 
         # 장바구니 비워졌는지 확인
         self.assertEqual(CartItem.objects.filter(user=self.user).count(), 0)
+
+    def test_confirm_test_payment_success(self):
+        """테스트 결제 승인 시 주문과 결제 상태가 완료로 변경된다."""
+        CartItem.objects.create(
+            user=self.user,
+            product=self.product1,
+            quantity=1,
+            pickup_store=self.store1,
+            pickup_date=date.today(),
+        )
+        create_response = self.client.post(self.create_order_url)
+        order_id = create_response.data["id"]
+
+        response = self.client.post(
+            f"/api/v1/orders/{order_id}/test-payment/confirm/",
+            {"payment_key": "test_payment_001"},
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        order = Order.objects.get(id=order_id)
+        order.payment.refresh_from_db()
+        self.assertEqual(order.status, Order.Status.CONFIRMED)
+        self.assertEqual(order.payment_status, Order.PaymentStatus.PAID)
+        self.assertEqual(order.payment.status, Payment.Status.PAID)
+        self.assertEqual(order.payment.payment_key, "test_payment_001")
 
     def test_create_order_from_cart_uses_selected_item_ids(self):
         """선택한 장바구니 항목만 주문으로 생성한다."""

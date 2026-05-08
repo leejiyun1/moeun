@@ -55,7 +55,10 @@ export const API_PATHS = {
   },
   ORDER: {
     LIST: '/orders/order-items/',
+    ADMIN_LIST: '/orders/manage/',
     CREATE_FROM_CART: '/orders/create_from_cart/',
+    CONFIRM_TEST_PAYMENT: (id: number) =>
+      `/orders/${id}/test-payment/confirm/`,
   },
   STORES: {
     LIST: '/stores/',

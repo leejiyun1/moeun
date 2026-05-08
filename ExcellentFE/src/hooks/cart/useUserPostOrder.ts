@@ -10,11 +10,14 @@ const useUserPostOrder = () => {
   const queryClient = useQueryClient()
 
   const postOrderMutation = useMutation({
-    mutationFn: (itemIds: number[]) => orderApi.CREATE_FROM_CART(itemIds),
+    mutationFn: async (itemIds: number[]) => {
+      const order = await orderApi.CREATE_FROM_CART(itemIds)
+      return orderApi.CONFIRM_TEST_PAYMENT(order.id)
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['UserCart'] })
       queryClient.invalidateQueries({ queryKey: ['orders'] })
-      showSuccess('주문이 완료되었습니다.')
+      showSuccess('테스트 결제가 완료되었습니다.')
       navigate('/mypage/order-history')
     },
     onError: (error) => {

@@ -11,6 +11,7 @@ export const ADMIN_QUERY_KEYS = {
   DRINKS_FOR_PACKAGE: 'admin-drinks-for-package',
   PACKAGE_POLICIES: 'admin-package-policies',
   PRODUCT_TAGS: 'admin-product-tags',
+  ORDERS: 'admin-orders',
 } as const
 
 export const ADMIN_PRODUCT_STATUS_OPTIONS: {
