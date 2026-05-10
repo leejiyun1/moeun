@@ -8,9 +8,7 @@ interface OrderPickupStore {
   id: number
   name: string
   address: string
-  phone_number: string
-  created_at: string
-  updated_at: string
+  contact: string | null
 }
 
 export interface OrderType {
@@ -19,8 +17,8 @@ export interface OrderType {
   product: OrderProduct
   quantity: number
   price: number
-  pickup_store: OrderPickupStore
-  pickup_day: string
+  pickup_store: OrderPickupStore | null
+  pickup_day: string | null
   pickup_status: boolean
   feedback_id: number | null
 }
@@ -63,8 +61,8 @@ export interface ServerOrder {
     updated_at: string
   } | null
   order_date: string
-  pickup_day: string
-  pickup_store: OrderPickupStore
+  pickup_day: string | null
+  pickup_store: OrderPickupStore | null
   pickup_status: boolean
   feedback_id: number | null
   price: number

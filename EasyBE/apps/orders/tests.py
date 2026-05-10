@@ -65,6 +65,15 @@ class OrderFromCartAPITest(APITestCase):
         # URL
         self.create_order_url = "/api/v1/orders/create_from_cart/"
 
+    def pickup_payload(self, **extra):
+        payload = {
+            "fulfillment_method": Order.FulfillmentMethod.PICKUP,
+            "pickup_store_id": self.store1.id,
+            "pickup_date": str(date.today()),
+        }
+        payload.update(extra)
+        return payload
+
     def test_create_order_from_cart_success(self):
         """장바구니에서 주문 생성 성공 테스트"""
         # Given: 장바구니에 상품 추가
@@ -76,7 +85,7 @@ class OrderFromCartAPITest(APITestCase):
         )
 
         # When: 주문 생성 API 호출
-        response = self.client.post(self.create_order_url)
+        response = self.client.post(self.create_order_url, self.pickup_payload(), format="json")
 
         # Then: 주문이 성공적으로 생성되고, 장바구니가 비워짐
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
@@ -88,6 +97,8 @@ class OrderFromCartAPITest(APITestCase):
         self.assertEqual(order.status, Order.Status.PENDING_PAYMENT)
         self.assertEqual(order.payment_status, Order.PaymentStatus.READY)
         self.assertEqual(order.fulfillment_method, Order.FulfillmentMethod.PICKUP)
+        self.assertEqual(order.pickup_store, self.store1)
+        self.assertEqual(order.pickup_day, date.today())
         self.assertEqual(order.payment.amount, 40000)
         self.assertEqual(order.payment.status, Payment.Status.READY)
 
@@ -103,7 +114,7 @@ class OrderFromCartAPITest(APITestCase):
             pickup_store=self.store1,
             pickup_date=date.today(),
         )
-        create_response = self.client.post(self.create_order_url)
+        create_response = self.client.post(self.create_order_url, self.pickup_payload(), format="json")
         order_id = create_response.data["id"]
 
         response = self.client.post(
@@ -139,7 +150,7 @@ class OrderFromCartAPITest(APITestCase):
             pickup_store=self.store1,
             pickup_date=date.today(),
         )
-        create_response = self.client.post(self.create_order_url)
+        create_response = self.client.post(self.create_order_url, self.pickup_payload(), format="json")
         order = Order.objects.get(id=create_response.data["id"])
 
         response = self.client.post(
@@ -171,7 +182,7 @@ class OrderFromCartAPITest(APITestCase):
             pickup_store=self.store1,
             pickup_date=date.today(),
         )
-        create_response = self.client.post(self.create_order_url)
+        create_response = self.client.post(self.create_order_url, self.pickup_payload(), format="json")
         order = Order.objects.get(id=create_response.data["id"])
 
         response = self.client.post(
@@ -207,7 +218,11 @@ class OrderFromCartAPITest(APITestCase):
             pickup_date=date.today(),
         )
 
-        response = self.client.post(self.create_order_url, {"item_ids": [selected_item.id]}, format="json")
+        response = self.client.post(
+            self.create_order_url,
+            self.pickup_payload(item_ids=[selected_item.id]),
+            format="json",
+        )
 
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         order = Order.objects.get()
@@ -237,7 +252,11 @@ class OrderFromCartAPITest(APITestCase):
             pickup_date=date.today(),
         )
 
-        response = self.client.post(self.create_order_url, {"item_ids": [selected_item.id]}, format="json")
+        response = self.client.post(
+            self.create_order_url,
+            self.pickup_payload(item_ids=[selected_item.id]),
+            format="json",
+        )
 
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         order = Order.objects.get()
@@ -260,7 +279,7 @@ class OrderFromCartAPITest(APITestCase):
             pickup_date=date.today(),
         )
 
-        response = self.client.post(self.create_order_url)
+        response = self.client.post(self.create_order_url, self.pickup_payload(), format="json")
 
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         order = Order.objects.get()
@@ -283,17 +302,18 @@ class OrderFromCartAPITest(APITestCase):
         self.assertIn("장바구니가 비어있습니다", response.data["detail"])
 
     def test_create_order_from_cart_fails_if_no_pickup_info(self):
-        """장바구니에 픽업 정보가 없을 때 주문 생성 실패 테스트"""
-        # Given: 장바구니에 픽업 정보 없이 상품 추가
-        CartItem.objects.create(user=self.user, product=self.product1, quantity=1)  # No pickup_store or pickup_date
+        """픽업 주문에 주문 단위 픽업 정보가 없으면 실패한다."""
+        CartItem.objects.create(user=self.user, product=self.product1, quantity=1)
 
-        # When: 주문 생성 API 호출
-        response = self.client.post(self.create_order_url)
+        response = self.client.post(
+            self.create_order_url,
+            {"fulfillment_method": Order.FulfillmentMethod.PICKUP},
+            format="json",
+        )
 
-        # Then: 400 에러와 함께 픽업 정보 부족 메시지를 반환
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertIn("상품의 픽업 정보가 없습니다.", response.data["detail"])
-        self.assertEqual(Order.objects.count(), 0)  # Order should not be created
+        self.assertIn("픽업 주문은 픽업 매장과 날짜가 필요합니다.", response.data["detail"])
+        self.assertEqual(Order.objects.count(), 0)
 
     def test_create_order_from_cart_requires_adult_verification(self):
         """성인 인증을 완료하지 않은 사용자는 주문 생성 불가."""
@@ -304,7 +324,7 @@ class OrderFromCartAPITest(APITestCase):
             user=self.user, product=self.product1, quantity=1, pickup_store=self.store1, pickup_date=date.today()
         )
 
-        response = self.client.post(self.create_order_url)
+        response = self.client.post(self.create_order_url, self.pickup_payload(), format="json")
 
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
         self.assertEqual(response.data["code"], "ADULT_VERIFICATION_REQUIRED")

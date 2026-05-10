@@ -259,15 +259,14 @@ PackagePolicy
 - `discount_amount`
 - `final_price`
 - `status`
-- `pickup_store`
-- `pickup_date`
+- `pickup_store` / `pickup_date` legacy 필드
 - `is_tasting_selected`
 
 주의:
 
-- `pickup_store`, `pickup_date`는 현재 구현 기준의 주문 전 정보다.
-- 실제 운영 방식이 픽업, 배송, 문의형 신청 중 무엇으로 갈지 확정되기 전까지 이 필드를 더 강한 운영 정책으로 확장하지 않는다.
-- 운영 방식 확정 후 필요하면 `fulfillment` 구조로 일반화한다.
+- 커스텀 패키지 draft는 구성과 가격 계산에 집중한다.
+- 신규 주문 생성 기준의 수령 정보는 `PackageDraft`가 아니라 `Order`에 둔다.
+- `pickup_store`, `pickup_date`는 이전 흐름 호환을 위해 남아 있지만 신규 화면에서는 주문 단위 수령 정보를 사용한다.
 
 상태:
 
@@ -328,7 +327,7 @@ Order
 - 구성품 합산가
 - 할인 금액
 - 최종 가격
-- 현재 구현 기준의 픽업 매장/날짜
+- 주문 단위 픽업 매장/날짜 snapshot
 - 시음 선택 여부
 
 `OrderCustomPackageItem`은 주문 당시 상품명, 단가, 수량을 보존한다.
@@ -386,6 +385,13 @@ Order.payment_status
 - `UNDECIDED`: 운영 방식 미정 또는 데모
 
 현재 기존 장바구니 UI는 픽업 기준이므로 1차 주문 생성은 `PICKUP`을 기본값으로 사용한다.
+
+픽업 정보는 주문 단위에 둔다.
+
+- `Order.pickup_store`: 이번 주문을 수령할 매장 또는 양조장
+- `Order.pickup_day`: 이번 주문의 희망 수령일
+
+일반 상품/패키지 항목별 픽업 필드는 기존 주문 내역과 후기 연결 호환을 위해 남겨두되, 신규 주문의 필수 검증 기준은 주문 단위 픽업 정보다.
 
 ## 시음 설계
 

@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useNavigate } from 'react-router-dom'
-import { orderApi } from '@/api/order'
+import { orderApi, type CreateOrderFromCartPayload } from '@/api/order'
 import { showSuccess, showError } from '@/utils/feedbackUtils'
 import { ROUTE_PATHS } from '@/constants/routePaths'
 import axios from 'axios'
@@ -11,8 +11,8 @@ const useUserPostOrder = () => {
   const queryClient = useQueryClient()
 
   const postOrderMutation = useMutation({
-    mutationFn: async (itemIds: number[]) => {
-      const order = await orderApi.CREATE_FROM_CART(itemIds)
+    mutationFn: async (payload: CreateOrderFromCartPayload) => {
+      const order = await orderApi.CREATE_FROM_CART(payload)
       await requestTossTestPayment(order)
       return order
     },

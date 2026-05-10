@@ -2,15 +2,23 @@ import { API_PATHS } from '@/constants/apiPaths'
 import { axiosInstance } from '@/utils/axios'
 import type { PaginatedResponse, ServerOrder } from '@/types/orderType'
 
+export interface CreateOrderFromCartPayload {
+  item_ids: number[]
+  package_draft_ids?: number[]
+  fulfillment_method: 'PICKUP' | 'DELIVERY' | 'UNDECIDED'
+  pickup_store_id?: number | null
+  pickup_date?: string | null
+}
+
 export const orderApi = {
   list: async (): Promise<PaginatedResponse<ServerOrder>> => {
     const response = await axiosInstance.get(API_PATHS.ORDER.LIST)
     return response.data as PaginatedResponse<ServerOrder>
   },
-  CREATE_FROM_CART: async (itemIds: number[]) => {
+  CREATE_FROM_CART: async (payload: CreateOrderFromCartPayload) => {
     const response = await axiosInstance.post(
       API_PATHS.ORDER.CREATE_FROM_CART,
-      { item_ids: itemIds, fulfillment_method: 'PICKUP' }
+      payload
     )
     return response.data as ServerOrder
   },

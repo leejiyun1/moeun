@@ -67,6 +67,7 @@ const AdminOrders = () => {
                   <th className="px-5 py-4">주문 상태</th>
                   <th className="px-5 py-4">결제 상태</th>
                   <th className="px-5 py-4">수령 방식</th>
+                  <th className="px-5 py-4">수령 정보</th>
                   <th className="px-5 py-4">구분</th>
                   <th className="px-5 py-4">일시</th>
                 </tr>
@@ -91,6 +92,18 @@ const AdminOrders = () => {
                     <td className="px-5 py-4">
                       {fulfillmentLabel[order.fulfillment_method] ??
                         order.fulfillment_method}
+                    </td>
+                    <td className="px-5 py-4 text-[#666666]">
+                      {order.pickup_store ? (
+                        <>
+                          <p className="font-medium text-[#333333]">
+                            {order.pickup_store.name}
+                          </p>
+                          <p>{order.pickup_day ?? '-'}</p>
+                        </>
+                      ) : (
+                        '-'
+                      )}
                     </td>
                     <td className="px-5 py-4">
                       {order.is_test_order ? '테스트 주문' : '실제 주문'}

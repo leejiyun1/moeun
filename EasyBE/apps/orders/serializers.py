@@ -96,6 +96,7 @@ class OrderSerializer(serializers.ModelSerializer):
     custom_packages = OrderCustomPackageSerializer(many=True, read_only=True)
     user = serializers.StringRelatedField()
     payment = serializers.SerializerMethodField()
+    pickup_store = StoreSerializer(read_only=True)
 
     class Meta:
         model = Order
@@ -107,6 +108,8 @@ class OrderSerializer(serializers.ModelSerializer):
             "status",
             "payment_status",
             "fulfillment_method",
+            "pickup_store",
+            "pickup_day",
             "is_test_order",
             "payment",
             "created_at",
@@ -143,6 +146,17 @@ class PaymentSerializer(serializers.ModelSerializer):
 
 class TestPaymentConfirmSerializer(serializers.Serializer):
     payment_key = serializers.CharField(max_length=120)
+
+
+class OrderCreateFromCartSerializer(serializers.Serializer):
+    item_ids = serializers.ListField(child=serializers.IntegerField(min_value=1), required=False)
+    package_draft_ids = serializers.ListField(child=serializers.IntegerField(min_value=1), required=False)
+    fulfillment_method = serializers.ChoiceField(
+        choices=Order.FulfillmentMethod.choices,
+        default=Order.FulfillmentMethod.PICKUP,
+    )
+    pickup_store_id = serializers.IntegerField(min_value=1, required=False, allow_null=True)
+    pickup_date = serializers.DateField(required=False, allow_null=True)
 
 
 class TossPaymentConfirmSerializer(serializers.Serializer):

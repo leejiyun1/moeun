@@ -42,6 +42,15 @@ class Order(models.Model):
         choices=FulfillmentMethod.choices,
         default=FulfillmentMethod.PICKUP,
     )
+    pickup_store = models.ForeignKey(
+        "stores.Store",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="orders_for_pickup",
+        help_text="주문 단위 픽업 매장",
+    )
+    pickup_day = models.DateField(null=True, blank=True, help_text="주문 단위 픽업 예정 날짜")
     is_test_order = models.BooleanField(default=True, help_text="테스트 결제 주문 여부")
 
     created_at = models.DateTimeField(auto_now_add=True)
@@ -55,6 +64,8 @@ class Order(models.Model):
             models.Index(fields=["status"]),
             models.Index(fields=["payment_status"]),
             models.Index(fields=["fulfillment_method"]),
+            models.Index(fields=["pickup_store"]),
+            models.Index(fields=["pickup_day"]),
             models.Index(fields=["is_test_order"]),
             models.Index(fields=["-created_at"]),
         ]
@@ -173,9 +184,14 @@ class OrderItem(models.Model):
 
     # 픽업 정보
     pickup_store = models.ForeignKey(
-        "stores.Store", on_delete=models.CASCADE, related_name="order_items", help_text="픽업 매장"
+        "stores.Store",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="order_items",
+        help_text="픽업 매장",
     )
-    pickup_day = models.DateField(help_text="픽업 예정 날짜")
+    pickup_day = models.DateField(null=True, blank=True, help_text="픽업 예정 날짜")
     pickup_status = models.BooleanField(default=False, help_text="픽업 완료 여부")
 
     # 선물 관련
@@ -230,8 +246,14 @@ class OrderCustomPackage(models.Model):
     base_price = models.PositiveIntegerField(help_text="구성품 합산가")
     discount_amount = models.PositiveIntegerField(default=0, help_text="정책 할인 금액")
     final_price = models.PositiveIntegerField(help_text="최종 패키지 가격")
-    pickup_store = models.ForeignKey("stores.Store", on_delete=models.CASCADE, related_name="order_custom_packages")
-    pickup_day = models.DateField(help_text="픽업 예정 날짜")
+    pickup_store = models.ForeignKey(
+        "stores.Store",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="order_custom_packages",
+    )
+    pickup_day = models.DateField(null=True, blank=True, help_text="픽업 예정 날짜")
     pickup_status = models.BooleanField(default=False, help_text="픽업 완료 여부")
     is_tasting_selected = models.BooleanField(default=False, help_text="시음 선택 여부")
     created_at = models.DateTimeField(auto_now_add=True)

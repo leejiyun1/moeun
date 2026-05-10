@@ -12,6 +12,7 @@ from apps.orders.models import (
     OrderItem,
     Payment,
 )
+from apps.stores.models import Store
 
 
 class OrderCreationError(Exception):
@@ -58,6 +59,8 @@ class OrderService:
         cart_item_ids=None,
         package_draft_ids=None,
         fulfillment_method=Order.FulfillmentMethod.PICKUP,
+        pickup_store_id=None,
+        pickup_date=None,
         is_test_order=True,
         payment_provider=Payment.Provider.TOSS_TEST,
     ):
@@ -67,11 +70,11 @@ class OrderService:
         if fulfillment_method not in Order.FulfillmentMethod.values:
             raise OrderCreationError("지원하지 않는 수령 방식입니다.")
 
-        cart_items = CartItem.objects.filter(user=user).select_related("product", "pickup_store")
+        cart_items = CartItem.objects.filter(user=user).select_related("product")
         package_drafts = (
             PackageDraft.objects.filter(user=user)
             .exclude(status=PackageDraft.Status.ORDERED)
-            .select_related("policy", "pickup_store")
+            .select_related("policy")
             .prefetch_related("items__product")
         )
         if cart_item_ids is not None:
@@ -82,6 +85,8 @@ class OrderService:
         if not cart_items.exists() and not package_drafts.exists():
             raise CartIsEmptyError("장바구니가 비어있습니다.")
 
+        pickup_store = OrderService._resolve_pickup_store(fulfillment_method, pickup_store_id, pickup_date)
+
         total_price = sum(item.total_price for item in cart_items) + sum(draft.final_price for draft in package_drafts)
 
         # 1. 주문 생성
@@ -89,22 +94,21 @@ class OrderService:
             user=user,
             total_price=total_price,
             fulfillment_method=fulfillment_method,
+            pickup_store=pickup_store,
+            pickup_day=pickup_date if fulfillment_method == Order.FulfillmentMethod.PICKUP else None,
             is_test_order=is_test_order,
         )
 
         # 2. 주문 항목 생성
         order_items_to_create = []
         for item in cart_items:
-            if not item.pickup_store or not item.pickup_date:
-                raise MissingPickupInfoError(f"{item.product.name} 상품의 픽업 정보가 없습니다.")
-
             order_item = OrderItem(
                 order=order,
                 product=item.product,
                 price=item.product.price,  # 주문 당시 가격 기록
                 quantity=item.quantity,
-                pickup_store=item.pickup_store,
-                pickup_day=item.pickup_date,
+                pickup_store=order.pickup_store,
+                pickup_day=order.pickup_day,
             )
             order_items_to_create.append(order_item)
 
@@ -117,6 +121,17 @@ class OrderService:
         package_drafts.update(status=PackageDraft.Status.ORDERED)
 
         return order
+
+    @staticmethod
+    def _resolve_pickup_store(fulfillment_method, pickup_store_id, pickup_date):
+        if fulfillment_method != Order.FulfillmentMethod.PICKUP:
+            return None
+        if not pickup_store_id or not pickup_date:
+            raise MissingPickupInfoError("픽업 주문은 픽업 매장과 날짜가 필요합니다.")
+        try:
+            return Store.objects.get(id=pickup_store_id)
+        except Store.DoesNotExist as exc:
+            raise MissingPickupInfoError("존재하지 않는 픽업 매장입니다.") from exc
 
     @staticmethod
     @transaction.atomic
@@ -237,9 +252,6 @@ class OrderService:
         custom_package_items_to_create = []
 
         for draft in package_drafts:
-            if not draft.pickup_store or not draft.pickup_date:
-                raise MissingPickupInfoError(f"{draft.display_name} 패키지의 픽업 정보가 없습니다.")
-
             custom_package = OrderCustomPackage.objects.create(
                 order=order,
                 source_draft=draft,
@@ -248,8 +260,8 @@ class OrderService:
                 base_price=draft.base_price,
                 discount_amount=draft.discount_amount,
                 final_price=draft.final_price,
-                pickup_store=draft.pickup_store,
-                pickup_day=draft.pickup_date,
+                pickup_store=order.pickup_store,
+                pickup_day=order.pickup_day,
                 is_tasting_selected=draft.is_tasting_selected,
             )
 

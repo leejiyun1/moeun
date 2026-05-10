@@ -15,12 +15,11 @@ const ItemRowLabel = ({ type, children, className }: ItemRowLabelType) => {
 
       {type === 'cart' && (
         <div className="flex border-b pb-2 text-center text-[#333333]">
-          <div className="w-[40%] min-w-[250px] pl-47 text-left">
+          <div className="w-[55%] min-w-[250px] pl-47 text-left">
             상품/옵션 정보
           </div>
           <div className="mx-auto w-20">수량</div>
           <div className="w-[15%] min-w-[80px]">가격</div>
-          <div className="w-[25%] min-w-[150px]">수령 장소</div>
         </div>
       )}
       {type === 'order' && (

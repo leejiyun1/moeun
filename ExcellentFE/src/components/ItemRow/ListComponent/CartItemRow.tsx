@@ -12,13 +12,6 @@ const CartItemRow = ({
   name,
   quantity,
   price,
-  pickupStoreId,
-  pickupDate,
-  pickupName,
-  pickupAddress,
-  pickupContact,
-  stores = [],
-  onPickupChange,
   onCheckChange,
   checked,
   onQuantityChange,
@@ -32,7 +25,7 @@ const CartItemRow = ({
 
   return (
     <div className="flex items-center border-b border-[#e1e1e1] py-5 text-center text-[#333333]">
-      <div className="flex w-[40%] min-w-[250px] items-center gap-12">
+      <div className="flex w-[55%] min-w-[250px] items-center gap-12">
         <input
           type="checkbox"
           checked={checked || false}
@@ -73,47 +66,6 @@ const CartItemRow = ({
       </div>
       <div className="w-[15%] min-w-[80px] font-medium">
         {parseInt(String(price ?? '0'), 10).toLocaleString()}원
-      </div>
-
-      <div className="w-[25%] min-w-[150px] text-[#666666]">
-        <select
-          value={pickupStoreId ?? ''}
-          onChange={(event) =>
-            onPickupChange?.({
-              pickup_store_id: event.target.value
-                ? Number(event.target.value)
-                : null,
-            })
-          }
-          className="mb-2 w-full rounded border border-[#d9d9d9] px-3 py-2 text-sm text-[#333333]"
-          aria-label={`${name} 픽업 매장 선택`}
-        >
-          <option value="">픽업 매장 선택</option>
-          {stores.map((store) => (
-            <option key={store.id} value={store.id}>
-              {store.name}
-            </option>
-          ))}
-        </select>
-        <input
-          type="date"
-          value={pickupDate ?? ''}
-          onChange={(event) =>
-            onPickupChange?.({ pickup_date: event.target.value || null })
-          }
-          className="mb-2 w-full rounded border border-[#d9d9d9] px-3 py-2 text-sm text-[#333333]"
-          aria-label={`${name} 픽업 날짜 선택`}
-        />
-        {pickupName ? (
-          <>
-            <p className="text-sm">{pickupAddress}</p>
-            <p className="text-sm">{pickupContact}</p>
-          </>
-        ) : (
-          <p className="text-sm text-[#f2544b]">
-            주문 전 픽업 정보를 선택해주세요.
-          </p>
-        )}
       </div>
     </div>
   )

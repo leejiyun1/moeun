@@ -8,6 +8,7 @@ from rest_framework.response import Response
 from apps.orders.models import Order, OrderItem
 from apps.orders.serializers import (
     FlatOrderItemSerializer,
+    OrderCreateFromCartSerializer,
     OrderSerializer,
     TestPaymentConfirmSerializer,
     TossPaymentConfirmSerializer,
@@ -31,7 +32,7 @@ class OrderViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         return (
             Order.objects.filter(user=self.request.user)
-            .select_related("payment")
+            .select_related("payment", "pickup_store")
             .prefetch_related(
                 "items__product",
                 "items__pickup_store",
@@ -46,17 +47,23 @@ class OrderViewSet(viewsets.ModelViewSet):
         """
         장바구니의 모든 상품으로 주문을 생성
         """
+        serializer = OrderCreateFromCartSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        data = serializer.validated_data
+
         try:
             has_selection = "item_ids" in request.data or "package_draft_ids" in request.data
             order = OrderService.create_order_from_cart(
                 user=request.user,
-                cart_item_ids=request.data.get("item_ids", []) if has_selection else None,
-                package_draft_ids=request.data.get("package_draft_ids", []) if has_selection else None,
-                fulfillment_method=request.data.get("fulfillment_method", Order.FulfillmentMethod.PICKUP),
+                cart_item_ids=data.get("item_ids", []) if has_selection else None,
+                package_draft_ids=data.get("package_draft_ids", []) if has_selection else None,
+                fulfillment_method=data.get("fulfillment_method", Order.FulfillmentMethod.PICKUP),
+                pickup_store_id=data.get("pickup_store_id"),
+                pickup_date=data.get("pickup_date"),
                 is_test_order=True,
             )
-            serializer = self.get_serializer(order)
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+            response_serializer = self.get_serializer(order)
+            return Response(response_serializer.data, status=status.HTTP_201_CREATED)
 
         except AdultVerificationRequiredError as e:
             return Response({"code": "ADULT_VERIFICATION_REQUIRED", "detail": str(e)}, status=status.HTTP_403_FORBIDDEN)
@@ -122,7 +129,7 @@ class AdminOrderListView(generics.ListAPIView):
 
     def get_queryset(self):
         queryset = (
-            Order.objects.select_related("user", "payment")
+            Order.objects.select_related("user", "payment", "pickup_store")
             .prefetch_related(
                 "items__product__images",
                 "items__pickup_store",
