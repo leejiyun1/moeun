@@ -92,7 +92,6 @@ const AdminHome = () => {
                 관리 기능을 카테고리별로 나눠 한 화면에서 전환합니다.
               </p>
             </div>
-            {currentCategory.action}
           </div>
         </div>
 
@@ -125,6 +124,7 @@ const AdminHome = () => {
                 {currentCategory.description}
               </p>
             </div>
+            {currentCategory.action}
           </div>
         </section>
 
