@@ -1124,7 +1124,12 @@ GET /admin
 GET /admin/products
 GET /admin/products/new
 GET /admin/package-policies
+GET /admin/product-tags
+GET /admin/orders
 ```
+
+`/admin`은 기본 관리자 진입점이며, 상품/패키지 정책/상품 태그/주문을 카테고리 탭으로 한 화면에서 전환한다.
+개별 URL은 직접 접근과 호환을 위해 유지한다.
 
 ### FE 책임
 
@@ -1134,6 +1139,8 @@ GET /admin/package-policies
 - `ExcellentFE/src/pages/admin/AdminProducts.tsx`
 - `ExcellentFE/src/pages/admin/AdminProductCreate.tsx`
 - `ExcellentFE/src/pages/admin/AdminPackagePolicies.tsx`
+- `ExcellentFE/src/pages/admin/AdminProductTags.tsx`
+- `ExcellentFE/src/pages/admin/AdminOrders.tsx`
 - `ExcellentFE/src/pages/admin/AdminPageShell.tsx`
 - `ExcellentFE/src/api/admin/index.ts`
 - `ExcellentFE/src/types/admin.ts`
@@ -1145,6 +1152,8 @@ GET /admin/package-policies
 - 일반 상품 등록
 - 고정 패키지 상품 등록
 - 패키지 정책 목록/등록
+- 상품 표시용 태그 목록/등록/활성 상태 변경
+- 테스트 주문 목록 확인
 - 시음 가능 여부 설정
 - 폼 선택지를 상수로 관리
 
@@ -1167,6 +1176,12 @@ POST   /api/v1/package-policies/manage/
 GET    /api/v1/package-policies/{id}/manage/
 PATCH  /api/v1/package-policies/{id}/manage/
 DELETE /api/v1/package-policies/{id}/manage/
+
+GET    /api/v1/product-tags/manage/
+POST   /api/v1/product-tags/manage/
+GET    /api/v1/product-tags/{id}/manage/
+PATCH  /api/v1/product-tags/{id}/manage/
+DELETE /api/v1/product-tags/{id}/manage/
 ```
 
 ### BE 책임
@@ -1179,6 +1194,7 @@ DELETE /api/v1/package-policies/{id}/manage/
 - `EasyBE/apps/products/serializers/product/create.py`
 - `EasyBE/apps/products/serializers/product/update.py`
 - `EasyBE/apps/products/serializers/package_policy.py`
+- `EasyBE/apps/products/serializers/product/tag.py`
 - `EasyBE/apps/products/services/product_command_service.py`
 - `EasyBE/apps/products/services/package_policy_command_service.py`
 - `EasyBE/apps/products/models.py`

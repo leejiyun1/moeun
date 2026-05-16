@@ -28,7 +28,11 @@ const fulfillmentLabel: Record<string, string> = {
   UNDECIDED: '미정',
 }
 
-const AdminOrders = () => {
+interface AdminOrdersProps {
+  embedded?: boolean
+}
+
+const AdminOrders = ({ embedded = false }: AdminOrdersProps) => {
   const { data, isLoading, isError } = useQuery({
     queryKey: [ADMIN_QUERY_KEYS.ORDERS],
     queryFn: adminApi.getOrders,
@@ -38,6 +42,7 @@ const AdminOrders = () => {
     <AdminPageShell
       title="주문 관리"
       description="현재 주문은 테스트 결제 기준으로만 처리합니다. 실제 판매 전환 시 결제 PG와 수령 정책을 이 구조에 연결합니다."
+      embedded={embedded}
     >
       <section className="rounded-[20px] border border-[#d9d9d9] bg-white">
         <div className="flex items-center justify-between border-b border-[#eeeeee] px-5 py-4">

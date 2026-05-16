@@ -136,8 +136,8 @@ export type CreatePackageProductResponse = ProductDetail
 
 export interface CreateProductTagPayload {
   name: string
-  group: ProductTagGroup
-  description: string
-  is_active: boolean
-  sort_order: number
+  group?: ProductTagGroup
+  description?: string
+  is_active?: boolean
+  sort_order?: number
 }

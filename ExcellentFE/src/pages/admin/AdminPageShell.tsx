@@ -6,6 +6,7 @@ interface AdminPageShellProps {
   title: string
   description: string
   action?: ReactNode
+  embedded?: boolean
   children: ReactNode
 }
 
@@ -13,8 +14,13 @@ const AdminPageShell = ({
   title,
   description,
   action,
+  embedded = false,
   children,
 }: AdminPageShellProps) => {
+  if (embedded) {
+    return children
+  }
+
   return (
     <main className="min-h-screen bg-white px-5 pt-[130px] pb-24 text-[#333333] md:px-10 md:pt-[150px]">
       <div className="mx-auto w-full max-w-[1280px]">

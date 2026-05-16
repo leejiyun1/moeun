@@ -23,7 +23,11 @@ const statusLabel = {
   OUT_OF_STOCK: '품절',
 } as const
 
-const AdminProducts = () => {
+interface AdminProductsProps {
+  embedded?: boolean
+}
+
+const AdminProducts = ({ embedded = false }: AdminProductsProps) => {
   const [searchDraft, setSearchDraft] = useState('')
   const [search, setSearch] = useState('')
   const [status, setStatus] = useState<AdminProductStatus | ''>('')
@@ -47,19 +51,8 @@ const AdminProducts = () => {
     setStatus(event.target.value as AdminProductStatus | '')
   }
 
-  return (
-    <AdminPageShell
-      title="상품 관리"
-      description="등록된 단일 상품과 패키지 상품을 확인합니다. 상태 변경과 수정은 다음 단계에서 같은 화면에 붙입니다."
-      action={
-        <Link
-          to={ROUTE_PATHS.ADMIN.PRODUCT_NEW}
-          className="rounded-full bg-[#f2544b] px-5 py-3 text-sm font-bold text-white transition hover:bg-[#d9443c]"
-        >
-          상품 등록
-        </Link>
-      }
-    >
+  const content = (
+    <>
       <section className="mb-6 rounded-[20px] border border-[#d9d9d9] bg-[#f8f8f8] p-5 md:p-6">
         <form
           onSubmit={handleSubmit}
@@ -189,6 +182,27 @@ const AdminProducts = () => {
           </div>
         )}
       </section>
+    </>
+  )
+
+  if (embedded) {
+    return content
+  }
+
+  return (
+    <AdminPageShell
+      title="상품 관리"
+      description="등록된 단일 상품과 패키지 상품을 확인합니다. 상태 변경과 수정은 다음 단계에서 같은 화면에 붙입니다."
+      action={
+        <Link
+          to={ROUTE_PATHS.ADMIN.PRODUCT_NEW}
+          className="rounded-full bg-[#f2544b] px-5 py-3 text-sm font-bold text-white transition hover:bg-[#d9443c]"
+        >
+          상품 등록
+        </Link>
+      }
+    >
+      {content}
     </AdminPageShell>
   )
 }

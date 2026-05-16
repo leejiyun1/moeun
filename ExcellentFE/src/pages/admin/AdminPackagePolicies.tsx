@@ -74,7 +74,13 @@ const getErrorMessage = (error: unknown) => {
   return '정책 값을 다시 확인해 주세요.'
 }
 
-const AdminPackagePolicies = () => {
+interface AdminPackagePoliciesProps {
+  embedded?: boolean
+}
+
+const AdminPackagePolicies = ({
+  embedded = false,
+}: AdminPackagePoliciesProps) => {
   const queryClient = useQueryClient()
   const [form, setForm] = useState<PolicyFormState>(initialForm)
   const [errorMessage, setErrorMessage] = useState('')
@@ -168,6 +174,7 @@ const AdminPackagePolicies = () => {
     <AdminPageShell
       title="패키지 정책"
       description="패키지 정책은 패키지를 만들 때 적용되는 운영 규칙입니다. 구성 수량, 같은 술 중복 허용, 허용 상품 범위, 할인 방식을 한 곳에서 관리합니다."
+      embedded={embedded}
     >
       <div className="grid gap-6 lg:grid-cols-[440px_1fr]">
         <form
