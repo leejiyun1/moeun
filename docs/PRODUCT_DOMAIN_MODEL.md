@@ -193,6 +193,16 @@ ProductTagging
 
 상품당 메인 이미지는 하나만 허용한다.
 
+관리자 상품 등록 화면에서는 운영자가 URL을 직접 입력하지 않는다.
+
+기준:
+
+- 메인 이미지 파일과 상세 설명 이미지 파일은 필수다.
+- 백엔드는 업로드된 파일을 저장소에 저장한 뒤 접근 가능한 URL을 생성한다.
+- DB에는 기존처럼 `ProductImage.image_url`, `Product.description_image_url`만 저장한다.
+- 현재 로컬/개발 환경은 `artifacts/backend/media/products/...`에 저장한다.
+- 추후 S3 또는 NCP Object Storage로 전환할 때는 저장 서비스만 교체한다.
+
 ### ProductLike
 
 상품 좋아요다.

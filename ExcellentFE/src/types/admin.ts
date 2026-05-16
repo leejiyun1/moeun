@@ -1,4 +1,8 @@
-import type { ProductDetail, ProductTag, ProductTagGroup } from '@/types/product'
+import type {
+  ProductDetail,
+  ProductTag,
+  ProductTagGroup,
+} from '@/types/product'
 
 export interface PaginatedResponse<T> {
   count: number
@@ -102,11 +106,6 @@ export interface CreatePackagePolicyPayload {
   allowed_product_ids?: string[]
 }
 
-export interface ProductImageCreatePayload {
-  image_url: string
-  is_main: boolean
-}
-
 export interface DrinkCreatePayload {
   name: string
   brewery_id: number
@@ -122,17 +121,7 @@ export interface DrinkCreatePayload {
   aroma_level: number
 }
 
-export interface CreateIndividualProductPayload {
-  price: number
-  original_price: number | null
-  discount: number | null
-  description: string
-  description_image_url: string
-  tag_ids?: number[]
-  is_tasting_available: boolean
-  images: ProductImageCreatePayload[]
-  drink_info: DrinkCreatePayload
-}
+export type CreateIndividualProductPayload = FormData
 
 export interface PackageItemCreatePayload {
   drink_id: number
@@ -140,22 +129,7 @@ export interface PackageItemCreatePayload {
   sort_order: number
 }
 
-export interface CreatePackageProductPayload {
-  price: number
-  original_price: number | null
-  discount: number | null
-  description: string
-  description_image_url: string
-  tag_ids?: number[]
-  is_tasting_available: boolean
-  images: ProductImageCreatePayload[]
-  package_info: {
-    name: string
-    type: 'CURATED'
-    policy_id: number | null
-    items: PackageItemCreatePayload[]
-  }
-}
+export type CreatePackageProductPayload = FormData
 
 export type CreateIndividualProductResponse = ProductDetail
 export type CreatePackageProductResponse = ProductDetail

@@ -1,7 +1,12 @@
 # apps/products/tests/test_product_creation.py
 
+import json
+import shutil
+import tempfile
+
 from django.contrib.auth import get_user_model
-from django.test import TransactionTestCase
+from django.core.files.uploadedfile import SimpleUploadedFile
+from django.test import TransactionTestCase, override_settings
 from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
@@ -55,7 +60,7 @@ class IndividualProductCreationAPITest(BaseProductCreationTestCase):
         response = self.client.post(url, creation_data, format="json")
 
         # Then
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED, response.data)
 
         # 생성된 데이터 검증
         self.assertEqual(Drink.objects.count(), initial_counts["drink"] + 1)
@@ -87,6 +92,59 @@ class IndividualProductCreationAPITest(BaseProductCreationTestCase):
         self.assertEqual(response_data["product_type"], "individual")
         self.assertIsNotNone(response_data["drink"])
         self.assertIsNone(response_data["package"])
+
+    def test_create_individual_product_with_uploaded_images(self):
+        """관리자 상품 등록은 이미지 파일을 받아 URL로 저장한다."""
+        url = reverse("products:v1:products-individual-create")
+        media_root = tempfile.mkdtemp()
+        main_image = SimpleUploadedFile(
+            "main.png",
+            b"fake-main-image",
+            content_type="image/png",
+        )
+        description_image = SimpleUploadedFile(
+            "description.png",
+            b"fake-description-image",
+            content_type="image/png",
+        )
+        payload = {
+            "price": 15000,
+            "original_price": 18000,
+            "discount": 3000,
+            "description": "업로드 이미지 상품 설명",
+            "is_tasting_available": "true",
+            "tag_ids": json.dumps([]),
+            "drink_info": json.dumps(
+                {
+                    "name": "업로드막걸리",
+                    "brewery_id": self.breweries[0].id,
+                    "ingredients": "쌀, 누룩, 정제수",
+                    "alcohol_type": "MAKGEOLLI",
+                    "abv": 6.0,
+                    "volume_ml": 750,
+                    "sweetness_level": 2.5,
+                    "acidity_level": 2.5,
+                    "body_level": 2.5,
+                    "carbonation_level": 1.0,
+                    "bitterness_level": 2.0,
+                    "aroma_level": 3.0,
+                }
+            ),
+            "main_image_file": main_image,
+            "description_image_file": description_image,
+        }
+
+        try:
+            with override_settings(MEDIA_ROOT=media_root, MEDIA_URL="/media/", BASE_URL="http://testserver"):
+                response = self.client.post(url, payload, format="multipart")
+        finally:
+            shutil.rmtree(media_root, ignore_errors=True)
+
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED, response.data)
+        product = Product.objects.get(drink__name="업로드막걸리")
+        self.assertTrue(product.description_image_url.startswith("http://testserver/media/products/"))
+        main = ProductImage.objects.get(product=product, is_main=True)
+        self.assertTrue(main.image_url.startswith("http://testserver/media/products/"))
 
     def test_create_individual_product_validation_errors(self):
         """개별 상품 생성 유효성 검사 실패 테스트"""

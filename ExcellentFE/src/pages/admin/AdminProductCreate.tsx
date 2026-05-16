@@ -8,7 +8,6 @@ import { ROUTE_PATHS } from '@/constants/routePaths'
 import type {
   CreateIndividualProductPayload,
   CreatePackageProductPayload,
-  ProductImageCreatePayload,
 } from '@/types/admin'
 import type { ProductTag } from '@/types/product'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
@@ -29,8 +28,8 @@ interface CommonProductFormState {
   originalPrice: string
   discount: string
   description: string
-  descriptionImageUrl: string
-  mainImageUrl: string
+  descriptionImageFile: File | null
+  mainImageFile: File | null
   isTastingAvailable: boolean
 }
 
@@ -62,16 +61,17 @@ interface PackageItemFormState {
 
 type CommonTextField = Exclude<
   keyof CommonProductFormState,
-  'isTastingAvailable'
+  'isTastingAvailable' | 'descriptionImageFile' | 'mainImageFile'
 >
+type CommonFileField = 'descriptionImageFile' | 'mainImageFile'
 
 const initialCommonForm: CommonProductFormState = {
   price: '',
   originalPrice: '',
   discount: '',
   description: '',
-  descriptionImageUrl: '',
-  mainImageUrl: '',
+  descriptionImageFile: null,
+  mainImageFile: null,
   isTastingAvailable: false,
 }
 
@@ -125,8 +125,9 @@ const AdminProductCreate = () => {
   const [productKind, setProductKind] = useState<ProductKind>('individual')
   const [commonForm, setCommonForm] =
     useState<CommonProductFormState>(initialCommonForm)
-  const [individualForm, setIndividualForm] =
-    useState<IndividualFormState>(initialIndividualForm)
+  const [individualForm, setIndividualForm] = useState<IndividualFormState>(
+    initialIndividualForm
+  )
   const [packageForm, setPackageForm] =
     useState<PackageFormState>(initialPackageForm)
   const [selectedTagIds, setSelectedTagIds] = useState<number[]>([])
@@ -216,9 +217,7 @@ const AdminProductCreate = () => {
       setPackageForm((current) => ({
         ...current,
         items: current.items.map((item, itemIndex) =>
-          itemIndex === index
-            ? { ...item, [field]: event.target.value }
-            : item
+          itemIndex === index ? { ...item, [field]: event.target.value } : item
         ),
       }))
     }
@@ -256,57 +255,81 @@ const AdminProductCreate = () => {
     }))
   }
 
-  const buildImages = (): ProductImageCreatePayload[] => [
-    {
-      image_url: commonForm.mainImageUrl.trim(),
-      is_main: true,
-    },
-  ]
+  const handleCommonFileChange =
+    (field: CommonFileField) => (event: ChangeEvent<HTMLInputElement>) => {
+      setCommonForm((current) => ({
+        ...current,
+        [field]: event.target.files?.[0] ?? null,
+      }))
+    }
 
-  const buildCommonPayload = () => ({
-    price: numericValue(commonForm.price),
-    original_price: optionalNumericValue(commonForm.originalPrice),
-    discount: optionalNumericValue(commonForm.discount),
-    description: commonForm.description.trim(),
-    description_image_url: commonForm.descriptionImageUrl.trim(),
-    tag_ids: selectedTagIds,
-    is_tasting_available: commonForm.isTastingAvailable,
-    images: buildImages(),
-  })
+  const appendCommonPayload = (formData: FormData) => {
+    formData.append('price', String(numericValue(commonForm.price)))
+    const originalPrice = optionalNumericValue(commonForm.originalPrice)
+    const discount = optionalNumericValue(commonForm.discount)
+    if (originalPrice !== null) {
+      formData.append('original_price', String(originalPrice))
+    }
+    if (discount !== null) {
+      formData.append('discount', String(discount))
+    }
+    formData.append('description', commonForm.description.trim())
+    formData.append('tag_ids', JSON.stringify(selectedTagIds))
+    formData.append(
+      'is_tasting_available',
+      String(commonForm.isTastingAvailable)
+    )
+    if (commonForm.mainImageFile) {
+      formData.append('main_image_file', commonForm.mainImageFile)
+    }
+    if (commonForm.descriptionImageFile) {
+      formData.append('description_image_file', commonForm.descriptionImageFile)
+    }
+  }
 
-  const buildIndividualPayload = (): CreateIndividualProductPayload => ({
-    ...buildCommonPayload(),
-    drink_info: {
-      name: individualForm.name.trim(),
-      brewery_id: numericValue(individualForm.breweryId),
-      ingredients: individualForm.ingredients.trim(),
-      alcohol_type: individualForm.alcoholType,
-      abv: numericValue(individualForm.abv),
-      volume_ml: numericValue(individualForm.volumeMl),
-      sweetness_level: numericValue(individualForm.sweetnessLevel),
-      acidity_level: numericValue(individualForm.acidityLevel),
-      body_level: numericValue(individualForm.bodyLevel),
-      carbonation_level: numericValue(individualForm.carbonationLevel),
-      bitterness_level: numericValue(individualForm.bitternessLevel),
-      aroma_level: numericValue(individualForm.aromaLevel),
-    },
-  })
+  const buildIndividualPayload = (): CreateIndividualProductPayload => {
+    const formData = new FormData()
+    appendCommonPayload(formData)
+    formData.append(
+      'drink_info',
+      JSON.stringify({
+        name: individualForm.name.trim(),
+        brewery_id: numericValue(individualForm.breweryId),
+        ingredients: individualForm.ingredients.trim(),
+        alcohol_type: individualForm.alcoholType,
+        abv: numericValue(individualForm.abv),
+        volume_ml: numericValue(individualForm.volumeMl),
+        sweetness_level: numericValue(individualForm.sweetnessLevel),
+        acidity_level: numericValue(individualForm.acidityLevel),
+        body_level: numericValue(individualForm.bodyLevel),
+        carbonation_level: numericValue(individualForm.carbonationLevel),
+        bitterness_level: numericValue(individualForm.bitternessLevel),
+        aroma_level: numericValue(individualForm.aromaLevel),
+      })
+    )
+    return formData
+  }
 
-  const buildPackagePayload = (): CreatePackageProductPayload => ({
-    ...buildCommonPayload(),
-    package_info: {
-      name: packageForm.name.trim(),
-      type: 'CURATED',
-      policy_id: optionalNumericValue(packageForm.policyId),
-      items: packageForm.items
-        .filter((item) => item.drinkId)
-        .map((item, index) => ({
-          drink_id: numericValue(item.drinkId),
-          quantity: numericValue(item.quantity),
-          sort_order: index,
-        })),
-    },
-  })
+  const buildPackagePayload = (): CreatePackageProductPayload => {
+    const formData = new FormData()
+    appendCommonPayload(formData)
+    formData.append(
+      'package_info',
+      JSON.stringify({
+        name: packageForm.name.trim(),
+        type: 'CURATED',
+        policy_id: optionalNumericValue(packageForm.policyId),
+        items: packageForm.items
+          .filter((item) => item.drinkId)
+          .map((item, index) => ({
+            drink_id: numericValue(item.drinkId),
+            quantity: numericValue(item.quantity),
+            sort_order: index,
+          })),
+      })
+    )
+    return formData
+  }
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
@@ -366,7 +389,11 @@ const AdminProductCreate = () => {
           />
         )}
 
-        <CommonSaleSection form={commonForm} onChange={handleCommonFieldChange} />
+        <CommonSaleSection
+          form={commonForm}
+          onChange={handleCommonFieldChange}
+          onFileChange={handleCommonFileChange}
+        />
         <CommonDescriptionSection
           form={commonForm}
           tags={tags?.results ?? []}
@@ -381,11 +408,14 @@ const AdminProductCreate = () => {
             {errorMessage}
           </p>
         )}
-        {productKind === 'individual' && !hasBreweries && !isBreweriesLoading && (
-          <p className="rounded-[14px] bg-[#fff4f2] p-4 font-bold text-[#8a3a32]">
-            등록 가능한 양조장이 없습니다. 상품 등록 전에 양조장 등록 화면이 필요합니다.
-          </p>
-        )}
+        {productKind === 'individual' &&
+          !hasBreweries &&
+          !isBreweriesLoading && (
+            <p className="rounded-[14px] bg-[#fff4f2] p-4 font-bold text-[#8a3a32]">
+              등록 가능한 양조장이 없습니다. 상품 등록 전에 양조장 등록 화면이
+              필요합니다.
+            </p>
+          )}
         {productKind === 'package' && !hasDrinks && !isDrinksLoading && (
           <p className="rounded-[14px] bg-[#fff4f2] p-4 font-bold text-[#8a3a32]">
             패키지에 담을 술이 없습니다. 단일 상품을 먼저 등록해야 합니다.
@@ -420,7 +450,12 @@ interface KindButtonProps {
   onClick: () => void
 }
 
-const KindButton = ({ active, title, description, onClick }: KindButtonProps) => (
+const KindButton = ({
+  active,
+  title,
+  description,
+  onClick,
+}: KindButtonProps) => (
   <button
     type="button"
     onClick={onClick}
@@ -539,12 +574,36 @@ const IndividualProductSection = ({
     <section className="rounded-[20px] border border-[#d9d9d9] bg-white p-6">
       <h2 className="text-2xl font-bold">맛 프로필</h2>
       <div className="mt-6 grid gap-4 md:grid-cols-3">
-        <TasteField label="단맛" value={form.sweetnessLevel} onChange={onChange('sweetnessLevel')} />
-        <TasteField label="산미" value={form.acidityLevel} onChange={onChange('acidityLevel')} />
-        <TasteField label="바디감" value={form.bodyLevel} onChange={onChange('bodyLevel')} />
-        <TasteField label="탄산감" value={form.carbonationLevel} onChange={onChange('carbonationLevel')} />
-        <TasteField label="쓴맛" value={form.bitternessLevel} onChange={onChange('bitternessLevel')} />
-        <TasteField label="풍미" value={form.aromaLevel} onChange={onChange('aromaLevel')} />
+        <TasteField
+          label="단맛"
+          value={form.sweetnessLevel}
+          onChange={onChange('sweetnessLevel')}
+        />
+        <TasteField
+          label="산미"
+          value={form.acidityLevel}
+          onChange={onChange('acidityLevel')}
+        />
+        <TasteField
+          label="바디감"
+          value={form.bodyLevel}
+          onChange={onChange('bodyLevel')}
+        />
+        <TasteField
+          label="탄산감"
+          value={form.carbonationLevel}
+          onChange={onChange('carbonationLevel')}
+        />
+        <TasteField
+          label="쓴맛"
+          value={form.bitternessLevel}
+          onChange={onChange('bitternessLevel')}
+        />
+        <TasteField
+          label="풍미"
+          value={form.aromaLevel}
+          onChange={onChange('aromaLevel')}
+        />
       </div>
     </section>
   </>
@@ -636,7 +695,9 @@ const PackageProductSection = ({
               {drinks.map((drink) => (
                 <option key={drink.id} value={drink.id}>
                   {drink.name} · {drink.brewery.name}
-                  {drink.price ? ` · ${drink.price.toLocaleString('ko-KR')}원` : ''}
+                  {drink.price
+                    ? ` · ${drink.price.toLocaleString('ko-KR')}원`
+                    : ''}
                 </option>
               ))}
             </select>
@@ -678,9 +739,16 @@ interface CommonSaleSectionProps {
   onChange: (
     field: CommonTextField
   ) => (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void
+  onFileChange: (
+    field: CommonFileField
+  ) => (event: ChangeEvent<HTMLInputElement>) => void
 }
 
-const CommonSaleSection = ({ form, onChange }: CommonSaleSectionProps) => (
+const CommonSaleSection = ({
+  form,
+  onChange,
+  onFileChange,
+}: CommonSaleSectionProps) => (
   <section className="rounded-[20px] border border-[#d9d9d9] bg-white p-6">
     <h2 className="text-2xl font-bold">가격과 이미지</h2>
     <div className="mt-6 grid gap-4 md:grid-cols-3">
@@ -716,28 +784,47 @@ const CommonSaleSection = ({ form, onChange }: CommonSaleSectionProps) => (
       </Field>
     </div>
     <div className="mt-4 grid gap-4 md:grid-cols-2">
-      <Field label="대표 이미지 URL">
-        <input
-          required
-          type="url"
-          value={form.mainImageUrl}
-          onChange={onChange('mainImageUrl')}
-          className="admin-input"
-          placeholder="https://..."
-        />
-      </Field>
-      <Field label="상세 설명 이미지 URL">
-        <input
-          required
-          type="url"
-          value={form.descriptionImageUrl}
-          onChange={onChange('descriptionImageUrl')}
-          className="admin-input"
-          placeholder="https://..."
-        />
-      </Field>
+      <FileField
+        label="대표 이미지"
+        file={form.mainImageFile}
+        onChange={onFileChange('mainImageFile')}
+      />
+      <FileField
+        label="상세 설명 이미지"
+        file={form.descriptionImageFile}
+        onChange={onFileChange('descriptionImageFile')}
+      />
     </div>
   </section>
+)
+
+interface FileFieldProps {
+  label: string
+  file: File | null
+  onChange: (event: ChangeEvent<HTMLInputElement>) => void
+}
+
+const FileField = ({ label, file, onChange }: FileFieldProps) => (
+  <Field label={label}>
+    <div className="rounded-[16px] border border-dashed border-[#d9d9d9] bg-[#fafafa] p-4">
+      <input
+        required
+        type="file"
+        accept="image/png,image/jpeg,image/webp,image/gif"
+        onChange={onChange}
+        className="block w-full text-sm text-[#666666] file:mr-4 file:rounded-full file:border-0 file:bg-[#333333] file:px-4 file:py-2 file:text-sm file:font-bold file:text-white"
+      />
+      <p className="mt-3 text-xs leading-5 text-[#888888]">
+        jpg, png, webp, gif 파일을 첨부하세요. 저장 후 URL은 서버가 자동으로
+        생성합니다.
+      </p>
+      {file && (
+        <p className="mt-2 rounded-[10px] bg-white px-3 py-2 text-sm font-bold text-[#333333]">
+          선택됨: {file.name}
+        </p>
+      )}
+    </div>
+  </Field>
 )
 
 interface CommonDescriptionSectionProps {
@@ -809,7 +896,7 @@ const CommonDescriptionSection = ({
       )}
     </div>
 
-    <label className="mt-5 flex items-start gap-3 rounded-[14px] bg-[#fff4f2] p-4 text-sm font-bold leading-6 text-[#8a3a32]">
+    <label className="mt-5 flex items-start gap-3 rounded-[14px] bg-[#fff4f2] p-4 text-sm leading-6 font-bold text-[#8a3a32]">
       <input
         type="checkbox"
         checked={form.isTastingAvailable}

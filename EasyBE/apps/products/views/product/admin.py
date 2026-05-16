@@ -9,6 +9,7 @@ from rest_framework.generics import (
     ListCreateAPIView,
     RetrieveUpdateDestroyAPIView,
 )
+from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
 from rest_framework.response import Response
 
 from apps.products.selectors import (
@@ -41,6 +42,7 @@ class IndividualProductCreateView(CreateAPIView):
 
     serializer_class = IndividualProductCreateSerializer
     permission_classes = [IsAdminRole]
+    parser_classes = [JSONParser, MultiPartParser, FormParser]
 
     @extend_schema(
         summary="개별 상품 생성",
@@ -58,6 +60,7 @@ class PackageProductCreateView(CreateAPIView):
 
     serializer_class = PackageProductCreateSerializer
     permission_classes = [IsAdminRole]
+    parser_classes = [JSONParser, MultiPartParser, FormParser]
 
     @extend_schema(
         summary="패키지 상품 생성",
