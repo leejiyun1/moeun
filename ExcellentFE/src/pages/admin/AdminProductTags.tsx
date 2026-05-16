@@ -4,6 +4,7 @@ import {
   PRODUCT_TAG_GROUP_LABELS,
 } from '@/constants/admin'
 import type { CreateProductTagPayload } from '@/types/admin'
+import type { ProductTag } from '@/types/product'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { isAxiosError } from 'axios'
 import {
@@ -103,6 +104,10 @@ const AdminProductTags = ({ embedded = false }: AdminProductTagsProps) => {
     createMutation.mutate(buildPayload())
   }
 
+  const tags = data?.results ?? []
+  const activeTags = tags.filter((tag) => tag.is_active)
+  const inactiveTags = tags.filter((tag) => !tag.is_active)
+
   const content = (
     <div className="grid gap-6 lg:grid-cols-[360px_1fr]">
       <form
@@ -151,7 +156,7 @@ const AdminProductTags = ({ embedded = false }: AdminProductTagsProps) => {
 
       <section className="rounded-[20px] border border-[#d9d9d9] bg-white">
         <div className="flex items-center justify-between border-b border-[#eeeeee] px-5 py-4">
-          <h2 className="text-xl font-bold">태그 목록</h2>
+          <h2 className="text-xl font-bold">태그 관리</h2>
           <span className="text-sm text-[#888888]">총 {data?.count ?? 0}개</span>
         </div>
 
@@ -171,46 +176,31 @@ const AdminProductTags = ({ embedded = false }: AdminProductTagsProps) => {
           </p>
         )}
         {!isLoading && !isError && Boolean(data?.results.length) && (
-          <div className="flex flex-wrap gap-3 p-5">
-            {data?.results.map((tag) => (
-              <article
-                key={tag.id}
-                className={`min-w-[180px] rounded-[18px] border px-4 py-3 ${
-                  tag.is_active
-                    ? 'border-[#d9d9d9] bg-[#fafafa]'
-                    : 'border-[#eeeeee] bg-white opacity-55'
-                }`}
-              >
-                <div className="flex items-center justify-between gap-3">
-                  <strong>{tag.name}</strong>
-                  <span className="rounded-full bg-white px-2.5 py-1 text-xs font-bold text-[#666666]">
-                    {PRODUCT_TAG_GROUP_LABELS[tag.group]}
-                  </span>
-                </div>
-                {tag.description && (
-                  <p className="mt-2 line-clamp-2 text-sm leading-6 text-[#666666]">
-                    {tag.description}
-                  </p>
-                )}
-                <button
-                  type="button"
-                  disabled={toggleMutation.isPending}
-                  onClick={() =>
-                    toggleMutation.mutate({
-                      id: tag.id,
-                      isActive: !tag.is_active,
-                    })
-                  }
-                  className={`mt-4 rounded-full px-3 py-1.5 text-xs font-bold transition disabled:cursor-not-allowed disabled:bg-[#cccccc] ${
-                    tag.is_active
-                      ? 'bg-[#333333] text-white hover:bg-[#111111]'
-                      : 'bg-[#eeeeee] text-[#666666] hover:bg-[#dddddd]'
-                  }`}
-                >
-                  {tag.is_active ? '활성' : '비활성'}
-                </button>
-              </article>
-            ))}
+          <div className="grid gap-6 p-5">
+            <TagSection
+              title="활성 태그"
+              description="상품 등록 화면에서 선택할 수 있는 태그입니다."
+              emptyMessage="활성 태그가 없습니다."
+              tags={activeTags}
+              actionLabel="비활성화"
+              actionTone="dark"
+              disabled={toggleMutation.isPending}
+              onToggle={(tagId) =>
+                toggleMutation.mutate({ id: tagId, isActive: false })
+              }
+            />
+            <TagSection
+              title="비활성 태그"
+              description="현재 상품 등록 화면에는 보이지 않는 태그입니다."
+              emptyMessage="비활성 태그가 없습니다."
+              tags={inactiveTags}
+              actionLabel="다시 사용"
+              actionTone="light"
+              disabled={toggleMutation.isPending}
+              onToggle={(tagId) =>
+                toggleMutation.mutate({ id: tagId, isActive: true })
+              }
+            />
           </div>
         )}
       </section>
@@ -241,6 +231,73 @@ const Field = ({ label, children }: FieldProps) => (
     {label}
     {children}
   </label>
+)
+
+interface TagSectionProps {
+  title: string
+  description: string
+  emptyMessage: string
+  tags: ProductTag[]
+  actionLabel: string
+  actionTone: 'dark' | 'light'
+  disabled: boolean
+  onToggle: (tagId: number) => void
+}
+
+const TagSection = ({
+  title,
+  description,
+  emptyMessage,
+  tags,
+  actionLabel,
+  actionTone,
+  disabled,
+  onToggle,
+}: TagSectionProps) => (
+  <section>
+    <div className="mb-3 flex flex-col gap-1">
+      <h3 className="text-lg font-bold">{title}</h3>
+      <p className="text-sm text-[#777777]">{description}</p>
+    </div>
+    {tags.length === 0 ? (
+      <p className="rounded-[16px] bg-[#fafafa] p-5 text-sm text-[#777777]">
+        {emptyMessage}
+      </p>
+    ) : (
+      <div className="flex flex-wrap gap-3">
+        {tags.map((tag) => (
+          <article
+            key={tag.id}
+            className="min-w-[180px] rounded-[18px] border border-[#d9d9d9] bg-[#fafafa] px-4 py-3"
+          >
+            <div className="flex items-center justify-between gap-3">
+              <strong>{tag.name}</strong>
+              <span className="rounded-full bg-white px-2.5 py-1 text-xs font-bold text-[#666666]">
+                {PRODUCT_TAG_GROUP_LABELS[tag.group]}
+              </span>
+            </div>
+            {tag.description && (
+              <p className="mt-2 line-clamp-2 text-sm leading-6 text-[#666666]">
+                {tag.description}
+              </p>
+            )}
+            <button
+              type="button"
+              disabled={disabled}
+              onClick={() => onToggle(tag.id)}
+              className={`mt-4 rounded-full px-3 py-1.5 text-xs font-bold transition disabled:cursor-not-allowed disabled:bg-[#cccccc] ${
+                actionTone === 'dark'
+                  ? 'bg-[#333333] text-white hover:bg-[#111111]'
+                  : 'bg-white text-[#666666] ring-1 ring-[#d9d9d9] hover:text-[#f2544b] hover:ring-[#f2544b]'
+              }`}
+            >
+              {actionLabel}
+            </button>
+          </article>
+        ))}
+      </div>
+    )}
+  </section>
 )
 
 export default AdminProductTags
