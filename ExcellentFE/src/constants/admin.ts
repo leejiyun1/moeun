@@ -1,5 +1,6 @@
 import type {
   AdminProductStatus,
+  AdminProductType,
   PackageAllowedItemScope,
   PackageDiscountType,
   PackagePolicyStatus,
@@ -22,6 +23,24 @@ export const ADMIN_PRODUCT_STATUS_OPTIONS: {
   { value: 'INACTIVE', label: '비활성' },
   { value: 'OUT_OF_STOCK', label: '품절' },
 ]
+
+export const ADMIN_PRODUCT_TYPE_OPTIONS: {
+  value: AdminProductType | ''
+  label: string
+}[] = [
+  { value: '', label: '전체' },
+  { value: 'individual', label: '단일 상품' },
+  { value: 'package', label: '패키지 상품' },
+]
+
+export const ADMIN_PRODUCT_ORDERING_OPTIONS = [
+  { value: '-created_at', label: '최근 등록순' },
+  { value: 'created_at', label: '오래된순' },
+  { value: '-price', label: '가격 높은순' },
+  { value: 'price', label: '가격 낮은순' },
+  { value: '-view_count', label: '조회 많은순' },
+  { value: '-like_count', label: '좋아요 많은순' },
+] as const
 
 export const PACKAGE_POLICY_STATUS_OPTIONS: {
   value: PackagePolicyStatus

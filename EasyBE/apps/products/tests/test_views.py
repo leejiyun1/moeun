@@ -375,6 +375,30 @@ class AdminAPITest(BaseAPITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertIn("results", response.data)
 
+    def test_product_manage_list_filters_by_product_type(self):
+        """관리자 상품 목록은 단일 상품과 패키지 상품을 구분해서 조회할 수 있다."""
+        self.client.force_authenticate(user=self.admin_user)
+        url = reverse("products:v1:products-manage-list")
+
+        individual_response = self.client.get(url, {"product_type": "individual"})
+        package_response = self.client.get(url, {"product_type": "package"})
+
+        self.assertEqual(individual_response.status_code, status.HTTP_200_OK)
+        self.assertEqual(package_response.status_code, status.HTTP_200_OK)
+        self.assertTrue(all(product["product_type"] == "individual" for product in individual_response.data["results"]))
+        self.assertTrue(all(product["product_type"] == "package" for product in package_response.data["results"]))
+
+    def test_product_manage_list_orders_by_price(self):
+        """관리자 상품 목록은 명시한 기준으로 정렬할 수 있다."""
+        self.client.force_authenticate(user=self.admin_user)
+        url = reverse("products:v1:products-manage-list")
+
+        response = self.client.get(url, {"ordering": "price"})
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        prices = [product["price"] for product in response.data["results"]]
+        self.assertEqual(prices, sorted(prices))
+
     def test_product_manage_list_rejects_non_admin(self):
         """일반 사용자는 관리자 상품 목록에 접근할 수 없다."""
         user = TestDataCreator.create_user(nickname="testnormal", email="normal@example.com")

@@ -1,10 +1,12 @@
 import { adminApi } from '@/api/admin'
 import {
+  ADMIN_PRODUCT_ORDERING_OPTIONS,
   ADMIN_PRODUCT_STATUS_OPTIONS,
+  ADMIN_PRODUCT_TYPE_OPTIONS,
   ADMIN_QUERY_KEYS,
 } from '@/constants/admin'
 import { ROUTE_PATHS } from '@/constants/routePaths'
-import type { AdminProductStatus } from '@/types/admin'
+import type { AdminProductStatus, AdminProductType } from '@/types/admin'
 import { useQuery } from '@tanstack/react-query'
 import { useState, type ChangeEvent, type FormEvent } from 'react'
 import { Link } from 'react-router-dom'
@@ -31,14 +33,20 @@ const AdminProducts = ({ embedded = false }: AdminProductsProps) => {
   const [searchDraft, setSearchDraft] = useState('')
   const [search, setSearch] = useState('')
   const [status, setStatus] = useState<AdminProductStatus | ''>('')
+  const [productType, setProductType] = useState<AdminProductType | ''>('')
+  const [ordering, setOrdering] = useState('-created_at')
 
   const { data, isLoading, isError } = useQuery({
-    queryKey: [ADMIN_QUERY_KEYS.PRODUCTS, { search, status }],
+    queryKey: [
+      ADMIN_QUERY_KEYS.PRODUCTS,
+      { search, status, productType, ordering },
+    ],
     queryFn: () =>
       adminApi.getProducts({
         search,
         status,
-        ordering: '-created_at',
+        product_type: productType,
+        ordering,
       }),
   })
 
@@ -51,12 +59,40 @@ const AdminProducts = ({ embedded = false }: AdminProductsProps) => {
     setStatus(event.target.value as AdminProductStatus | '')
   }
 
+  const handleProductTypeChange = (nextProductType: AdminProductType | '') => {
+    setProductType(nextProductType)
+  }
+
+  const handleOrderingChange = (event: ChangeEvent<HTMLSelectElement>) => {
+    setOrdering(event.target.value)
+  }
+
   const content = (
     <>
       <section className="mb-6 rounded-[20px] border border-[#d9d9d9] bg-[#f8f8f8] p-5 md:p-6">
+        <div className="mb-5 flex flex-wrap gap-2">
+          {ADMIN_PRODUCT_TYPE_OPTIONS.map((option) => {
+            const isSelected = productType === option.value
+
+            return (
+              <button
+                key={option.label}
+                type="button"
+                onClick={() => handleProductTypeChange(option.value)}
+                className={`rounded-full px-4 py-2 text-sm font-bold transition ${
+                  isSelected
+                    ? 'bg-[#333333] text-white'
+                    : 'bg-white text-[#666666] hover:text-[#f2544b]'
+                }`}
+              >
+                {option.label}
+              </button>
+            )
+          })}
+        </div>
         <form
           onSubmit={handleSubmit}
-          className="flex flex-col gap-3 md:flex-row md:items-end"
+          className="grid gap-3 md:grid-cols-[1fr_180px_180px_auto] md:items-end"
         >
           <label className="flex flex-1 flex-col gap-2 text-sm font-bold text-[#555555]">
             검색어
@@ -67,7 +103,7 @@ const AdminProducts = ({ embedded = false }: AdminProductsProps) => {
               className="h-12 rounded-[12px] border border-[#d9d9d9] bg-white px-4 font-normal outline-none focus:border-[#f2544b]"
             />
           </label>
-          <label className="flex flex-col gap-2 text-sm font-bold text-[#555555] md:w-[220px]">
+          <label className="flex flex-col gap-2 text-sm font-bold text-[#555555]">
             상태
             <select
               value={status}
@@ -76,6 +112,20 @@ const AdminProducts = ({ embedded = false }: AdminProductsProps) => {
             >
               <option value="">전체</option>
               {ADMIN_PRODUCT_STATUS_OPTIONS.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className="flex flex-col gap-2 text-sm font-bold text-[#555555]">
+            정렬
+            <select
+              value={ordering}
+              onChange={handleOrderingChange}
+              className="h-12 rounded-[12px] border border-[#d9d9d9] bg-white px-4 font-normal outline-none focus:border-[#f2544b]"
+            >
+              {ADMIN_PRODUCT_ORDERING_OPTIONS.map((option) => (
                 <option key={option.value} value={option.value}>
                   {option.label}
                 </option>

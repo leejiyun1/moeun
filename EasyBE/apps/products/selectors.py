@@ -72,10 +72,17 @@ class ProductSelector:
         return get_object_or_404(ProductSelector.management_queryset(), pk=product_id)
 
     @staticmethod
-    def get_management_list_queryset(status_filter: str | None = None) -> QuerySet:
+    def get_management_list_queryset(
+        status_filter: str | None = None,
+        product_type_filter: str | None = None,
+    ) -> QuerySet:
         queryset = ProductSelector.management_queryset()
         if status_filter:
             queryset = queryset.filter(status=status_filter)
+        if product_type_filter == "individual":
+            queryset = queryset.filter(drink__isnull=False)
+        elif product_type_filter == "package":
+            queryset = queryset.filter(package__isnull=False)
         return queryset
 
     @staticmethod

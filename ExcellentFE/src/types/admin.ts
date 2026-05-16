@@ -91,6 +91,7 @@ export interface PackagePolicy {
 export interface AdminProductQuery {
   search?: string
   status?: AdminProductStatus | ''
+  product_type?: AdminProductType | ''
   ordering?: string
 }
 

@@ -1149,6 +1149,8 @@ GET /admin/orders
 책임:
 
 - 상품 목록 조회
+- 상품 목록의 단일/패키지 구분 필터링
+- 상품 목록 정렬 기준 선택
 - 일반 상품 등록
 - 고정 패키지 상품 등록
 - 패키지 정책 목록/등록
@@ -1161,6 +1163,7 @@ GET /admin/orders
 
 ```text
 GET    /api/v1/products/manage/
+      query: product_type=individual|package, status=ACTIVE|INACTIVE|OUT_OF_STOCK, ordering=-created_at|price|-price|-view_count|-like_count
 GET    /api/v1/products/{id}/manage/
 PATCH  /api/v1/products/{id}/manage/
 DELETE /api/v1/products/{id}/manage/

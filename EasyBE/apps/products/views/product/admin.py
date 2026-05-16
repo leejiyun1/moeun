@@ -282,7 +282,7 @@ class ProductManageListView(ListAPIView):
     permission_classes = [IsAdminRole]
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
     search_fields = ["drink__name", "package__name", "description"]
-    ordering_fields = ["price", "created_at", "view_count", "status"]
+    ordering_fields = ["price", "created_at", "updated_at", "view_count", "like_count", "order_count", "status"]
     ordering = ["-created_at"]
 
     @extend_schema(
@@ -297,4 +297,7 @@ class ProductManageListView(ListAPIView):
 
     def get_queryset(self):
         """관리자는 모든 상태의 제품 조회 가능"""
-        return ProductSelector.get_management_list_queryset(self.request.query_params.get("status"))
+        return ProductSelector.get_management_list_queryset(
+            status_filter=self.request.query_params.get("status"),
+            product_type_filter=self.request.query_params.get("product_type"),
+        )
