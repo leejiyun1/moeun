@@ -42,7 +42,10 @@ class ProductSearchService:
     @staticmethod
     def apply_category_filters(queryset: QuerySet, query_params: QueryDict) -> QuerySet:
         """
-        카테고리 체크박스 필터링 적용
+        카테고리 체크박스 필터링 적용.
+
+        태그 slug 기반 필터는 운영 복잡도를 줄이기 위해 제거했다.
+        기존 호출부 호환을 위해 쿼리셋을 그대로 반환한다.
 
         Args:
             queryset: 기본 쿼리셋
@@ -51,7 +54,7 @@ class ProductSearchService:
         Returns:
             QuerySet: 카테고리 필터가 적용된 쿼리셋
         """
-        return ProductSelector.apply_category_filters(queryset, query_params)
+        return queryset
 
     @staticmethod
     def apply_alcohol_type_filter(queryset: QuerySet, alcohol_type: str) -> QuerySet:
@@ -141,11 +144,6 @@ class ProductSearchService:
             if query_params.get(param):
                 return True
 
-        # 카테고리 필터 확인
-        for param in ProductSelector.CATEGORY_FILTER_MAPPING.keys():
-            if query_params.get(param) == "true":
-                return True
-
         return False
 
     @staticmethod
@@ -169,11 +167,6 @@ class ProductSearchService:
                     applied_filters[param] = float(value)
                 except (ValueError, TypeError):
                     pass
-
-        # 카테고리 필터
-        for param in ProductSelector.CATEGORY_FILTER_MAPPING.keys():
-            if query_params.get(param) == "true":
-                applied_filters[param] = True
 
         return applied_filters
 

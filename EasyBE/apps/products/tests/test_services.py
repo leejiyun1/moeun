@@ -8,7 +8,6 @@ from apps.products.models import (
     Product,
     ProductImage,
     ProductLike,
-    ProductTag,
 )
 from apps.products.selectors import ProductSelector
 from apps.products.services import (
@@ -356,33 +355,22 @@ class ProductSearchServiceTest(BaseServiceTestCase):
         # 필터가 적용되었는지 확인 (쿼리 변화)
         self.assertNotEqual(str(queryset.query), str(filtered_queryset.query))
 
-    def test_apply_category_filters(self):
-        """카테고리 필터 적용 테스트"""
+    def test_apply_category_filters_keeps_queryset(self):
+        """제거된 태그 기반 카테고리 필터는 쿼리셋을 제한하지 않는다."""
         queryset = Product.objects.filter(status="ACTIVE")
         query_params = QueryDict("premium=true")
 
         filtered_queryset = ProductSearchService.apply_category_filters(queryset, query_params)
 
-        # 프리미엄 상품만 반환되는지 확인
-        for product in filtered_queryset:
-            self.assertTrue(product.tags.filter(slug="premium").exists())
+        self.assertEqual(list(filtered_queryset), list(queryset))
 
-    def test_get_search_queryset_with_multiple_filters(self):
-        """여러 필터 동시 적용 테스트"""
-        # 테스트 데이터 설정
-        product = self.all_products[0]
-        premium_tag = ProductTag.objects.get(slug="premium")
-        gift_tag = ProductTag.objects.get(slug="gift-suitable")
-        product.tags.add(premium_tag, gift_tag)
-
+    def test_get_search_queryset_ignores_removed_category_filters(self):
+        """검색 쿼리셋은 태그 기반 카테고리 파라미터를 무시한다."""
         query_params = QueryDict("premium=true&gift_suitable=true")
 
         queryset = ProductSearchService.get_search_queryset(query_params)
 
-        self.assertIn(product, queryset)
-        for filtered_product in queryset:
-            self.assertTrue(filtered_product.tags.filter(slug="premium").exists())
-            self.assertTrue(filtered_product.tags.filter(slug="gift-suitable").exists())
+        self.assertEqual(list(queryset), list(ProductSelector.active_queryset()))
 
     def test_validate_search_params_valid(self):
         """유효한 검색 파라미터 검증 테스트"""
@@ -413,8 +401,7 @@ class ProductSearchServiceTest(BaseServiceTestCase):
 
         # 유효한 필터만 반환되는지 확인
         self.assertIn("sweetness", applied_filters)
-        self.assertIn("premium", applied_filters)
+        self.assertNotIn("premium", applied_filters)
         self.assertNotIn("invalid_param", applied_filters)
 
         self.assertEqual(applied_filters["sweetness"], 3.0)
-        self.assertTrue(applied_filters["premium"])

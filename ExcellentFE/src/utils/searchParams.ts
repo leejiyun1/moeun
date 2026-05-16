@@ -1,5 +1,4 @@
 import type { SearchFilters } from '@/types/search'
-import { FEATURE_OPTIONS } from '@/constants/search'
 
 export const buildSearchParamsRecommended = (
   filters: SearchFilters
@@ -24,13 +23,6 @@ export const buildSearchParamsRecommended = (
   Object.entries(tasteMap).forEach(([key, value]) => {
     if (value > 0) {
       searchParams.set(key, value.toFixed(1))
-    }
-  })
-
-  // 선택 필터 (체크박스) — true인 값만 추가
-  FEATURE_OPTIONS.forEach((option) => {
-    if (filters.selectedFeatures.includes(option.label)) {
-      searchParams.set(option.key, 'true')
     }
   })
 

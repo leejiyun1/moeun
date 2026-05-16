@@ -136,7 +136,6 @@ export type CreatePackageProductResponse = ProductDetail
 
 export interface CreateProductTagPayload {
   name: string
-  slug: string
   group: ProductTagGroup
   description: string
   is_active: boolean

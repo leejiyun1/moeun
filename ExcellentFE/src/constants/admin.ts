@@ -75,7 +75,6 @@ export const ALCOHOL_TYPE_OPTIONS = [
 ] as const
 
 export const PRODUCT_TAG_GROUP_LABELS = {
-  DISPLAY: '노출',
-  RECOMMENDATION: '추천',
+  DISPLAY: '표시',
   FEATURE: '특성',
 } as const

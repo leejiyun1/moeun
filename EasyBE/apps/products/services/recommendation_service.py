@@ -67,10 +67,9 @@ class ProductRecommendationService:
             if not taste_vector:
                 continue
 
-            taste_score = cls._taste_similarity(profile_vector, taste_vector) * 70
-            engagement_score = cls._engagement_score(product) * 20
-            operation_score = cls._operation_score(product) * 10
-            final_score = round(taste_score + engagement_score + operation_score, 2)
+            taste_score = cls._taste_similarity(profile_vector, taste_vector) * 75
+            engagement_score = cls._engagement_score(product) * 25
+            final_score = round(taste_score + engagement_score, 2)
             cls._attach_recommendation(product, final_score, cls._build_reason(profile_vector, taste_vector))
             scored_products.append(product)
 
@@ -83,11 +82,10 @@ class ProductRecommendationService:
         max_index = max(len(products_by_recency) - 1, 1)
 
         for index, product in enumerate(products_by_recency):
-            engagement_score = cls._engagement_score(product) * 65
-            operation_score = cls._operation_score(product) * 25
-            recency_score = (1 - (index / max_index)) * 10
-            final_score = round(engagement_score + operation_score + recency_score, 2)
-            cls._attach_recommendation(product, final_score, "인기와 운영 추천 기준을 함께 반영한 상품입니다.")
+            engagement_score = cls._engagement_score(product) * 80
+            recency_score = (1 - (index / max_index)) * 20
+            final_score = round(engagement_score + recency_score, 2)
+            cls._attach_recommendation(product, final_score, "인기와 최신성을 함께 반영한 상품입니다.")
             scored_products.append(product)
 
         return sorted(scored_products, key=cls._sort_key, reverse=True)
@@ -139,20 +137,6 @@ class ProductRecommendationService:
             + product.review_count * 0.25
         )
         return min(weighted_score, 1.0)
-
-    @staticmethod
-    def _operation_score(product: Product) -> float:
-        product_tag_slugs = {tag.slug for tag in product.tags.all() if tag.is_active}
-        enabled_flags = sum(
-            [
-                "premium" in product_tag_slugs,
-                "award-winning" in product_tag_slugs,
-                "regional-specialty" in product_tag_slugs,
-                "gift-suitable" in product_tag_slugs,
-                product.is_tasting_available,
-            ]
-        )
-        return min(enabled_flags / 5, 1.0)
 
     @staticmethod
     def _attach_recommendation(product: Product, score: float, reason: str) -> None:

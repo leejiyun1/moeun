@@ -91,8 +91,8 @@ class TestDataCreator:
         """테스트용 상품 태그 생성"""
         tags = {}
         for data in PRODUCT_TAG_DATA:
-            tag, _ = ProductTag.objects.get_or_create(slug=data["slug"], defaults=data)
-            tags[tag.slug] = tag
+            tag, _ = ProductTag.objects.get_or_create(name=data["name"], defaults=data)
+            tags[tag.name] = tag
         return tags
 
     @staticmethod
@@ -106,7 +106,7 @@ class TestDataCreator:
         for data in INDIVIDUAL_PRODUCT_DATA:
             product_data = data.copy()
             drink_index = product_data.pop("drink_index")
-            tag_slugs = product_data.pop("tag_slugs", [])
+            tag_names = product_data.pop("tag_names", [])
             product_data["drink"] = drinks[drink_index]
 
             # 기존 상품이 있는지 확인 (OneToOne 관계)
@@ -117,7 +117,7 @@ class TestDataCreator:
                 product = Product.objects.create(**product_data)
                 products.append(product)
 
-            products[-1].tags.set([tags[slug] for slug in tag_slugs])
+            products[-1].tags.set([tags[name] for name in tag_names])
 
         return products
 
@@ -132,7 +132,7 @@ class TestDataCreator:
         for data in PACKAGE_PRODUCT_DATA:
             product_data = data.copy()
             package_index = product_data.pop("package_index")
-            tag_slugs = product_data.pop("tag_slugs", [])
+            tag_names = product_data.pop("tag_names", [])
             product_data["package"] = packages[package_index]
 
             # 기존 상품이 있는지 확인 (OneToOne 관계)
@@ -143,7 +143,7 @@ class TestDataCreator:
                 product = Product.objects.create(**product_data)
                 products.append(product)
 
-            products[-1].tags.set([tags[slug] for slug in tag_slugs])
+            products[-1].tags.set([tags[name] for name in tag_names])
 
         return products
 

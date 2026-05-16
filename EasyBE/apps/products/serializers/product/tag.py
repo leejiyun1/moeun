@@ -8,7 +8,7 @@ class ProductTagSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ProductTag
-        fields = ["id", "name", "slug", "group", "description", "is_active", "sort_order"]
+        fields = ["id", "name", "group", "description", "is_active", "sort_order"]
 
 
 class ProductTagManageSerializer(serializers.ModelSerializer):
@@ -19,7 +19,6 @@ class ProductTagManageSerializer(serializers.ModelSerializer):
         fields = [
             "id",
             "name",
-            "slug",
             "group",
             "description",
             "is_active",

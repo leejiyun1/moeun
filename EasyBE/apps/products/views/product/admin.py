@@ -171,7 +171,7 @@ class ProductTagManageListView(ListCreateAPIView):
     pagination_class = SearchPagination
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
     filterset_fields = ["group", "is_active"]
-    search_fields = ["name", "slug", "description"]
+    search_fields = ["name", "description"]
     ordering_fields = ["sort_order", "name", "created_at", "updated_at"]
     ordering = ["sort_order", "name"]
 

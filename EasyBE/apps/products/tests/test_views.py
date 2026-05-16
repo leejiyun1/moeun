@@ -129,17 +129,14 @@ class ProductSearchAPITest(BaseAPITestCase):
         prices = [product["price"] for product in results]
         self.assertEqual(prices, sorted(prices))
 
-    def test_product_category_filters(self):
-        """카테고리 필터 테스트"""
+    def test_product_ignores_removed_category_filters(self):
+        """제거된 태그 기반 카테고리 필터는 검색 결과를 제한하지 않는다."""
         url = reverse("products:v1:products-search")
 
+        base_response = self.client.get(url)
         response = self.client.get(url, {"premium": "true"})
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-
-        results = response.data["results"]
-        if results:
-            for product in results:
-                self.assertTrue(any(tag["slug"] == "premium" for tag in product["tags"]))
+        self.assertEqual(response.data["count"], base_response.data["count"])
 
     def test_product_taste_profile_filters(self):
         """맛 프로필 필터 테스트"""

@@ -17,7 +17,6 @@ import AdminPageShell from './AdminPageShell'
 
 interface TagFormState {
   name: string
-  slug: string
   group: ProductTagGroup
   description: string
   sortOrder: string
@@ -25,7 +24,6 @@ interface TagFormState {
 
 const initialForm: TagFormState = {
   name: '',
-  slug: '',
   group: 'DISPLAY',
   description: '',
   sortOrder: '0',
@@ -103,7 +101,6 @@ const AdminProductTags = () => {
 
   const buildPayload = (): CreateProductTagPayload => ({
     name: form.name.trim(),
-    slug: form.slug.trim(),
     group: form.group,
     description: form.description.trim(),
     is_active: true,
@@ -119,7 +116,7 @@ const AdminProductTags = () => {
   return (
     <AdminPageShell
       title="상품 태그"
-      description="상품 태그는 노출, 추천, 특성 분류를 관리하는 운영 기준입니다. 상품 모델에 필드를 늘리지 않고 여기서 태그를 추가해 확장합니다."
+      description="상품 태그는 상품에 붙이는 표시/분류 라벨입니다. 검색 필터나 추천 점수 정책은 태그와 분리해서 관리합니다."
     >
       <div className="grid gap-6 lg:grid-cols-[420px_1fr]">
         <form
@@ -128,8 +125,8 @@ const AdminProductTags = () => {
         >
           <h2 className="text-2xl font-bold">태그 등록</h2>
           <p className="mt-3 text-sm leading-6 text-[#666666]">
-            예: 선물 적합, 수상작, 프리미엄. 검색 필터와 추천 로직에서
-            쓰려면 slug를 정책에 맞게 고정합니다.
+            예: 선물 적합, 수상작, 프리미엄. 상품 카드나 상세 화면에서
+            운영자가 이해하기 쉬운 라벨로 사용합니다.
           </p>
 
           <div className="mt-6 grid gap-4">
@@ -140,15 +137,6 @@ const AdminProductTags = () => {
                 onChange={handleFieldChange<HTMLInputElement>('name')}
                 className="admin-input"
                 placeholder="예: 선물 적합"
-              />
-            </Field>
-            <Field label="slug">
-              <input
-                required
-                value={form.slug}
-                onChange={handleFieldChange<HTMLInputElement>('slug')}
-                className="admin-input"
-                placeholder="예: gift-suitable"
               />
             </Field>
             <div className="grid grid-cols-2 gap-3">
@@ -180,7 +168,7 @@ const AdminProductTags = () => {
                 value={form.description}
                 onChange={handleFieldChange<HTMLTextAreaElement>('description')}
                 className="min-h-[96px] w-full rounded-[12px] border border-[#d9d9d9] bg-white px-4 py-3 outline-none focus:border-[#f2544b]"
-                placeholder="운영자가 구분할 수 있는 설명"
+                placeholder="예: 상품 카드에 선물용 라벨로 표시합니다."
               />
             </Field>
           </div>
@@ -234,9 +222,6 @@ const AdminProductTags = () => {
                       <strong>{tag.name}</strong>
                       <span className="rounded-full bg-[#f8f8f8] px-2.5 py-1 text-xs font-bold text-[#666666]">
                         {PRODUCT_TAG_GROUP_LABELS[tag.group]}
-                      </span>
-                      <span className="text-sm text-[#999999]">
-                        {tag.slug}
                       </span>
                     </div>
                     {tag.description && (

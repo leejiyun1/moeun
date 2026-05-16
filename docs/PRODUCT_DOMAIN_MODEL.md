@@ -156,7 +156,6 @@ Product.product_type
 ```text
 ProductTag
 ├── name
-├── slug
 ├── group
 ├── description
 ├── is_active
@@ -167,18 +166,19 @@ ProductTagging
 └── tag
 ```
 
-태그는 상품의 실제 판매 상태가 아니라 노출/추천/특성 분류다.
+태그는 상품의 실제 판매 상태나 추천 점수 정책이 아니라, 운영자가 상품에 붙이는 표시/분류 라벨이다.
 
 예:
 
-- `award-winning`: 수상작
-- `regional-specialty`: 지역 특산주
-- `premium`: 프리미엄
-- `gift-suitable`: 선물 적합
-- `limited-edition`: 한정판
-- `organic`: 유기농
+- 수상작
+- 지역 특산주
+- 프리미엄
+- 선물 적합
+- 한정판
+- 유기농
 
 태그가 늘어나도 `Product` 필드나 마이그레이션을 추가하지 않는다.
+검색 필터, 패키지 섹션, 추천 점수 보정은 태그명이나 slug에 묶지 않는다. 해당 기능이 필요하면 별도 정책 모델이나 섹션 관리 모델로 분리한다.
 
 `is_tasting_available`은 태그가 아니라 시음 판매 정책이므로 `Product` 필드로 유지한다.
 

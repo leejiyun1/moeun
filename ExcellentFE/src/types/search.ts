@@ -2,7 +2,6 @@ import type { ProductTag } from '@/types/product'
 
 export interface SearchFilters {
   keyword: string
-  selectedFeatures: string[]
   sweetness: number[]
   acidity: number[]
   body: number[]
@@ -37,11 +36,6 @@ export interface SearchFormProps {
   keyword: string
   onKeywordChange: (keyword: string) => void
   onSearch: (keyword: string) => void
-}
-
-export interface FeatureFilterProps {
-  selectedFeatures: string[]
-  onFeatureChange: (features: string[]) => void
 }
 
 export interface SearchResultsProps {

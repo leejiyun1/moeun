@@ -27,14 +27,6 @@ class ProductSelector:
         "aroma": "drink__aroma_level",
     }
 
-    CATEGORY_FILTER_MAPPING: Dict[str, str] = {
-        "gift_suitable": "gift-suitable",
-        "regional_specialty": "regional-specialty",
-        "limited_edition": "limited-edition",
-        "premium": "premium",
-        "award_winning": "award-winning",
-    }
-
     TASTE_RANGE = Decimal("0.5")
     MIN_TASTE_VALUE = Decimal("0.0")
     MAX_TASTE_VALUE = Decimal("5.0")
@@ -98,8 +90,7 @@ class ProductSelector:
     @staticmethod
     def get_search_queryset(query_params: QueryDict) -> QuerySet:
         queryset = ProductSelector.active_queryset()
-        queryset = ProductSelector.apply_taste_filters(queryset, query_params)
-        return ProductSelector.apply_category_filters(queryset, query_params)
+        return ProductSelector.apply_taste_filters(queryset, query_params)
 
     @staticmethod
     def apply_taste_filters(queryset: QuerySet, query_params: QueryDict) -> QuerySet:
@@ -123,13 +114,6 @@ class ProductSelector:
         return queryset
 
     @staticmethod
-    def apply_category_filters(queryset: QuerySet, query_params: QueryDict) -> QuerySet:
-        for param, field in ProductSelector.CATEGORY_FILTER_MAPPING.items():
-            if query_params.get(param) == "true":
-                queryset = queryset.filter(tags__slug=field, tags__is_active=True)
-        return queryset.distinct()
-
-    @staticmethod
     def get_section_products(section_type: str, limit: int = 8) -> QuerySet:
         queryset = ProductSelector.active_queryset()
 
@@ -141,15 +125,11 @@ class ProductSelector:
             queryset = queryset.filter(drink__isnull=False).order_by("-view_count")
             limit = 3
         elif section_type == ProductSelector.SECTION_AWARD_WINNING:
-            queryset = queryset.filter(
-                tags__slug="award-winning", tags__is_active=True, package__isnull=False
-            ).order_by("-order_count")
+            queryset = queryset.filter(package__isnull=False).order_by("-order_count")
         elif section_type == ProductSelector.SECTION_MAKGEOLLI:
             queryset = queryset.filter(package__isnull=False, package__name__icontains="막걸리").order_by("-created_at")
         elif section_type == ProductSelector.SECTION_REGIONAL:
-            queryset = queryset.filter(
-                tags__slug="regional-specialty", tags__is_active=True, package__isnull=False
-            ).order_by("-created_at")
+            queryset = queryset.filter(package__isnull=False).order_by("-created_at")
         else:
             return queryset.none()
 

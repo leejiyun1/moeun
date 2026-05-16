@@ -237,13 +237,11 @@ class ProductTag(models.Model):
     """운영자가 관리하는 상품 태그."""
 
     class Group(models.TextChoices):
-        DISPLAY = "DISPLAY", "노출"
-        RECOMMENDATION = "RECOMMENDATION", "추천"
+        DISPLAY = "DISPLAY", "표시"
         FEATURE = "FEATURE", "특성"
 
     name = models.CharField(max_length=50, unique=True, help_text="태그명")
-    slug = models.SlugField(max_length=80, unique=True, help_text="태그 식별자")
-    group = models.CharField(max_length=20, choices=Group.choices, default=Group.FEATURE, help_text="태그 그룹")
+    group = models.CharField(max_length=20, choices=Group.choices, default=Group.DISPLAY, help_text="태그 그룹")
     description = models.TextField(blank=True, help_text="태그 설명")
     is_active = models.BooleanField(default=True, help_text="활성 여부")
     sort_order = models.PositiveIntegerField(default=0, help_text="정렬 순서")
@@ -254,7 +252,6 @@ class ProductTag(models.Model):
         db_table = "product_tags"
         ordering = ["sort_order", "name"]
         indexes = [
-            models.Index(fields=["slug"]),
             models.Index(fields=["group", "is_active"]),
             models.Index(fields=["sort_order"]),
         ]

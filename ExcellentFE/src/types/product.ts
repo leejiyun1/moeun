@@ -49,12 +49,11 @@ export interface ProductImage {
   created_at: string
 }
 
-export type ProductTagGroup = 'DISPLAY' | 'RECOMMENDATION' | 'FEATURE'
+export type ProductTagGroup = 'DISPLAY' | 'FEATURE'
 
 export interface ProductTag {
   id: number
   name: string
-  slug: string
   group: ProductTagGroup
   description: string
   is_active: boolean

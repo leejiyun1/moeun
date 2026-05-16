@@ -3,7 +3,6 @@ import { useSearchFilters } from '@/hooks/useSearchFilters'
 import { buildSearchParamsRecommended } from '@/utils/searchParams'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import Button from '@/components/common/Button'
-import FeatureFilter from '@/components/search/FeatureFilter'
 import SliderGroup from '@/components/search/SliderGroup'
 import SearchResults from '@/components/search/SearchResults'
 import { useProductSearch } from '@/hooks/useProductSearch'
@@ -13,8 +12,7 @@ import type { Product } from '@/types/search'
 
 const Search = () => {
   const [searchParams] = useSearchParams()
-  const { filters, updateKeyword, updateSelectedFeatures, updateSliderValue } =
-    useSearchFilters()
+  const { filters, updateKeyword, updateSliderValue } = useSearchFilters()
   const navigate = useNavigate()
 
   const queryParams = Object.fromEntries(searchParams.entries())
@@ -56,7 +54,6 @@ const Search = () => {
     const queryString = buildSearchParamsRecommended({
       ...filters,
       keyword: searchValue, // 이 부분은 buildSearchParamsRecommended 함수 내부에서 처리
-      selectedFeatures: filters.selectedFeatures,
     })
     navigate(`/search?${queryString}`)
   }
@@ -86,11 +83,7 @@ const Search = () => {
           </Button>
         </div>
 
-        <div className="flex h-[266px] w-320 items-center justify-center gap-[59px] rounded-[6px] bg-[#F2F2F2]">
-          <FeatureFilter
-            selectedFeatures={filters.selectedFeatures}
-            onFeatureChange={updateSelectedFeatures}
-          />
+        <div className="flex min-h-[266px] w-320 items-center justify-center rounded-[6px] bg-[#F2F2F2] px-8">
           <SliderGroup filters={filters} onSliderChange={updateSliderValue} />
         </div>
       </div>
