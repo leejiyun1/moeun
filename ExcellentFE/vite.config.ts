@@ -7,6 +7,9 @@ import svgr from 'vite-plugin-svgr'
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react(), tailwindcss(), svgr()],
+  server: {
+    allowedHosts: ['jiyun.dev'],
+  },
   build: {
     outDir:
       process.env.VITE_BUILD_OUT_DIR ??
