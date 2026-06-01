@@ -45,6 +45,7 @@ const Card = ({ type, data }: CardType) => {
           review={data.review || ''}
           defaultRating={Number(data.defaultRating) || 0}
           modalTitle={data.modalTitle || ''}
+          isLiked={data.isLiked}
         />
       )
     case 'test':
@@ -68,6 +69,7 @@ const Card = ({ type, data }: CardType) => {
           title={data.title || '모은'}
           subtitle={data.subtitle || '모은 주류'}
           price={data.price || 0}
+          isLiked={data.isLiked}
         />
       )
     case 'best':
@@ -80,7 +82,7 @@ const Card = ({ type, data }: CardType) => {
           userId={data.userId || ''}
           review={data.review || ''}
           date={data.date || ''}
-          defaultRating={Number(data.rating) || 0}
+          defaultRating={Number(data.defaultRating ?? data.rating) || 0}
         />
       )
   }

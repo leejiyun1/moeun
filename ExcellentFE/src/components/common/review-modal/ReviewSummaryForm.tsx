@@ -1,4 +1,5 @@
 import { Plus } from 'lucide-react'
+import SafeImage from '@/components/common/SafeImage'
 
 interface ReviewSummaryFormProps {
   comment: string
@@ -23,7 +24,7 @@ const ReviewSummaryForm = ({
           <div className="flex flex-wrap gap-4">
             {imagePreviews.map((preview, index) => (
               <div key={index} className="relative">
-                <img
+                <SafeImage
                   src={preview}
                   alt={`미리보기 ${index + 1}`}
                   className="h-[150px] w-[150px] rounded-[10px] object-cover"

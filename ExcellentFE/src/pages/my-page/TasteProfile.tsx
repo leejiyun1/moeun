@@ -1,5 +1,6 @@
 import RefreshIcon from '@/assets/icons/taste-profile/refresh.svg?react'
 import summaryIcon from '@/assets/icons/taste-profile/summary.svg?react'
+import defaultProductImage from '@/assets/images/default-product.svg'
 import Button from '@/components/common/Button'
 import GaugeBar from '@/components/common/GaugeBar'
 import Icon from '@/components/common/Icon'
@@ -52,8 +53,8 @@ const TasteProfile = () => {
 
   return (
     <div className="whitespace-pre-wrap">
-      <div className="mb-25 w-320">
-        <div className="mb-5 flex justify-between border-b-2 pb-3">
+      <div className="mb-25 w-full max-w-[1280px]">
+        <div className="mb-5 flex flex-col gap-4 border-b-2 pb-3 sm:flex-row sm:justify-between">
           <h1 className="text-2xl font-bold text-[#333333]">
             나의 입맛 프로필
           </h1>
@@ -67,7 +68,7 @@ const TasteProfile = () => {
           userName={user ?? ''}
         />
         <div className="flex flex-col items-center gap-10">
-          <section className="relative flex h-92 w-315 flex-col items-center justify-center rounded-md bg-[#F2544B] py-13 text-white">
+          <section className="relative flex min-h-92 w-full flex-col items-center justify-center rounded-md bg-[#F2544B] px-5 py-20 text-center text-white sm:py-13">
             <h2 className="absolute top-5 left-5 flex h-11 w-35 items-center justify-center rounded-full border text-lg font-bold">
               나의 취향 유형
             </h2>
@@ -76,9 +77,11 @@ const TasteProfile = () => {
                 <div
                   className="mb-4 h-20 w-20 bg-cover bg-center bg-no-repeat"
                   aria-hidden="true"
-                  style={{ backgroundImage: `url(${image_url})` }}
+                  style={{
+                    backgroundImage: `url(${image_url || defaultProductImage})`,
+                  }}
                 ></div>
-                <h3 className="mb-3 text-2xl font-bold">{`${user}님의 취향 유형은 '${prefer_taste_display}' 입니다.`}</h3>
+                <h3 className="mb-3 text-xl font-bold md:text-2xl">{`${user}님의 취향 유형은 '${prefer_taste_display}' 입니다.`}</h3>
                 <p className="mb-7 text-center text-lg">
                   {insertLineBreaks(taste_description ?? '', '!')}
                 </p>
@@ -101,14 +104,14 @@ const TasteProfile = () => {
           </section>
           <section
             className={cn(
-              'relative flex h-92 w-315 items-center justify-evenly rounded-md bg-[#F2F2F2] px-10 text-[#333]',
+              'relative flex min-h-92 w-full flex-col items-center justify-evenly gap-8 rounded-md bg-[#F2F2F2] px-5 py-20 text-[#333] lg:flex-row lg:px-10 lg:py-0',
               isExpanded && 'h-auto py-15'
             )}
           >
             <h2 className="absolute top-5 left-5 flex h-11 w-35 items-center justify-center rounded-full border text-lg font-bold">
               나의 맛의 지문
             </h2>
-            <section className="mt-11 flex w-[452px] flex-col items-center">
+            <section className="mt-11 flex w-full max-w-[452px] flex-col items-center">
               <figure
                 className={cn(
                   'mb-6 h-36 overflow-hidden transition-all duration-500 ease-in-out',
@@ -137,8 +140,8 @@ const TasteProfile = () => {
                 />
               </Button>
             </section>
-            <hr className="h-55 border-r-1 border-[#D9D9D9]" />
-            <section className="w-[392px]">
+            <hr className="hidden h-55 border-r-1 border-[#D9D9D9] lg:block" />
+            <section className="w-full max-w-[392px]">
               <h3 className="mb-5 flex items-center gap-3 text-lg font-bold">
                 <Icon
                   icon={summaryIcon}

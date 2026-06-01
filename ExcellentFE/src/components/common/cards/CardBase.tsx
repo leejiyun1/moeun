@@ -1,5 +1,6 @@
 import type { CardBaseProps } from '@/types/cardProps'
 import HeartButton from '@/components/common/HeartButton.tsx'
+import SafeImage from '@/components/common/SafeImage'
 import { Link } from 'react-router-dom'
 import { useProductLike } from '@/hooks/product/useProductLike'
 
@@ -22,21 +23,21 @@ const CardBase = ({
   const { isLiked, toggleLike } = useProductLike(id, initialLiked)
 
   return (
-    <div className="flex w-[300px] flex-col">
-      <div className="relative mb-5 flex h-[290px] w-full items-center justify-center overflow-hidden rounded-[6px] border border-[#D9D9D9] bg-gray-200">
+    <div className="mx-auto flex w-[220px] shrink-0 flex-col sm:w-[240px] md:w-full md:max-w-[260px] lg:max-w-[300px]">
+      <div className="relative mb-5 flex aspect-square max-h-[290px] w-full max-w-[300px] items-center justify-center overflow-hidden rounded-[6px] border border-[#D9D9D9] bg-gray-200">
         {detailPath ? (
           <Link to={detailPath} className="h-full w-full">
-            <img
+            <SafeImage
               src={imgSrc}
               alt={imgAlt}
-              className="h-full w-full object-cover"
+              className="h-full w-full object-contain p-3"
             />
           </Link>
         ) : (
-          <img
+          <SafeImage
             src={imgSrc}
             alt={imgAlt}
-            className="h-full w-full object-cover"
+            className="h-full w-full object-contain p-3"
           />
         )}
         <HeartButton

@@ -6,7 +6,7 @@ import StarRating from '@/components/common/StarRating'
 import Modal from '@/components/common/Modal'
 import Button from '@/components/common/Button'
 import { Link } from 'react-router-dom'
-import defaultImg from '@/assets/images/backgrounds/login.jpg'
+import SafeImage from '@/components/common/SafeImage'
 import { useProductLike } from '@/hooks/product/useProductLike'
 
 const ReviewCard = ({
@@ -32,8 +32,8 @@ const ReviewCard = ({
       }}
     >
       <div className="relative mb-5 flex h-[290px] w-full items-center justify-center overflow-hidden rounded-[6px] border border-[#D9D9D9]">
-        <img
-          src={imgSrc || defaultImg}
+        <SafeImage
+          src={imgSrc}
           alt={imgAlt || '모은 주류'}
           className="h-full w-full object-cover"
         />
@@ -42,10 +42,7 @@ const ReviewCard = ({
           onClick={(e) => e.stopPropagation()}
           className="absolute right-2 bottom-2"
         >
-          <HeartButton
-            isLiked={isLiked}
-            onClick={toggleLike}
-          />
+          <HeartButton isLiked={isLiked} onClick={toggleLike} />
         </div>
       </div>
       <div className="flex w-full flex-col gap-2">
@@ -70,10 +67,10 @@ const ReviewCard = ({
         className="review-modal-scroll h-[900px] w-170 overflow-x-hidden overflow-y-auto"
       >
         <div>
-          <img
-            src={imgSrc || defaultImg}
+          <SafeImage
+            src={imgSrc}
             alt={imgAlt || '모은 주류'}
-            className="mt-14 mb-[34px] h-119 w-150 rounded-[10px] border border-[#333333]"
+            className="mt-14 mb-[34px] h-auto max-h-119 w-full max-w-150 rounded-[10px] border border-[#333333] object-contain"
           />
           <p className="pb-[4px] text-[40px]">{product_name}</p>
           <StarRating

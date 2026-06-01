@@ -6,12 +6,11 @@ const GaugeBar = ({ type, score }: TasteScore) => {
   const { label, color } = tasteMetaMap[type]
 
   return (
-    <div className="mb-5 flex items-center font-medium">
-      <dt className="mr-11 flex w-[50px] justify-between text-lg text-[#333]">
+    <div className="mb-5 grid w-full grid-cols-[64px_1fr] items-center gap-6 font-medium">
+      <dt className="flex justify-between text-lg text-[#333]">
         {JustifiedText(label)}
       </dt>
-      <dd className="flex items-center gap-7 text-[#666]">
-        <span className="shrink-0 text-sm">둔감하게</span>
+      <dd className="flex items-center">
         <div className="flex gap-2">
           {Array.from({ length: 5 }).map((_, i) => {
             const diff = score - i
@@ -61,7 +60,6 @@ const GaugeBar = ({ type, score }: TasteScore) => {
             return content
           })}
         </div>
-        <span className="shrink-0 text-sm">민감하게</span>
       </dd>
     </div>
   )

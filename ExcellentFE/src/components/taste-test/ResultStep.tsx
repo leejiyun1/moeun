@@ -13,6 +13,7 @@ import { useEffect, useRef } from 'react'
 import { captureAndSaveImage } from '@/utils/imageCapture'
 import { useTasteTestProfile } from '@/hooks/user/useUser'
 import { Link, useNavigate } from 'react-router-dom'
+import SafeImage from '@/components/common/SafeImage'
 
 // 렌더링 확인용 더미데이터
 const testCardData: TestCardProps[] = [
@@ -131,14 +132,14 @@ const ResultStep = ({
         <p className="mb-[10px] text-[40px] font-extrabold">
           {testResult?.type}
         </p>
-        <p className="mx-[62px] mb-[28px] text-center text-[19px] whitespace-pre-line text-[#666666]">
+        <p className="mx-5 mb-[28px] text-center text-[17px] whitespace-pre-line text-[#666666] sm:mx-[62px] sm:text-[19px]">
           {testResult?.info?.description}
         </p>
 
-        <img
+        <SafeImage
           src={testResult?.info?.image_url}
           alt={testResult?.type}
-          className="mb-[50px] h-[200px] w-[200px]"
+          className="mb-[50px] h-[200px] w-[200px] object-contain"
           // crossOrigin="anonymous" //개발 땐 주석 처리 해야 함 (이미지 로딩 안됌)
         />
       </div>
@@ -151,7 +152,7 @@ const ResultStep = ({
 
       {/* 취향 패키지 추천 조합 섹션 */}
       <div className="mb-20 w-full">
-        <p className="mb-4 ml-[57px] text-xl font-bold text-[#333333]">
+        <p className="mb-4 px-5 text-xl font-bold text-[#333333] sm:ml-[57px] sm:px-0">
           {testResult?.type} 유형을 위한 첫 번째 추천 조합
         </p>
         <div className="flex justify-center">
@@ -173,14 +174,14 @@ const ResultStep = ({
           이 조합으로 나만의 패키지 만들기
         </TestButton>
       </Link>
-      <p className="mb-20">
+      <p className="mb-20 px-5 text-center">
         물론, 패키지 구성은 다음 단계에서 자유롭게 변경할 수 있어요.
       </p>
 
       {/* 하단 빨간 박스 섹션 */}
-      <div className="relative flex h-[103px] w-[560px] items-center justify-center gap-2.5 rounded-br-[20px] rounded-bl-[20px] bg-[#F2544B]">
+      <div className="relative flex min-h-[103px] w-full max-w-[560px] flex-col items-center justify-center gap-2.5 rounded-br-[20px] rounded-bl-[20px] bg-[#F2544B] px-5 py-5 sm:flex-row">
         <button
-          className="h-[54px] w-[225px] cursor-pointer rounded-[60px] border border-[#FFFFFF] font-bold text-[#FFFFFF]"
+          className="h-[54px] w-full max-w-[225px] cursor-pointer rounded-[60px] border border-[#FFFFFF] font-bold text-[#FFFFFF]"
           onClick={() => {
             if (!isLoggedIn) {
               handleNonMemberReset()
@@ -193,7 +194,7 @@ const ResultStep = ({
           테스트 다시 하기
         </button>
         <Link to="/package" aria-label="다른 패키지 구경하기 ">
-          <button className="h-[54px] w-[225px] cursor-pointer rounded-[60px] border border-[#FFFFFF] font-bold text-[#FFFFFF]">
+          <button className="h-[54px] w-full max-w-[225px] cursor-pointer rounded-[60px] border border-[#FFFFFF] px-5 font-bold text-[#FFFFFF]">
             다른 패키지 둘러보기
           </button>
         </Link>

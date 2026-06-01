@@ -45,24 +45,26 @@ const AccountEdit = () => {
   }
 
   return (
-    <div className="w-320text-[#333333]">
+    <div className="w-full max-w-[1280px] text-[#333333]">
       <h1 className="border-b-2 pb-5 text-2xl font-bold">회원정보 수정</h1>
-      <div className="flex flex-col items-center gap-93">
+      <div className="flex flex-col items-center gap-24 md:gap-93">
         <ul className="w-full text-lg">
-          <li className="flex h-19 items-center gap-4 border-b border-[#E1E1E1] p-5">
-            <span className="basis-1/6 font-medium">닉네임</span>
+          <li className="flex min-h-19 flex-col gap-4 border-b border-[#E1E1E1] p-5 sm:flex-row sm:items-center">
+            <span className="font-medium sm:basis-1/6">닉네임</span>
             <Input
               onChange={(e) => setNickname(e.target.value)}
               value={nickname}
               type="text"
-              className="h-10 w-70 rounded-sm"
+              className="h-10 w-full max-w-70 rounded-sm"
             />
             <Button variant="VARIANT14" onClick={handleNicknameChange}>
               수정
             </Button>
           </li>
-          <li className="flex h-19 items-center gap-4 border-b border-[#E1E1E1] p-5">
-            <span className="basis-1/6 font-medium">마케팅 알림 설정</span>
+          <li className="flex min-h-19 flex-wrap items-center gap-4 border-b border-[#E1E1E1] p-5">
+            <span className="w-full font-medium sm:w-auto sm:basis-1/6">
+              마케팅 알림 설정
+            </span>
             <input
               type="radio"
               id="notification_agreed"
@@ -106,7 +108,7 @@ const AccountEdit = () => {
         <Modal
           isOpen={isDeleteAccountModalOpen}
           onClose={() => setIsDeleteAccountModalOpen(false)}
-          className="w-160"
+          className="max-w-160"
         >
           <h2 className="mb-3 text-2xl font-bold">
             모은을 정말로 탈퇴하시겠습니까?
@@ -119,7 +121,7 @@ const AccountEdit = () => {
             onClick={() => {
               deleteProfile()
             }}
-            className="w-125"
+            className="w-full max-w-125"
           >
             탈퇴하기
           </Button>

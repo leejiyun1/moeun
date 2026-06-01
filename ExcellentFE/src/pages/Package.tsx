@@ -50,23 +50,25 @@ const Package = () => {
   return (
     <div className="min-h-screen bg-white">
       {/* 히어로 섹션 */}
-      <section className="relative h-[500px]">
+      <section className="relative min-h-[420px] md:h-[500px]">
         <div
           className="absolute inset-0 h-full w-full bg-cover bg-center bg-no-repeat"
           style={{ backgroundImage: `url('${banner}')` }}
         />
-        <div className="relative z-10 container mx-auto flex h-full items-center">
+        <div className="relative z-10 mx-auto flex h-full min-h-[420px] w-full max-w-[1280px] items-center px-5 sm:px-8 md:min-h-0 lg:px-10 xl:px-0">
           <div className="max-w-2xl">
-            <p className="mb-[30px] text-xl text-[#333333]">
+            <p className="mb-5 text-base text-[#333333] md:mb-[30px] md:text-xl">
               2025년 주류대상 선정
             </p>
-            <h1 className="mb-10 text-[40px] font-bold text-[#333333]">
+            <h1 className="mb-8 text-[30px] leading-tight font-bold text-[#333333] md:mb-10 md:text-[40px]">
               <span className="mb-2 block">
                 한 잔 취향의 특별한 인천 패키지
               </span>
             </h1>
             <Link to={`/package/${featuredPackageId}`}>
-              <Button variant="VARIANT9">구매하기</Button>
+              <Button variant="VARIANT9" className="w-full max-w-[197px]">
+                구매하기
+              </Button>
             </Link>
           </div>
         </div>

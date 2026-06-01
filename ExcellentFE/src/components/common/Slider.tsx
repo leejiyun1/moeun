@@ -18,12 +18,17 @@ const Slider = ({
   const displayValue = value?.[0] ?? 0
 
   return (
-    <div className={clsx('flex w-[480px] items-center', className)}>
-      <span className="text-5 mr-[44px] w-13 text-center font-bold text-[#333333] select-none">
+    <div
+      className={clsx(
+        'flex w-full flex-col gap-3 sm:flex-row sm:items-center lg:w-[480px]',
+        className
+      )}
+    >
+      <span className="text-5 w-13 shrink-0 text-left font-bold text-[#333333] select-none sm:mr-[44px] sm:text-center">
         {label}
       </span>
-      <div className="flex items-center">
-        <div className="mr-3 text-[22px] font-light">
+      <div className="flex min-w-0 flex-1 items-center">
+        <div className="mr-3 shrink-0 text-[18px] font-light sm:text-[22px]">
           {formatValue ? formatValue(0) : '0'}
         </div>
         <SliderPrimitive.Root
@@ -33,7 +38,7 @@ const Slider = ({
           max={max}
           step={step}
           className={clsx(
-            'relative flex h-[20px] w-[308px] cursor-pointer touch-none items-center select-none',
+            'relative flex h-[20px] min-w-0 flex-1 cursor-pointer touch-none items-center select-none sm:w-[308px] sm:flex-none',
             className
           )}
         >
@@ -55,7 +60,7 @@ const Slider = ({
             </div>
           </SliderPrimitive.Thumb>
         </SliderPrimitive.Root>
-        <div className="ml-3 text-[22px] font-light">
+        <div className="ml-3 shrink-0 text-[18px] font-light sm:text-[22px]">
           {formatValue ? formatValue(displayValue) : displayValue.toFixed(1)}
         </div>
       </div>

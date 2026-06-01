@@ -15,7 +15,7 @@ const TestButton = ({
 }: TestButtonProps) => {
   return (
     <button
-      className={`h-[59px] w-[460px] rounded-[60px] text-xl ${className} cursor-pointer`}
+      className={`h-[59px] w-full max-w-[460px] rounded-[60px] px-5 text-base sm:text-xl ${className} cursor-pointer`}
       onClick={onClick}
       disabled={disabled}
     >

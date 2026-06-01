@@ -69,7 +69,7 @@ const Input = ({
       <div
         className={clsx(
           'relative',
-          variant === 'search' ? 'w-[360px]' : 'w-full'
+          variant === 'search' ? 'w-full max-w-[360px]' : 'w-full'
         )}
       >
         <input

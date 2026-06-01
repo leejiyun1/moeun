@@ -118,17 +118,17 @@ const MainStep = ({ setStep }: MainStepProps) => {
 
   return (
     <div className="flex flex-col items-center">
-      <p className="mt-[80px] mb-[10px] text-[40px] font-bold text-[#333333]">
+      <p className="mt-14 mb-[10px] px-5 text-center text-[30px] font-bold text-[#333333] sm:mt-[80px] sm:text-[40px]">
         내 입맛에 맞는 전통주는?
       </p>
       <p className="text-lg text-[#666666]">나는 어떤 입맛일까?</p>
-      <p className="mb-[50px] text-lg text-[#666666]">
+      <p className="mb-[50px] px-5 text-center text-lg text-[#666666]">
         테스트 후 나만의 전통주를 찾아보세요!
       </p>
       <img
         src={testMain}
         alt="모은 테스트 메인"
-        className="mb-[50px] h-[340px] w-[380px]"
+        className="mb-[50px] h-auto w-full max-w-[380px] px-5"
       />
       <TestButton
         className="mb-[57px] bg-[#2E2F2F] text-[#FFFFFF]"
@@ -154,7 +154,7 @@ const MainStep = ({ setStep }: MainStepProps) => {
             onClose={handleCloseModal}
             title="공유하기"
           >
-            <div className="mt-[51px] flex space-x-[46px]">
+            <div className="mt-[51px] flex flex-wrap justify-center gap-6 sm:gap-[46px]">
               {SNS_SHARE.map((option, index) => (
                 <div key={`${option.label} - ${index}`}>
                   <img

@@ -7,11 +7,11 @@ const MonthProductsSection = ({
   monthCards: CardBaseProps[]
 }) => {
   return (
-    <section className="py-16">
-      <div className="container mx-auto">
-        <div className="flex flex-row items-start">
-          <div className="w-80 flex-shrink-0">
-            <h2 className="mb-4 text-3xl font-bold text-[#333333]">
+    <section className="py-14 md:py-16">
+      <div className="mx-auto w-full max-w-[1280px] px-5 sm:px-8 lg:px-10 xl:px-0">
+        <div className="flex flex-col items-start gap-8 lg:flex-row">
+          <div className="w-full shrink-0 lg:w-80">
+            <h2 className="mb-4 text-2xl font-bold text-[#333333] md:text-3xl">
               이달의 전통주
             </h2>
             <p className="text-[#666666]">

@@ -139,11 +139,15 @@ const ProgressStep = ({
         ]
         return (
           <div key={question?.id} className="flex w-full flex-col items-center">
-            <p className="mt-[80px] mb-[127px] text-[#666666]">
+            <p className="mt-14 mb-20 text-[#666666] sm:mt-[80px] sm:mb-[127px]">
               {index + 1} / {data.length}
             </p>
-            <p className="mb-3.5 text-[26px] font-bold">{question?.id}.</p>
-            <p className="mb-[60px] text-[26px]">{question?.question}</p>
+            <p className="mb-3.5 text-[22px] font-bold sm:text-[26px]">
+              {question?.id}.
+            </p>
+            <p className="mb-[60px] px-5 text-center text-[22px] sm:text-[26px]">
+              {question?.question}
+            </p>
             <TestButton
               className={
                 isClicked === 'A'

@@ -1,4 +1,5 @@
 import StarRating from '@/components/common/StarRating'
+import SafeImage from '@/components/common/SafeImage'
 import { useProductFeedbacks } from '@/hooks/feedback/useProductFeedbacks'
 
 interface DetailFeedbackProps {
@@ -7,7 +8,11 @@ interface DetailFeedbackProps {
 }
 
 const DetailFeedback = ({ productId, reviewCount }: DetailFeedbackProps) => {
-  const { data: feedbacks = [], isLoading, isError } = useProductFeedbacks(productId)
+  const {
+    data: feedbacks = [],
+    isLoading,
+    isError,
+  } = useProductFeedbacks(productId)
 
   return (
     <div className="mb-[100px]">
@@ -59,7 +64,7 @@ const DetailFeedback = ({ productId, reviewCount }: DetailFeedbackProps) => {
                   </p>
                 </div>
                 {feedback.image_url && (
-                  <img
+                  <SafeImage
                     src={feedback.image_url}
                     alt={`${feedback.product_name} 후기 이미지`}
                     className="h-22 w-22 rounded-[10px] object-cover"

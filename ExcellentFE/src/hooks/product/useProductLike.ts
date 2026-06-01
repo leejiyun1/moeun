@@ -1,5 +1,5 @@
 import { toggleProductLike } from '@/api/productApi'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 export const useProductLike = (
   productId?: string | number,
@@ -7,6 +7,10 @@ export const useProductLike = (
 ) => {
   const [isLiked, setIsLiked] = useState(initialLiked)
   const [isPending, setIsPending] = useState(false)
+
+  useEffect(() => {
+    setIsLiked(initialLiked)
+  }, [initialLiked, productId])
 
   const toggleLike = async () => {
     if (!productId || isPending) return

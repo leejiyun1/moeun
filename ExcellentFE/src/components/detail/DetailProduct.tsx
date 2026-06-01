@@ -25,10 +25,10 @@ const DetailProduct = ({
   onPurchase,
 }: DetailProductProps) => {
   return (
-    <div className="grid grid-cols-2 gap-8">
+    <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
       <DetailCard
         id={data.id}
-        className="h-50 w-50 sm:h-100 sm:w-100 md:h-100 md:w-100 lg:h-140 lg:w-140"
+        className="mx-auto aspect-square h-auto w-full max-w-[560px]"
         imgSrc={
           Array.isArray(data.images)
             ? data.images.find((img) => img.is_main)?.image_url || ''
@@ -39,9 +39,9 @@ const DetailProduct = ({
       />
 
       <div className="space-y-4">
-        <div className="grid grid-cols-2 border-b pb-4">
-          <div className="ml-6">
-            <h1 className="mb-3 text-[40px] font-bold text-[#333333]">
+        <div className="grid grid-cols-1 gap-4 border-b pb-4 md:grid-cols-2">
+          <div className="md:ml-6">
+            <h1 className="mb-3 text-[32px] leading-tight font-bold text-[#333333] md:text-[40px]">
               {data.name}
             </h1>
             <div className="flex items-center gap-3">
@@ -58,7 +58,7 @@ const DetailProduct = ({
               )}
             </div>
           </div>
-          <div className="mr-2 mb-3 flex items-center justify-end gap-2">
+          <div className="mb-3 flex items-center gap-2 md:mr-2 md:justify-end">
             <StarRating defaultRating={5} readOnly />
             <span className="mr-2 text-sm text-[#666666] underline">
               ({data.review_count}개의 리뷰)
@@ -69,7 +69,7 @@ const DetailProduct = ({
         <div className="mt-8 flex flex-col gap-6 border-b border-[#D9D9D9] pb-5">
           <div className="flex items-center">
             <div>수량</div>
-            <div className="ml-[110px] inline-flex h-8 w-20 items-center justify-center rounded-[5px] bg-[#f6f6f6]">
+            <div className="ml-10 inline-flex h-8 w-20 items-center justify-center rounded-[5px] bg-[#f6f6f6] md:ml-[110px]">
               <button
                 aria-label="수량 감소"
                 onClick={onDecreaseQuantity}
@@ -107,11 +107,11 @@ const DetailProduct = ({
             </span>
           </div>
 
-          <div className="flex gap-[10px]">
-            <Button variant="VARIANT12" onClick={onAddCart}>
+          <div className="flex flex-col gap-[10px] sm:flex-row">
+            <Button variant="VARIANT12" className="w-full" onClick={onAddCart}>
               장바구니
             </Button>
-            <Button variant="VARIANT13" onClick={onPurchase}>
+            <Button variant="VARIANT13" className="w-full" onClick={onPurchase}>
               구매하기
             </Button>
           </div>

@@ -26,6 +26,7 @@ const Footer = () => {
       setIsVisible(isNearBottom)
     }
 
+    handleScroll()
     window.addEventListener('scroll', handleScroll)
     return () => window.removeEventListener('scroll', handleScroll)
   }, [isFloatingPage])
@@ -33,24 +34,20 @@ const Footer = () => {
   return (
     <footer
       className={cn(
-        'text-base text-white',
+        'w-full bg-[#2E2F2F] text-white',
         isFloatingPage
           ? [
-              'fixed right-0 bottom-0 left-0',
-              'transition-transform duration-300',
-              isVisible ? 'translate-y-0' : 'translate-y-full',
+              'relative md:fixed md:right-0 md:bottom-0 md:left-0',
+              'md:transition-transform md:duration-300',
+              isVisible ? 'md:translate-y-0' : 'md:translate-y-full',
             ]
-          : 'relative mt-auto w-full'
+          : 'relative mt-auto'
       )}
-      style={{
-        backgroundColor: '#2E2F2F',
-        height: '255px',
-        zIndex: Z_INDEX.FOOTER,
-      }}
+      style={{ zIndex: Z_INDEX.FOOTER }}
     >
-      <div className="max-w-10xl mx-auto flex h-full flex-col justify-between px-80 py-[50px] text-sm">
-        <div className="mb-4 flex flex-col items-start justify-between space-y-4 lg:flex-row lg:items-center lg:space-y-0">
-          <div className="flex flex-col space-y-2">
+      <div className="mx-auto flex min-h-[255px] w-full max-w-[1440px] flex-col justify-between px-5 py-8 text-xs leading-6 sm:px-8 md:px-10 md:py-[50px] md:text-sm xl:px-20 2xl:px-80">
+        <div className="mb-6 flex flex-col items-start justify-between gap-6 lg:flex-row lg:items-center">
+          <div className="flex flex-col gap-1.5 break-keep">
             <span>상호명 : 모은 | 대표 : 김영선</span>
             <span>
               주소 : 인천광역시 부평구 충선로209번길 13, 407-1호 | 고객센터 :
@@ -60,12 +57,18 @@ const Footer = () => {
           </div>
 
           <Link to="/" aria-label="홈으로 이동" className="shrink-0">
-            <img src={Logo} alt="모은 취향 추천 로고" />
+            <img
+              src={Logo}
+              alt="모은 취향 추천 로고"
+              className="h-10 w-auto md:h-auto"
+            />
           </Link>
         </div>
 
-        <div className="border-t border-white/30 pt-8">
-          <p className="text-white/50">Copyright © 모은. All right reserved.</p>
+        <div className="border-t border-white/30 pt-6 md:pt-8">
+          <p className="text-white/50">
+            Copyright © 모은. All right reserved.
+          </p>
         </div>
       </div>
     </footer>

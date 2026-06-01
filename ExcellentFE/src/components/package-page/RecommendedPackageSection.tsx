@@ -9,10 +9,10 @@ const RecommendedPackageSection = ({
 }) => {
   const { user } = useAuthStore()
   return (
-    <section className="py-16">
-      <div className="container mx-auto">
+    <section className="py-14 md:py-16">
+      <div className="mx-auto w-full max-w-[1280px] px-5 sm:px-8 lg:px-10 xl:px-0">
         <div className="mb-12">
-          <h2 className="mb-4 text-3xl font-bold text-[#333333]">
+          <h2 className="mb-4 text-2xl font-bold text-[#333333] md:text-3xl">
             추천 패키지
           </h2>
           <p className="text-[#666666]">

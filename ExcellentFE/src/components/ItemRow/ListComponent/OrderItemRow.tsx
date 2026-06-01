@@ -1,4 +1,5 @@
 import Button from '@/components/common/Button'
+import SafeImage from '@/components/common/SafeImage'
 import { useOrderItemRow } from '@/hooks/useOrderItemRow'
 import TastingReviewModal from '@/pages/my-page/TastingReviewModal'
 import type { ItemRowType } from '@/types/ItemRow/itemRows'
@@ -43,7 +44,11 @@ const OrderItemRow = ({
 
         <div className="flex w-[40%] min-w-[250px] items-center gap-4 pl-2">
           <div className="ml-36 flex items-center justify-center overflow-hidden border">
-            <img src={img} alt={name || '상품 이미지'} className="h-25 w-25" />
+            <SafeImage
+              src={img}
+              alt={name || '상품 이미지'}
+              className="h-25 w-25 object-contain p-1"
+            />
           </div>
           <p className="text-left text-lg font-bold">{name}</p>
         </div>

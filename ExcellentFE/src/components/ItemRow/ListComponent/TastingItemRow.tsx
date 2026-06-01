@@ -1,3 +1,5 @@
+import SafeImage from '@/components/common/SafeImage'
+
 interface TastingItemRowProps {
   img: string
   name: string
@@ -14,7 +16,7 @@ const TastingItemRow = ({
   return (
     <div className="flex items-center border-b border-[#e1e1e1] py-4 text-[#666666]">
       <div className="ml-10 flex items-center justify-center gap-4">
-        <img
+        <SafeImage
           src={img}
           alt={name}
           className="h-25 w-25 rounded-[5px] border border-[#d9d9d9] object-cover"

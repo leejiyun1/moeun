@@ -12,7 +12,7 @@ const SliderGroup = ({ filters, onSliderChange }: SliderGroupProps) => {
   )
 
   const renderSliders = (sliders: SliderConfig[]) => (
-    <div className="flex h-[181px] flex-col justify-between gap-[30px]">
+    <div className="flex w-full flex-col justify-between gap-[30px] md:h-[181px]">
       {sliders.map(({ filterKey, label, variant }) => (
         <Slider
           key={filterKey}
@@ -26,7 +26,7 @@ const SliderGroup = ({ filters, onSliderChange }: SliderGroupProps) => {
   )
 
   return (
-    <div className="flex gap-8">
+    <div className="flex w-full flex-col gap-8 lg:flex-row">
       {renderSliders(leftSliders)}
       {renderSliders(rightSliders)}
     </div>

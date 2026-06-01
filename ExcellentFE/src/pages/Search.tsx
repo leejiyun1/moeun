@@ -71,19 +71,19 @@ const Search = () => {
         onKeywordChange={updateKeyword}
         onSearch={handleKeywordSearch}
       />
-      <div className="mb-25 flex flex-col items-center">
-        <div className="mb-[17px] flex w-320 items-center justify-between">
+      <div className="mb-20 flex flex-col items-center px-5 md:mb-25">
+        <div className="mb-[17px] flex w-full max-w-[1280px] flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <h2 className="text-[24px] font-bold text-[#333333]">상세 검색</h2>
           <Button
             onClick={handleFilterSearch}
             variant="VARIANT7"
-            className="h-[39px] w-[117px]"
+            className="h-[39px] w-full sm:w-[117px]"
           >
             필터 적용하기
           </Button>
         </div>
 
-        <div className="flex min-h-[266px] w-320 items-center justify-center rounded-[6px] bg-[#F2F2F2] px-8">
+        <div className="flex min-h-[266px] w-full max-w-[1280px] items-center justify-center rounded-[6px] bg-[#F2F2F2] px-5 py-8 md:px-8">
           <SliderGroup filters={filters} onSliderChange={updateSliderValue} />
         </div>
       </div>

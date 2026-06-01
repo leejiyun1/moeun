@@ -38,7 +38,7 @@ const Detail = () => {
   }
 
   return (
-    <div className="mx-auto mt-25 flex max-w-320 flex-col gap-25">
+    <div className="mx-auto mt-16 flex w-full max-w-[1280px] flex-col gap-16 px-5 sm:px-8 md:mt-25 md:gap-25 lg:px-10 xl:px-0">
       <DetailProduct
         data={data}
         quantity={localQuantity}
@@ -54,10 +54,8 @@ const Detail = () => {
         <div className="border-b-2 pb-5 text-lg font-bold">
           구매 및 수령 방식
         </div>
-        <div className="mt-[35px] h-40 w-313 bg-[#f2f2f2]">
-          <span className="flex h-full items-center justify-center font-semibold">
-            수도권 픽업 가능한 상품입니다.
-          </span>
+        <div className="mt-[35px] flex min-h-40 w-full items-center justify-center bg-[#f2f2f2] px-5 text-center">
+          <span className="font-semibold">수도권 픽업 가능한 상품입니다.</span>
         </div>
       </div>
 

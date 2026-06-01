@@ -21,10 +21,10 @@ const TestContainer = () => {
   const [testResult, setTestResult] = useState<TasteTestResult>()
 
   return (
-    <div className="min-h-screen overflow-y-scroll bg-[#F2F2F2]">
-      <div className="mt-[100px] flex flex-col items-center">
+    <div className="min-h-screen overflow-y-auto bg-[#F2F2F2] px-4">
+      <div className="mt-12 flex flex-col items-center md:mt-[100px]">
         {/* 빨간 박스 */}
-        <div className="relative flex h-[70px] w-[560px] items-center justify-center rounded-tl-[20px] rounded-tr-[20px] bg-[#F2544B]">
+        <div className="relative flex h-[70px] w-full max-w-[560px] items-center justify-center rounded-tl-[20px] rounded-tr-[20px] bg-[#F2544B]">
           {step === 'question' && (
             <Icon
               icon={leftArrow}
@@ -43,7 +43,7 @@ const TestContainer = () => {
         </div>
         {/* 메인 박스 */}
         <div
-          className="mb-[100px] w-[560px] rounded-bl-[20px] bg-cover"
+          className="mb-[100px] w-full max-w-[560px] rounded-bl-[20px] bg-cover"
           style={{ backgroundImage: `url(${testTestBg})` }}
         >
           {/* 분기처리 */}

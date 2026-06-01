@@ -17,33 +17,35 @@ const MyPageLayout = () => {
     : baseMenuItems
 
   return (
-    <>
+    <div className="min-h-screen bg-white lg:flex">
       <nav
-        className="fixed top-0 left-0 h-screen w-[260px] bg-[#F2F2F2] px-[52px] pt-[152px]"
+        className="sticky top-16 w-full border-b border-[#d9d9d9] bg-[#F2F2F2] px-5 py-5 md:top-[90px] lg:fixed lg:top-0 lg:left-0 lg:h-screen lg:w-[260px] lg:border-b-0 lg:px-[52px] lg:pt-[152px]"
         style={{ zIndex: Z_INDEX.SIDEBAR }}
       >
-        <h2 className="mb-8 text-3xl font-bold text-[#333]">마이페이지</h2>
-        <ul className="text-18px flex flex-col gap-4 text-[#666]">
-          {menuItems.map(({ to, label }) => {
-            return (
-              <li key={to}>
-                <NavLink
-                  to={to}
-                  className={({ isActive }) =>
-                    isActive ? 'border-b-2 font-bold' : 'font-medium'
-                  }
-                >
-                  {label}
-                </NavLink>
-              </li>
-            )
-          })}
+        <h2 className="mb-4 text-2xl font-bold text-[#333] lg:mb-8 lg:text-3xl">
+          마이페이지
+        </h2>
+        <ul className="flex gap-3 overflow-x-auto text-sm text-[#666] lg:flex-col lg:gap-4 lg:overflow-visible lg:text-base">
+          {menuItems.map(({ to, label }) => (
+            <li key={to} className="shrink-0">
+              <NavLink
+                to={to}
+                className={({ isActive }) =>
+                  isActive
+                    ? 'block border-b-2 border-[#333333] py-1 font-bold text-[#333333]'
+                    : 'block py-1 font-medium'
+                }
+              >
+                {label}
+              </NavLink>
+            </li>
+          ))}
         </ul>
       </nav>
-      <section className="mx-auto ml-[320px] w-[1280px] min-w-[1280px] pt-[106px] pb-[100px]">
+      <section className="w-full px-5 pt-10 pb-[100px] sm:px-8 lg:ml-[320px] lg:max-w-[1280px] lg:px-0 lg:pt-[106px]">
         <Outlet />
       </section>
-    </>
+    </div>
   )
 }
 

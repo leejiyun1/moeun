@@ -37,7 +37,7 @@ const Modal = ({
     <Portal containerId={PORTAL_CONTAINER_ID.MODAL}>
       <div
         onClick={handleOverlayClick}
-        className="fixed inset-0 flex items-center justify-center bg-black/25"
+        className="fixed inset-0 flex items-center justify-center overflow-y-auto bg-black/25 px-4 py-8"
         style={{ zIndex: Z_INDEX.MODAL_OVERLAY }}
       >
         <FocusLock>
@@ -46,7 +46,7 @@ const Modal = ({
             aria-modal="true"
             {...(title && { 'aria-labelledby': 'modal-title' })}
             className={cn(
-              'relative flex w-170 flex-col items-center rounded-[20px] bg-white px-[40px] py-[100px]',
+              'relative flex w-full max-w-170 flex-col items-center rounded-[20px] bg-white px-5 py-16 sm:px-[40px] sm:py-[100px]',
               className
             )}
             style={{ zIndex: Z_INDEX.MODAL }}

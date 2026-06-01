@@ -3,6 +3,7 @@ import type { CartItemRowProps } from '@/types/ItemRow/itemRows'
 import PlusIcon from '@/assets/icons/cart/plus.svg?react'
 import MinusIcon from '@/assets/icons/cart/minus.svg?react'
 import Icon from '@/components/common/Icon'
+import SafeImage from '@/components/common/SafeImage'
 import useCartItem from '@/hooks/cart/useCartItem'
 
 const CartItemRow = ({
@@ -33,10 +34,10 @@ const CartItemRow = ({
           className="ml-12 h-5 w-5 accent-[#f2544b]"
         />
         <Link to={`/product/${detailId}`}>
-          <img
-            src={img || '상품 이미지'}
+          <SafeImage
+            src={img}
             alt={name || '상품 이름'}
-            className="h-25 w-25 rounded border border-[#d9d9d9]"
+            className="h-25 w-25 rounded border border-[#d9d9d9] object-contain p-1"
           />
         </Link>
         <p className="text-left text-lg font-bold">{name || '상품 이름'}</p>

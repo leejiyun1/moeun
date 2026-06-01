@@ -1,41 +1,46 @@
+import CardCarousel from '@/components/common/cards/CardCarousel'
+import CardGrid from '@/components/common/cards/CardGrid'
 import type {
+  BestReviewCardProps,
   CardBaseProps,
   ReviewCardProps,
   TestCardProps,
-  BestReviewCardProps,
 } from '@/types/cardProps'
-import Card from '@/components/common/cards/Card.tsx'
+
+type CardListOptions = {
+  columns?: 3 | 4
+  carousel?: boolean
+  slidesToShow?: number
+  gap?: string
+  responsive?: {
+    mobile?: number
+    tablet?: number
+    desktop?: number
+  }
+}
 
 type CardListProps =
-  | { type: 'default'; cards: CardBaseProps[]; columns?: 3 | 4 }
-  | { type: 'review'; cards: ReviewCardProps[]; columns?: 3 | 4 }
-  | { type: 'test'; cards: TestCardProps[]; columns?: 3 | 4 }
-  | { type: 'best'; cards: BestReviewCardProps[]; columns?: 3 | 4 }
+  | ({ type: 'default'; cards: CardBaseProps[] } & CardListOptions)
+  | ({ type: 'review'; cards: ReviewCardProps[] } & CardListOptions)
+  | ({ type: 'test'; cards: TestCardProps[] } & CardListOptions)
+  | ({ type: 'best'; cards: BestReviewCardProps[] } & CardListOptions)
 
 const CardList = (props: CardListProps) => {
   const columns = props.columns ?? 4
 
-  const colClass = columns === 3 ? 'grid-cols-3' : 'grid-cols-4'
-  return (
-    <div className={`mx-auto grid max-w-[1281px] ${colClass} gap-[27px]`}>
-      {props.cards.map((card, i) => {
-        switch (props.type) {
-          case 'default':
-            return <Card key={i} type="default" data={card as CardBaseProps} />
-          case 'review':
-            return <Card key={i} type="review" data={card as ReviewCardProps} />
-          case 'test':
-            return <Card key={i} type="test" data={card as TestCardProps} />
-          case 'best':
-            return (
-              <Card key={i} type="best" data={card as BestReviewCardProps} />
-            )
-          default:
-            return null
-        }
-      })}
-    </div>
-  )
+  if (props.carousel) {
+    return (
+      <CardCarousel
+        type={props.type}
+        cards={props.cards}
+        slidesToShow={props.slidesToShow ?? columns}
+        gap={props.gap ?? '27px'}
+        responsive={props.responsive}
+      />
+    )
+  }
+
+  return <CardGrid type={props.type} cards={props.cards} columns={columns} />
 }
 
 export default CardList

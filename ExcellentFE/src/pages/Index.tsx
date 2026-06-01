@@ -61,17 +61,17 @@ const Home = () => {
   return (
     <div className="min-h-screen bg-white">
       {/* 히어로 섹션 */}
-      <section className="relative h-[650px]">
+      <section className="relative min-h-[520px] md:h-[650px]">
         <div
           className="absolute inset-0 h-full w-full bg-cover bg-center bg-no-repeat"
           style={{ backgroundImage: `url('${banner}')` }}
         />
-        <div className="relative z-10 container mx-auto flex h-full items-center">
+        <div className="relative z-10 mx-auto flex h-full min-h-[520px] w-full max-w-[1280px] items-center px-5 sm:px-8 md:min-h-0 lg:px-10 xl:px-0">
           <div className="max-w-2xl">
-            <p className="mb-[30px] text-xl text-[#333333]">
+            <p className="mb-5 text-base text-[#333333] md:mb-[30px] md:text-xl">
               나의 입맛 전통주, 어떤 것이 내 취향일지 모르겠다구요?
             </p>
-            <h1 className="mb-10 text-[40px] font-bold text-[#333333]">
+            <h1 className="mb-8 text-[30px] leading-tight font-bold text-[#333333] md:mb-10 md:text-[40px]">
               <span className="mb-1 block">당신의 전통주 한 잔,</span>
               <span className="mb-1 block">
                 한 잔 취향만의 입맛 테스트를 통해
@@ -79,7 +79,9 @@ const Home = () => {
               <span className="block">당신의 맛을 찾아보세요!</span>
             </h1>
             <Link to="/test">
-              <Button variant="VARIANT9">지금 테스트하러 가기</Button>
+              <Button variant="VARIANT9" className="w-full max-w-[197px]">
+                지금 테스트하러 가기
+              </Button>
             </Link>
           </div>
         </div>

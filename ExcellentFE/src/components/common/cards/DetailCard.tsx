@@ -1,5 +1,6 @@
 import type { CardBaseProps } from '@/types/cardProps'
 import HeartButton from '@/components/common/HeartButton.tsx'
+import SafeImage from '@/components/common/SafeImage'
 import { useProductLike } from '@/hooks/product/useProductLike'
 
 interface DetailCardProps extends CardBaseProps {
@@ -17,7 +18,11 @@ const DetailCard = ({
   return (
     <div className={className}>
       <div className="relative flex h-full w-full items-center justify-center overflow-hidden rounded-[6px] border border-[#D9D9D9] bg-gray-200">
-        <img src={imgSrc} alt={imgAlt} className="h-full w-full object-cover" />
+        <SafeImage
+          src={imgSrc}
+          alt={imgAlt}
+          className="h-full w-full object-contain p-4"
+        />
         <HeartButton
           isLiked={isLiked}
           onClick={toggleLike}
