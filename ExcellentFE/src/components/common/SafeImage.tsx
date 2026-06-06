@@ -6,6 +6,21 @@ interface SafeImageProps extends React.ImgHTMLAttributes<HTMLImageElement> {
   fallbackSrc?: string
 }
 
+const normalizeImageSrc = (value?: string) => {
+  if (!value) return value
+
+  try {
+    const parsed = new URL(value)
+    if (['localhost', '127.0.0.1', '0.0.0.0'].includes(parsed.hostname)) {
+      return `${parsed.pathname}${parsed.search}${parsed.hash}`
+    }
+  } catch {
+    return value
+  }
+
+  return value
+}
+
 const SafeImage = ({
   src,
   fallbackSrc = defaultProductImage,
@@ -14,10 +29,12 @@ const SafeImage = ({
   onError,
   ...props
 }: SafeImageProps) => {
-  const [currentSrc, setCurrentSrc] = useState(src || fallbackSrc)
+  const [currentSrc, setCurrentSrc] = useState(
+    normalizeImageSrc(src) || fallbackSrc
+  )
 
   useEffect(() => {
-    setCurrentSrc(src || fallbackSrc)
+    setCurrentSrc(normalizeImageSrc(src) || fallbackSrc)
   }, [fallbackSrc, src])
 
   return (

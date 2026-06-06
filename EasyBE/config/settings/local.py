@@ -4,10 +4,12 @@ DEBUG = True
 ALLOWED_HOSTS = ["*"]
 
 # Static files (CSS, JavaScript, Images)
-STATIC_URL = "static/"
+BASE_URL = os.getenv("BASE_URL", "")
+
+STATIC_URL = "/static/"
 STATIC_ROOT = ARTIFACTS_DIR / "backend" / "staticfiles"
 
-MEDIA_URL = "media/"
+MEDIA_URL = "/media/"
 MEDIA_ROOT = ARTIFACTS_DIR / "backend" / "media"
 
 INTERNAL_IPS = [

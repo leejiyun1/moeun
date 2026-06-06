@@ -1,4 +1,5 @@
 import { ROUTE_PATHS } from '@/constants/routePaths'
+import { getSocialRedirectUri, SOCIAL_LOGIN } from '@/constants/socialLoginUrl'
 import { useSocialLogin } from '@/hooks/auth/useSocialLogin'
 import { type SocialProvider } from '@/types/auth'
 import { useEffect } from 'react'
@@ -21,9 +22,22 @@ const SocialCallback = () => {
     }
 
     if (provider === 'naver' && state) {
-      socialLogin({ code, state })
+      socialLogin({
+        code,
+        state,
+        redirect_uri: getSocialRedirectUri(
+          provider,
+          SOCIAL_LOGIN[provider].redirectUri
+        ),
+      })
     } else {
-      socialLogin({ code })
+      socialLogin({
+        code,
+        redirect_uri: getSocialRedirectUri(
+          provider,
+          SOCIAL_LOGIN[provider].redirectUri
+        ),
+      })
     }
   }, [provider, code, state, socialLogin, navigate])
 

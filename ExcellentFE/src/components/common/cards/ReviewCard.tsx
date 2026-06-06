@@ -64,7 +64,7 @@ const ReviewCard = ({
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         title={modalTitle}
-        className="review-modal-scroll h-[900px] w-170 overflow-x-hidden overflow-y-auto"
+        className="review-modal-scroll h-[min(900px,90vh)] w-[min(680px,calc(100vw-32px))] overflow-x-hidden overflow-y-auto"
       >
         <div>
           <SafeImage
@@ -72,7 +72,9 @@ const ReviewCard = ({
             alt={imgAlt || '모은 주류'}
             className="mt-14 mb-[34px] h-auto max-h-119 w-full max-w-150 rounded-[10px] border border-[#333333] object-contain"
           />
-          <p className="pb-[4px] text-[40px]">{product_name}</p>
+          <p className="pb-[4px] text-[28px] font-semibold md:text-[40px]">
+            {product_name}
+          </p>
           <StarRating
             totalStars={5}
             readOnly
@@ -81,13 +83,17 @@ const ReviewCard = ({
             showRatingValue={false}
             className="my-[23px]"
           />
-          <p className="mb-15 w-140 text-[22px] text-[#333333]">{review}</p>
-          <div className="mb-[101px] flex w-[250px] justify-between text-[22px] text-[#666666]">
+          <p className="mb-10 text-base leading-7 text-[#333333] md:mb-15 md:text-[22px] md:leading-8">
+            {review}
+          </p>
+          <div className="mb-12 flex w-full max-w-[250px] justify-between text-base text-[#666666] md:mb-[101px] md:text-[22px]">
             <p> {userId ? maskingUserId(userId) : 'Unknown User'}</p>
             <p>{date ? date.slice(0, 10) : ''}</p>
           </div>
           <Link to={`/product/${String(product_id)}`}>
-            <Button>제품 상세보기</Button>
+            <Button className="h-14 w-full text-base md:h-[72px] md:text-2xl">
+              제품 상세보기
+            </Button>
           </Link>
         </div>
       </Modal>

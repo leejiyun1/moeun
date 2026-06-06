@@ -151,11 +151,11 @@ const ResultStep = ({
       </div>
 
       {/* 취향 패키지 추천 조합 섹션 */}
-      <div className="mb-20 w-full">
-        <p className="mb-4 px-5 text-xl font-bold text-[#333333] sm:ml-[57px] sm:px-0">
+      <div className="mb-14 w-full max-w-[500px] px-5 sm:px-0">
+        <p className="mb-5 text-center text-xl leading-[1.4] font-bold text-[#333333]">
           {testResult?.type} 유형을 위한 첫 번째 추천 조합
         </p>
-        <div className="flex justify-center">
+        <div className="flex justify-center overflow-x-auto">
           <CardList type="test" cards={testCardData} columns={3} />
         </div>
       </div>

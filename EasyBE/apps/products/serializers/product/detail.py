@@ -37,6 +37,7 @@ class ProductDrinkSerializer(serializers.ModelSerializer):
             "alcohol_type_display",
             "abv",
             "volume_ml",
+            "food_pairing",
             "taste_profile",
             "created_at",
             "updated_at",
@@ -60,6 +61,7 @@ class PackageDrinkSerializer(serializers.ModelSerializer):
             "alcohol_type_display",
             "abv",
             "volume_ml",
+            "food_pairing",
         ]
 
 

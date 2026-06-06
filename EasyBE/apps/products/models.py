@@ -17,6 +17,7 @@ class Brewery(models.Model):
     phone = models.CharField(max_length=20, null=True, blank=True, help_text="연락처")
     description = models.TextField(null=True, blank=True, help_text="양조장 설명")
     image_url = models.URLField(max_length=255, null=True, blank=True, help_text="양조장 이미지 URL")
+    homepage_url = models.URLField(max_length=500, null=True, blank=True)
     is_active = models.BooleanField(default=True, help_text="활성 상태")
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -57,6 +58,7 @@ class Drink(models.Model):
         help_text="알코올 도수(%)",
     )
     volume_ml = models.PositiveIntegerField(help_text="용량(ml)")
+    food_pairing = models.TextField(blank=True)
 
     # 맛 프로필 (0.0 ~ 5.0)
     sweetness_level = models.DecimalField(

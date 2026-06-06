@@ -7,7 +7,7 @@ from django.conf import settings
 
 class KakaoService:
     @staticmethod
-    def get_access_token(authorization_code: str) -> Dict[str, Any]:
+    def get_access_token(authorization_code: str, redirect_uri: str | None = None) -> Dict[str, Any]:
         """
         1단계: authorization code로 access token 요청
         """
@@ -15,7 +15,7 @@ class KakaoService:
         data = {
             "grant_type": "authorization_code",
             "client_id": settings.KAKAO_CLIENT_ID,
-            "redirect_uri": settings.KAKAO_REDIRECT_URI,
+            "redirect_uri": redirect_uri or settings.KAKAO_REDIRECT_URI,
             "code": authorization_code,
         }
 

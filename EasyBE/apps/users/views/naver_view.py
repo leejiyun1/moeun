@@ -27,10 +27,11 @@ class NaverLoginView(APIView):
 
         authorization_code = serializer.validated_data["code"]
         state = serializer.validated_data["state"]
+        redirect_uri = serializer.validated_data.get("redirect_uri")
 
         try:
             # 1. 네이버에서 access token 획득
-            token_data = NaverService.get_access_token(authorization_code, state)
+            token_data = NaverService.get_access_token(authorization_code, state, redirect_uri)
             access_token = token_data["access_token"]
 
             # 2. access token으로 네이버 사용자 정보 획득

@@ -19,7 +19,7 @@ const TastingItemRow = ({
         <SafeImage
           src={img}
           alt={name}
-          className="h-25 w-25 rounded-[5px] border border-[#d9d9d9] object-cover"
+          className="h-25 w-25 rounded-[5px] border border-[#d9d9d9] object-contain"
         />
         <p className="w-36 text-left text-base font-bold whitespace-nowrap">
           {name}

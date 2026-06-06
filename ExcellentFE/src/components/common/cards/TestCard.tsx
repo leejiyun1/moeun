@@ -10,17 +10,21 @@ const TestCard = ({
   secondLabel,
 }: TestCardProps) => {
   return (
-    <div className="flex w-[130px] flex-col">
-      <div className="relative mb-[9px] flex h-[125px] w-full items-center justify-center overflow-hidden rounded-[6px] border border-[#D9D9D9] bg-gray-200">
+    <div className="flex w-[148px] flex-col sm:w-[154px]">
+      <div className="relative mb-3 flex aspect-[1.18] w-full items-center justify-center overflow-hidden rounded-[6px] border border-[#D9D9D9] bg-white">
         <SafeImage
           src={imgSrc}
           alt={imgAlt}
-          className="h-full w-full object-contain p-2"
+          className="h-full w-full object-contain p-3"
         />
       </div>
-      <p className="mb-[9px] text-sm font-bold text-[#333333]"> {title} </p>
-      <p className="mb-[13px] text-xs font-bold text-[#666666]">{subtitle}</p>
-      <div className="flex gap-1">
+      <p className="mb-2 text-[15px] leading-[1.35] font-bold text-[#333333]">
+        {title}
+      </p>
+      <p className="mb-3 min-h-[34px] text-xs leading-[1.45] font-bold text-[#666666]">
+        {subtitle}
+      </p>
+      <div className="flex flex-wrap gap-1.5">
         <p className="flex h-[25px] items-center justify-center bg-[#FFFFFF] px-2 py-[5px] text-[11px] text-[#F2544B]">
           {firstLabel}
         </p>

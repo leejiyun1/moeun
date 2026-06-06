@@ -51,7 +51,7 @@ class BrewerySerializerTest(BaseSerializerTestCase):
 
         self.assertEqual(len(data), 3)
         first_brewery = data[0]
-        expected_fields = {"id", "name", "region", "image_url", "product_count"}
+        expected_fields = {"id", "name", "region", "image_url", "homepage_url", "product_count"}
         self.assertEqual(set(first_brewery.keys()), expected_fields)
 
 
@@ -126,7 +126,7 @@ class DrinkSerializerTest(BaseSerializerTestCase):
         self.assertEqual(set(data.keys()), expected_fields)
 
         brewery_data = data["brewery"]
-        expected_brewery_fields = {"id", "name", "region"}
+        expected_brewery_fields = {"id", "name", "region", "homepage_url"}
         self.assertEqual(set(brewery_data.keys()), expected_brewery_fields)
 
 

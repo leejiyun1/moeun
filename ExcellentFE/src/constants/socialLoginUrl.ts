@@ -7,6 +7,41 @@ interface SocialLoginConfig {
   getLoginUrl: (state: string) => string
 }
 
+const LOCAL_HOSTS = new Set(['localhost', '127.0.0.1', '0.0.0.0'])
+
+export const getSocialRedirectUri = (
+  provider: SocialProvider,
+  configuredRedirectUri?: string
+) => {
+  const fallbackPath = `/auth/${provider}/callback`
+
+  if (typeof window === 'undefined') {
+    return configuredRedirectUri ?? fallbackPath
+  }
+
+  const currentOriginRedirectUri = `${window.location.origin}${fallbackPath}`
+
+  if (!configuredRedirectUri) {
+    return currentOriginRedirectUri
+  }
+
+  try {
+    const configuredUrl = new URL(configuredRedirectUri)
+    const currentUrl = new URL(currentOriginRedirectUri)
+
+    if (
+      LOCAL_HOSTS.has(configuredUrl.hostname) &&
+      !LOCAL_HOSTS.has(currentUrl.hostname)
+    ) {
+      return currentOriginRedirectUri
+    }
+  } catch {
+    return currentOriginRedirectUri
+  }
+
+  return configuredRedirectUri
+}
+
 export const SOCIAL_LOGIN: Record<SocialProvider, SocialLoginConfig> = {
   kakao: {
     clientId: import.meta.env.VITE_KAKAO_CLIENT_ID,
@@ -17,7 +52,7 @@ export const SOCIAL_LOGIN: Record<SocialProvider, SocialLoginConfig> = {
       const params = new URLSearchParams({
         response_type: 'code',
         client_id: this.clientId,
-        redirect_uri: this.redirectUri,
+        redirect_uri: getSocialRedirectUri('kakao', this.redirectUri),
         scope: this.scope,
         state,
       })
@@ -33,7 +68,7 @@ export const SOCIAL_LOGIN: Record<SocialProvider, SocialLoginConfig> = {
       const params = new URLSearchParams({
         response_type: 'code',
         client_id: this.clientId,
-        redirect_uri: this.redirectUri,
+        redirect_uri: getSocialRedirectUri('naver', this.redirectUri),
         state,
       })
       return `${baseUrl}?${params.toString()}`
@@ -48,7 +83,7 @@ export const SOCIAL_LOGIN: Record<SocialProvider, SocialLoginConfig> = {
       const params = new URLSearchParams({
         response_type: 'code',
         client_id: this.clientId,
-        redirect_uri: this.redirectUri,
+        redirect_uri: getSocialRedirectUri('google', this.redirectUri),
         scope: this.scope,
         state,
       })

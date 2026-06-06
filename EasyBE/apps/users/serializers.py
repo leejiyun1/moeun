@@ -15,6 +15,7 @@ class KakaoLoginSerializer(serializers.Serializer):
     """카카오 로그인 요청 데이터"""
 
     code = serializers.CharField(help_text="카카오에서 받은 authorization code")
+    redirect_uri = serializers.URLField(required=False)
     # state = serializers.CharField(help_text="카카오에서 받은 state 값")
 
 
@@ -23,12 +24,14 @@ class NaverLoginSerializer(serializers.Serializer):
 
     code = serializers.CharField(help_text="네이버에서 받은 authorization code")
     state = serializers.CharField(help_text="네이버에서 받은 state 값")
+    redirect_uri = serializers.URLField(required=False)
 
 
 class GoogleLoginSerializer(serializers.Serializer):
     """구글 로그인 요청 데이터"""
 
     code = serializers.CharField(help_text="구글에서 받은 authorization code")
+    redirect_uri = serializers.URLField(required=False)
     # state = serializers.CharField(help_text="구글에서 받은 state 값")
 
 

@@ -7,7 +7,7 @@ from django.conf import settings
 
 class NaverService:
     @staticmethod
-    def get_access_token(authorization_code: str, state: str) -> Dict[str, Any]:
+    def get_access_token(authorization_code: str, state: str, redirect_uri: str | None = None) -> Dict[str, Any]:
         """
         1단계: authorization code로 access token 요청
         """
@@ -16,7 +16,7 @@ class NaverService:
             "grant_type": "authorization_code",
             "client_id": settings.NAVER_CLIENT_ID,
             "client_secret": settings.NAVER_CLIENT_SECRET,
-            "redirect_uri": settings.NAVER_REDIRECT_URI,
+            "redirect_uri": redirect_uri or settings.NAVER_REDIRECT_URI,
             "code": authorization_code,
             "state": state,
         }

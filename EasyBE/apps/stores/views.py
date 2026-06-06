@@ -6,6 +6,6 @@ from apps.stores.serializers import StoreSerializer
 
 
 class StoreViewSet(viewsets.ModelViewSet):
-    queryset = Store.objects.all().order_by("-created_at")
+    queryset = Store.objects.all().order_by("name")
     serializer_class = StoreSerializer
     permission_classes = [AllowAny]

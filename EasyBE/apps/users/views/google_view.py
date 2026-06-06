@@ -27,10 +27,11 @@ class GoogleLoginView(APIView):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
         authorization_code = serializer.validated_data["code"]
+        redirect_uri = serializer.validated_data.get("redirect_uri")
 
         try:
             # 1. 구글에서 access token 획득
-            token_data = GoogleService.get_access_token(authorization_code)
+            token_data = GoogleService.get_access_token(authorization_code, redirect_uri)
             access_token = token_data["access_token"]
 
             # 2. access token으로 구글 사용자 정보 획득

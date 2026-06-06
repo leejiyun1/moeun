@@ -4,6 +4,7 @@ export type SocialProvider = (typeof SOCIAL_PROVIDERS)[number]
 export interface SocialLoginRequest {
   code: string
   state?: string
+  redirect_uri?: string
 }
 
 export interface SocialLoginUser {

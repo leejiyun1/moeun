@@ -24,6 +24,7 @@ class DrinkCreateSerializer(serializers.ModelSerializer):
             "alcohol_type",
             "abv",
             "volume_ml",
+            "food_pairing",
             "sweetness_level",
             "acidity_level",
             "body_level",
@@ -86,7 +87,17 @@ class DrinkListSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Drink
-        fields = ["id", "name", "brewery", "alcohol_type", "alcohol_type_display", "abv", "volume_ml", "created_at"]
+        fields = [
+            "id",
+            "name",
+            "brewery",
+            "alcohol_type",
+            "alcohol_type_display",
+            "abv",
+            "volume_ml",
+            "food_pairing",
+            "created_at",
+        ]
 
 
 class DrinkForPackageSerializer(serializers.ModelSerializer):

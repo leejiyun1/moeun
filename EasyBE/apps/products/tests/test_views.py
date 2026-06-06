@@ -46,7 +46,7 @@ class BreweryAPITest(BaseAPITestCase):
         self.assertEqual(len(response.data["results"]), 4)
 
         first_brewery = response.data["results"][0]
-        expected_fields = {"id", "name", "region", "image_url", "product_count"}
+        expected_fields = {"id", "name", "region", "image_url", "homepage_url", "product_count"}
         self.assertEqual(set(first_brewery.keys()), expected_fields)
 
     def test_brewery_detail_api(self):

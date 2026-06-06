@@ -26,10 +26,11 @@ class KakaoLoginView(APIView):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
         authorization_code = serializer.validated_data["code"]
+        redirect_uri = serializer.validated_data.get("redirect_uri")
 
         try:
             # 1. 카카오에서 access token 획득
-            token_data = KakaoService.get_access_token(authorization_code)
+            token_data = KakaoService.get_access_token(authorization_code, redirect_uri)
             access_token = token_data["access_token"]
 
             # 2. access token으로 카카오 사용자 정보 획득

@@ -11,7 +11,7 @@ class BrewerySimpleSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Brewery
-        fields = ["id", "name", "region"]
+        fields = ["id", "name", "region", "homepage_url"]
 
 
 class BreweryListSerializer(serializers.ModelSerializer):
@@ -21,7 +21,7 @@ class BreweryListSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Brewery
-        fields = ["id", "name", "region", "image_url", "product_count"]
+        fields = ["id", "name", "region", "image_url", "homepage_url", "product_count"]
 
     @extend_schema_field(serializers.IntegerField)
     def get_product_count(self, obj) -> int:
@@ -45,6 +45,7 @@ class BrewerySerializer(serializers.ModelSerializer):
             "phone",
             "description",
             "image_url",
+            "homepage_url",
             "is_active",
             "drink_count",
             "product_count",

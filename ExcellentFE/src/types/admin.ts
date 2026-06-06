@@ -46,6 +46,7 @@ export interface AdminBreweryListItem {
   name: string
   region: string | null
   image_url: string | null
+  homepage_url: string | null
   product_count: number
 }
 
@@ -56,9 +57,11 @@ export interface AdminDrinkForPackage {
     id: number
     name: string
     region: string | null
+    homepage_url?: string | null
   }
   alcohol_type: string
   abv: number
+  food_pairing?: string
   main_image: string | null
   price: number | null
   is_tasting_available: boolean
@@ -114,6 +117,7 @@ export interface DrinkCreatePayload {
   alcohol_type: string
   abv: number
   volume_ml: number
+  food_pairing?: string
   sweetness_level: number
   acidity_level: number
   body_level: number

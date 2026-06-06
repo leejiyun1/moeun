@@ -24,20 +24,20 @@ const CardBase = ({
 
   return (
     <div className="mx-auto flex w-[220px] shrink-0 flex-col sm:w-[240px] md:w-full md:max-w-[260px] lg:max-w-[300px]">
-      <div className="relative mb-5 flex aspect-square max-h-[290px] w-full max-w-[300px] items-center justify-center overflow-hidden rounded-[6px] border border-[#D9D9D9] bg-gray-200">
+      <div className="relative mb-5 flex aspect-square w-full max-w-[300px] items-center justify-center overflow-hidden rounded-[6px] border border-[#D9D9D9] bg-gray-200">
         {detailPath ? (
           <Link to={detailPath} className="h-full w-full">
             <SafeImage
               src={imgSrc}
               alt={imgAlt}
-              className="h-full w-full object-contain p-3"
+              className="h-full w-full object-contain p-2"
             />
           </Link>
         ) : (
           <SafeImage
             src={imgSrc}
             alt={imgAlt}
-            className="h-full w-full object-contain p-3"
+            className="h-full w-full object-contain p-2"
           />
         )}
         <HeartButton

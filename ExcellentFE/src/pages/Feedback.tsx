@@ -21,8 +21,8 @@ export const Feedback = () => {
     <div>
       <BestReviewSection cards={mapToBestReviewCards(popular)} />
 
-      <div className="m-auto my-25 flex flex-col items-center gap-25">
-        <div className="m-auto my-25 flex flex-col items-center gap-25">
+      <div className="mx-auto my-16 flex w-full max-w-[1280px] flex-col items-center gap-16 px-5 sm:px-8 md:my-25 md:gap-25 lg:px-10 xl:px-0">
+        <div className="flex w-full flex-col items-center gap-16 md:gap-25">
           <ReviewSection
             title="실시간 후기"
             description="한잔 취향을 이용한 고객님들의 실시간 후기"

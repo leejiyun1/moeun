@@ -3,6 +3,7 @@ export interface BreweryInfo {
   id: number
   name: string
   region: string | null
+  homepage_url?: string | null
 }
 
 // 맛 프로파일 세부 점수
@@ -25,6 +26,7 @@ export interface DrinkInfo {
   alcohol_type_display: string
   abv: number
   volume_ml: number
+  food_pairing: string
   taste_profile: TasteProfile
   created_at: string
   updated_at: string
@@ -39,6 +41,7 @@ export interface PackageDetail {
     name: string
     abv: number
     volume_ml: number
+    food_pairing?: string
   }[]
 }
 

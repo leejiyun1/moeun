@@ -8,9 +8,13 @@ import svgr from 'vite-plugin-svgr'
 export default defineConfig({
   plugins: [react(), tailwindcss(), svgr()],
   server: {
-    allowedHosts: ['jiyun.dev'],
+    allowedHosts: true,
     proxy: {
       '/api': {
+        target: process.env.DEV_PROXY_TARGET ?? 'http://backend:8000',
+        changeOrigin: true,
+      },
+      '/media': {
         target: process.env.DEV_PROXY_TARGET ?? 'http://backend:8000',
         changeOrigin: true,
       },
